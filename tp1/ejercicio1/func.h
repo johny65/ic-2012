@@ -3,7 +3,17 @@
 #include <vector>
 using namespace std;
 
+/**
+	func.h maneja todas las funciones matematicas utilizadas por la clase Perceptron
+*/
+
+
 vector<double> init_weight(int nd){
+	/**
+		@brief rutina que inicializa el vector de pesos aletoriamente
+		@param nd es la longitud del vector a retornar.
+		@return vector de pesos inicializados al azar
+	*/
 	double w;
 	vector<double> pesos;
 	srand(time(NULL));
@@ -15,8 +25,12 @@ vector<double> init_weight(int nd){
 }
 
 vector<double> sum(vector<double> y,vector<double> x){
+	/**
+		@brief rutina que suma vectores componente a componente
+	*/
 	vector<double> r;
-	for(int i=0;i<y.size()-1;i++){
+	int n=y.size()-1;
+	for(int i=0;i<n;i++){
 		r.push_back(y[i]+x[i]);
 	}
 	r.push_back(y.back());
@@ -25,7 +39,8 @@ vector<double> sum(vector<double> y,vector<double> x){
 
 vector<double> dif(vector<double> y,vector<double> x){
 	vector<double> r;
-	for(int i=0;i<y.size()-1;i++){
+	int n=y.size()-1;
+	for(int i=0;i<n;i++){
 		r.push_back(y[i]-x[i]);
 	}
 	r.push_back(y.back());
@@ -34,7 +49,8 @@ vector<double> dif(vector<double> y,vector<double> x){
 
 vector<double> prod_escalar(vector<double> x,double nu){
 	vector<double> y;
-	for(int i=0;i<x.size();i++){
+	int n=x.size();
+	for(int i=0;i<n;i++){
 		y.push_back(nu*x[i]);
 	}
 	return y;
@@ -48,7 +64,8 @@ double dot(vector<double> &x, vector<double> &y){
 	}
 	double p=0;
 	//vector de pesos sin sesgo
-	for(int i=0;i<x.size();i++){
+	int n=x.size();
+	for(int i=0;i<n;i++){
 		p+=x[i]*y[i];
 	}
 	return p;

@@ -7,13 +7,20 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <cstring>
 using namespace std;
 
-
-
+/**
+	utils.h maneja todas las rutinas de entrada/salida de archivos
+*/
 
 
 vector< vector<double> > leer_csv(const char *archivo){
+	/**
+		@brief rutina para leer un archivo csv
+		@param archivo nombre del archivo que se va a leer.
+		@return matriz de datos leidos cuya ultima columna es el resultado esperado.
+	*/
 	vector< vector<double> > todo;
 	
 	vector<double> aux;
@@ -36,7 +43,59 @@ vector< vector<double> > leer_csv(const char *archivo){
 }
 
 
+void crear_csv(vector<vector<double> > &v, const char *name){
+	/**
+		@brief Recibe una matriz de datos y genera un archivo con extension .csv (en general se usa para realizar pruebas sobre datos nunca vistos)
+		@param v matriz de datos a grabar
+		@param name es el nombre del archivo a generar
+	*/
+
+	std::ostringstream ss;
+	ofstream out(name);
+	vector<vector<double> >::iterator q=v.begin();
+	while(q!=v.end()){
+		int n=(*q).size();
+		for(int i=0;i<n;i++){
+			if(i!=n-1) ss << ((*q)[i]) << ", ";
+			else ss << ((*q)[i]) << endl;
+		}
+		q++;
+		
+	}
+	out<<ss.str();
+	out.close();
+	
+}
+
 
 	
+
+int generar_resultados(vector<vector<double> > &entradas,vector<double> &salidas,const char *name){
+	/**
+		@brief Rutina que genera un archivo txt que contiene las entradas de los datos de prueba y la salida obtinada por el Perceptron
+		@param entradas matriz de datos de entradas(sin resultado esperado)
+		@param salidas vector de salida calculado por el Perceptron
+		@param name nombre del archivo .txt a generar
+	*/
+
+	std::ostringstream ss;
+	ofstream out(name);
+	vector<vector<double> >::iterator q=entradas.begin();
+	int c=0;
+	while(q!=entradas.end()){
+		int n=(*q).size();
+		for(int i=0;i<n;i++){
+			ss << ((*q)[i]) << ", ";
+		}
+		ss << salidas[c] << endl;
+		c++;
+		q++;
+		
+	}
+	out<<ss.str();
+	out.close();
+	return 1;
+}
+
 
 #endif

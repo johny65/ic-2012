@@ -5,6 +5,8 @@
 #include <fstream>
 #include "GNUplot.h"
 #include "func.h"
+#include "utils.h"
+
 using namespace std;
 
 
@@ -12,11 +14,26 @@ using namespace std;
 
 
 Perceptron::~Perceptron() {
+
 	
 }
 
 
-void Perceptron::entrenar(vector<vector<double> > &datos){
+void Perceptron::def_epocas (int g) {
+	/**
+		@brief define el numero max de iteraciones para entrenar el Perceptron
+		@param g numero maximo de epocas.
+	*/
+	epocas=g;
+	
+}
+
+void Perceptron::entrenar(const char *name){
+	/**
+	@brief rutina con la cual el Perceptron aprende a partir de datos
+	@param name nombre del archivo .csv a leer, el mismo contiene los datos de entrenamiento.
+	*/
+	vector<vector<double> > datos=leer_csv(name);
 	vector<vector<double> >::iterator q=datos.begin();
 	nd=(*q).size()-1; //numero de datos de entrada (el ultimo dato es la salida esperada)
 	
@@ -57,15 +74,33 @@ void Perceptron::entrenar(vector<vector<double> > &datos){
 	
 }
 
+void Perceptron::probar(const char *name){
+	salidas.clear();
+	vector<vector<double> > datos=leer_csv(name);
+	/**
+		@brief Rutina que a partir de los datos de prueba genera las salidas y grafica(idea falta implementar)
+		@param datos matriz de datos de prueba en este vector no existe salida esperada a diferencia de la rutina entrenar
+	*/
+	if(pesos.empty()) {cout<<"Primero debe entrenar el Perceptron"<<endl; return;}
+	vector<vector<double> >::iterator q=datos.begin();
+	
+	while(q!=datos.end()){
+		salidas.push_back(clasificar(*q));
+		q++;
+	}
+	
+	generar_resultados(datos,salidas,"resultadoprueba.txt");
+	
+}
 void Perceptron::result(){
 	vector<double>::iterator q=entradas.begin(), p=salidas.begin();
+	cout<<"entradas:        "<< " salidas "<<endl<<"---------------------"<<endl;
 	while(p!=salidas.end()){
-		cout<<"entradas:        ";
+		
 		while(q!=entradas.end()){
 			cout<<*q<<" ";
 			q++;
 		}
-		cout<<endl<<"salida "<<*p<<endl;
 		p++;
 	}
 	
@@ -86,6 +121,10 @@ void Perceptron::fijar_tasa(double m){
 }
 
 void Perceptron::sel_func(int x){
+	/**
+	@brief rutina que permite seleccionar la funcion del Perceptron
+	@param x es 1-funcion signo, 2-funcion sigmoide, 3-funcion gaussiana (esta es la idea->no esta implementado)
+	*/
 	if(x>=1 &&x<=3) func=x;
 }
 void Perceptron::graficar(){
@@ -102,9 +141,10 @@ void Perceptron::graficar(){
 	
 	plot("p \"data.txt\"");
 }
-void Perceptron::clasificar(vector<double> &D){
+
+int Perceptron::clasificar(vector<double> &D){
 	entradas=D;
-	D.push_back(-1);
-	salidas.push_back(signo(dot(D,pesos)));
+	entradas.push_back(-1);
+	return (signo(dot(entradas,pesos)));
 	
 }

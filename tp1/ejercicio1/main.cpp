@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "Perceptron.h"
-#include "utils.h"
 #include <iterator>
 
 
@@ -11,15 +10,39 @@
 
 using namespace std;
 
-int main (int argc, char *argv[]) {
-	vector<vector<double> > bd;
-	bd=leer_csv("datos.csv");
-	Perceptron C(0.005);
-	C.entrenar(bd);
-	vector<double> s; s.push_back(-0.95); s.push_back(0.8);
-	C.clasificar(s);
-	C.result();
+int sign(int x){
+	if(x>=0) return 1;
+	else return -1;
+}
 
+vector<vector<double> > generar_datprueba(double porc, int l){
+	/**
+		@brief genera una matriz con datos para realizar las pruebas (ejercicio 1: OR o XOR)
+		@param porc es el % de desvio de los datos
+		@param l cantidad de datos a generar
+	*/
+	vector<vector<double> > p;
+	vector<double> d;
+	double v;
+	srand(time(NULL));
+	for(int i=0;i<l;i++){
+		for(int j=0;j<2;j++){ //solo genero las entradas no las salidas esperadas
+			v=(((95+rand()%(6))/100.0)*sign(-10+rand()%(21)));
+			d.push_back(v);	
+		}
+		p.push_back(d);
+		d.clear();
+	}
+	
+	return p;
+	
+}
+
+int main (int argc, char *argv[]) {
+	Perceptron P(0.005);
+	P.entrenar("datos.csv");
+	P.probar("prueba.csv");
+	
 	return 0;
 }
 

@@ -6,24 +6,33 @@
 #include "GNUplot.h"
 
 
+
 using namespace std;
 
+
+
 class Perceptron {
+	/**
+	@brief Clase Perceptron Simple
+	*/
 private:
 	GNUplot plot;
 	int nd; //numero de datos
+	int epocas;
 	vector<double> pesos;
 	vector<double> entradas;
 	vector<double> salidas;
 	double mu; //tasa de aprendizaje
-	int func;
+	int func; 
 	
 public:
 	Perceptron(double t=0.05):mu(t){};
 	Perceptron();
 	~Perceptron();
-	void entrenar(vector<vector<double> > &datos);
-	void clasificar(vector<double> &datos);
+	void def_epocas(int g);
+	void entrenar(const char *name);
+	void probar(const char *name);
+	int clasificar(vector<double> &datos);
 	void sel_func(int x); //Selecciono la funcion 
 	void fijar_tasa(double m);
 	void result();
@@ -33,4 +42,5 @@ public:
 };
 
 #endif
+
 
