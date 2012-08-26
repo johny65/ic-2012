@@ -1,14 +1,13 @@
+#ifndef _GNUPLOT_HPP_
+#define _GNUPLOT_HPP_
 
-#include<cstdio>
-#include<cstdlib>
-#include<cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <string>
 #include <iostream>
 
 //#ifdef WITH_GNUPLOT
-
-#ifndef _GNUPLOT_HPP_
-#define _GNUPLOT_HPP_
 
 class GNUplot {
 public:

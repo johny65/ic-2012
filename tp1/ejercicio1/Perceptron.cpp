@@ -1,23 +1,16 @@
-#include "Perceptron.h"
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <fstream>
-#include "GNUplot.h"
-#include "func.h"
+#include "Perceptron.h"
 #include "utils.h"
+#include "func.h"
 
 using namespace std;
 
+Perceptron::Perceptron(double t=0.05) : mu(t), func(signo) {};
 
-
-
-
-Perceptron::~Perceptron() {
-
-	
-}
-
+Perceptron::~Perceptron() {}
 
 void Perceptron::def_epocas (int g) {
 	/**
@@ -46,10 +39,15 @@ void Perceptron::entrenar(const char *name){
 		//Calculo la sumatoria (pasar siempre en dot en segundo lugar los pesos)
 		cout<<endl<<"Pesos nuevos"<<endl; mostrar_pesos(); cout<<endl;
 		while(q!=datos.end()){
-			vector <double> d((*q).begin(),(*q).end()-1); d.push_back(-1); 
-			salidas.push_back(signo(dot(d,pesos)));
+			vector <double> d((*q).begin(),(*q).end()-1); d.push_back(-1);
+			
+			salidas.push_back(func(dot(d,pesos), 1.0)); //ver ese 1.0...
+			
 			if((*q)[nd]!=salidas.back()){ 
 				tol+=1; //cuenta la cantidad salidas fallidas (criterio de parada)
+
+				/* no entiendo este if... */
+				
 				if((*q)[nd]==1)  pesos=recalcular_pesos(pesos,2*mu,salidas.back(),(*q)[nd],d);
 				else pesos=recalcular_pesos(pesos,2*mu,salidas.back(),(*q)[nd],d);
 			}
@@ -117,7 +115,7 @@ void Perceptron::mostrar_pesos(){
 }
 
 void Perceptron::fijar_tasa(double m){
-	mu=m;
+	this->mu = m;
 }
 
 void Perceptron::sel_func(int x){
@@ -125,8 +123,13 @@ void Perceptron::sel_func(int x){
 	@brief rutina que permite seleccionar la funcion del Perceptron
 	@param x es 1-funcion signo, 2-funcion sigmoide, 3-funcion gaussiana (esta es la idea->no esta implementado)
 	*/
-	if(x>=1 &&x<=3) func=x;
+	if (x == 1)
+		this->func = signo;
+	else if (x == 2)
+		this->func = sigmoide;
+	
 }
+
 void Perceptron::graficar(){
 //	//archivo de salida de datos
 //	ofstream data("data.txt");

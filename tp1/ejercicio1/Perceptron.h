@@ -1,15 +1,10 @@
 #ifndef PERCEPTRON_H
 #define PERCEPTRON_H
 
-#include <valarray>
 #include <vector>
 #include "GNUplot.h"
 
-
-
 using namespace std;
-
-
 
 class Perceptron {
 	/**
@@ -23,10 +18,10 @@ private:
 	vector<double> entradas;
 	vector<double> salidas;
 	double mu; //tasa de aprendizaje
-	int func;
+	double (*func)(double, double);
 	
 public:
-	Perceptron(double t=0.05):mu(t){};
+	Perceptron(double);
 	Perceptron();
 	~Perceptron();
 	void def_epocas(int g);
@@ -42,5 +37,3 @@ public:
 };
 
 #endif
-
-

@@ -1,12 +1,8 @@
-#include<iostream>
+#include <iostream>
 #include <valarray>
 #include <vector>
-
-#include "Perceptron.h"
 #include <iterator>
-
-
-
+#include "Perceptron.h"
 
 using namespace std;
 
