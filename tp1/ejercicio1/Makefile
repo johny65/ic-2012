@@ -1,15 +1,15 @@
 GPP=g++
 GCC=gcc
-FLAGS=  -g2 -Wall -O0  -D_DEBUG 
+FLAGS= -g2 -Wall -O0  -D_DEBUG 
 LIBS=  
 OBJS=Debug/main.o Debug/Perceptron.o 
 
-all: Debug Debug/ejercicio1.bin
+all: Debug ejercicio1
 
 clean:
 	rm -rf ${OBJS} Debug/ejercicio1.bin
 
-Debug/ejercicio1.bin: ${OBJS}
+ejercicio1: ${OBJS}
 	${GPP} ${OBJS} ${LIBS} -o $@
 
 Debug:
@@ -21,3 +21,4 @@ Debug/main.o: main.cpp Perceptron.h GNUplot.h
 Debug/Perceptron.o: Perceptron.cpp Perceptron.h GNUplot.h func.h utils.h
 	${GPP} ${FLAGS} -c Perceptron.cpp -o $@
 
+.PHONY: all clean

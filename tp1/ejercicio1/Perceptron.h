@@ -23,7 +23,7 @@ private:
 	vector<double> entradas;
 	vector<double> salidas;
 	double mu; //tasa de aprendizaje
-	int func; 
+	int func;
 	
 public:
 	Perceptron(double t=0.05):mu(t){};
