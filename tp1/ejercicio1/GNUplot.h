@@ -25,7 +25,7 @@ public:
 	
 	void operator()(const std::string& command) {
 		fprintf(gnuplotpipe,"%s\n",command.c_str());
-		fflush(gnuplotpipe);	
+		fflush(gnuplotpipe);
 	}
 	
 protected:

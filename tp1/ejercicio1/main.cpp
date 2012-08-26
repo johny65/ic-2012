@@ -42,7 +42,8 @@ int main (int argc, char *argv[]) {
 	else
 		P.entrenar("datos.csv");
 	
-	P.probar("prueba.csv");
-	
+	//P.probar("prueba.csv");
+
+	cin.get();
 	return 0;
 }

@@ -8,6 +8,9 @@
 #include <fstream>
 #include <vector>
 #include <cstring>
+#include <sstream>
+#include "GNUplot.h"
+
 
 using namespace std;
 
@@ -16,11 +19,15 @@ using namespace std;
 */
 
 
-vector< vector<double> > leer_csv(const char *archivo){
+vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd){
 	/**
-		@brief rutina para leer un archivo csv
-		@param archivo nombre del archivo que se va a leer.
-		@return matriz de datos leidos cuya ultima columna es el resultado esperado.
+	 * @brief Rutina para leer un archivo csv.
+	 *
+	 * Lee todas las entradas más la salida deseada. La entrada del sesgo la agrega
+	 * al principio. Las salidas deseadas las mete en un vector aparte.
+	 *
+	 * @param archivo nombre del archivo que se va a leer.
+	 * @return matriz de datos leidos cuya ultima columna es el resultado esperado.
 	*/
 	vector< vector<double> > todo;
 	
@@ -29,12 +36,17 @@ vector< vector<double> > leer_csv(const char *archivo){
 	string linea, temp;
 	double val;
 	while (getline(in, linea)){
+		aux.push_back(-1);
 		stringstream ss(linea);
 		while(getline(ss, temp, ',')){
 			stringstream ss2(temp);
 			ss2>>val;
 			aux.push_back(val);
 		}
+		//pasar la salida deseada al vector de salidas deseadas:
+		sd.push_back(aux.back());
+		aux.erase(aux.end()-1);
+		
 		todo.push_back(aux);
 		aux.clear();
 	
@@ -56,8 +68,8 @@ void crear_csv(vector<vector<double> > &v, const char *name){
 	vector<vector<double> >::iterator q=v.begin();
 	while(q!=v.end()){
 		int n=(*q).size();
-		for(int i=0;i<n;i++){
-			if(i!=n-1) ss << ((*q)[i]) << ", ";
+		for(int i=1;i<n;i++){
+			if(i!=n-1) ss << ((*q)[i]) << " ";
 			else ss << ((*q)[i]) << endl;
 		}
 		q++;
