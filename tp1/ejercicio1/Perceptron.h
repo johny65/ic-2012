@@ -31,7 +31,7 @@ public:
 	void def_epocas(int g);
 	void entrenar(const char *name);
 	void probar(const char *name);
-	int clasificar(vector<double> &datos);
+	double clasificar(vector<double> &datos);
 	void sel_func(int x); //Selecciono la funcion 
 	void fijar_tasa(double m);
 	void result();

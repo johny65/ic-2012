@@ -151,23 +151,8 @@ void Perceptron::sel_func(int x){
 	
 }
 
-void Perceptron::graficar(){
-//	//archivo de salida de datos
-//	ofstream data("data.txt");
-//	
-//	//guardamos los datos de prueba
-//	vector<double> >::iterator q=entradas.begin();
-//	while(q!=entradas.end()){
-//		data<<(*q)[0]<<"\t"<<(*q)[1]<<endl;	
-//		q++;
-//	}
-//	data.flush();
-	
-	plotter("p \"data.txt\"");
-}
-
-int Perceptron::clasificar(vector<double> &D){
-	return (signo(dot(D,this->pesos)));
+double Perceptron::clasificar(vector<double> &D){
+	return func(dot(D, this->pesos), 1.0);
 }
 
 void Perceptron::armar_recta(vector<double> &pesos)
@@ -179,7 +164,7 @@ void Perceptron::armar_recta(vector<double> &pesos)
 	stringstream ss;
 	ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
 	plotter(ss.str());
-	ss.str(""); ss<<"replot \"plot.dat\"";
+	ss.str(""); ss<<"replot \"plot.dat\" lt 3";
 	plotter(ss.str());
 	sleep(0.5);
 }

@@ -1,0 +1,4 @@
+#Para que Mercurial ignore todos los .o
+
+syntax: glob
+*.o
