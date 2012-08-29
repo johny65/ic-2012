@@ -168,3 +168,6 @@ void Perceptron::armar_recta(vector<double> &pesos)
 	plotter(ss.str());
 	sleep(0.5);
 }
+void particionar(vector<vector<double> entradas,int cant, float porc){
+	
+}

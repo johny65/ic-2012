@@ -2,7 +2,7 @@
 <tagfile>
   <compound kind="file">
     <name>func.h</name>
-    <path>/home/andres/ic/tp1/ejercicio1/</path>
+    <path>/media/Facultad/Inteligencia Computacional/TPS/ic/tp1/ejercicio1/</path>
     <filename>func_8h</filename>
     <member kind="function">
       <type>vector&lt; double &gt;</type>
@@ -40,29 +40,43 @@
       <arglist>(vector&lt; double &gt; &amp;x, vector&lt; double &gt; &amp;y)</arglist>
     </member>
     <member kind="function">
-      <type>double</type>
-      <name>signo</name>
-      <anchorfile>func_8h.html</anchorfile>
-      <anchor>a63a3f287eec094d0d8269d763d8a29e1</anchor>
-      <arglist>(int valor)</arglist>
-    </member>
-    <member kind="function">
       <type>vector&lt; double &gt;</type>
       <name>recalcular_pesos</name>
       <anchorfile>func_8h.html</anchorfile>
       <anchor>a4be1c17c506100a53f2e52c190774853</anchor>
       <arglist>(vector&lt; double &gt; pv, double tasa, double s, double se, vector&lt; double &gt; datos)</arglist>
     </member>
+    <member kind="function">
+      <type>double</type>
+      <name>calc_error</name>
+      <anchorfile>func_8h.html</anchorfile>
+      <anchor>ad68ed751f5f6ffebb8354c05dc1bd2c5</anchor>
+      <arglist>(vector&lt; double &gt; &amp;x, vector&lt; double &gt; &amp;y)</arglist>
+    </member>
+    <member kind="function">
+      <type>double</type>
+      <name>signo</name>
+      <anchorfile>func_8h.html</anchorfile>
+      <anchor>aaccd35f0180617d9435aed7563934dab</anchor>
+      <arglist>(double valor, double a=1.0)</arglist>
+    </member>
+    <member kind="function">
+      <type>double</type>
+      <name>sigmoide</name>
+      <anchorfile>func_8h.html</anchorfile>
+      <anchor>a1d5bf741433c344e3c0b25c284de6fb1</anchor>
+      <arglist>(double valor, double a=1.0)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>GNUplot.h</name>
-    <path>/home/andres/ic/tp1/ejercicio1/</path>
+    <path>/media/Facultad/Inteligencia Computacional/TPS/ic/tp1/ejercicio1/</path>
     <filename>GNUplot_8h</filename>
     <class kind="class">GNUplot</class>
   </compound>
   <compound kind="file">
     <name>main.cpp</name>
-    <path>/home/andres/ic/tp1/ejercicio1/</path>
+    <path>/media/Facultad/Inteligencia Computacional/TPS/ic/tp1/ejercicio1/</path>
     <filename>main_8cpp</filename>
     <includes id="Perceptron_8h" name="Perceptron.h" local="yes" imported="no">Perceptron.h</includes>
     <member kind="function">
@@ -89,30 +103,37 @@
   </compound>
   <compound kind="file">
     <name>Perceptron.cpp</name>
-    <path>/home/andres/ic/tp1/ejercicio1/</path>
+    <path>/media/Facultad/Inteligencia Computacional/TPS/ic/tp1/ejercicio1/</path>
     <filename>Perceptron_8cpp</filename>
     <includes id="Perceptron_8h" name="Perceptron.h" local="yes" imported="no">Perceptron.h</includes>
-    <includes id="GNUplot_8h" name="GNUplot.h" local="yes" imported="no">GNUplot.h</includes>
-    <includes id="func_8h" name="func.h" local="yes" imported="no">func.h</includes>
     <includes id="utils_8h" name="utils.h" local="yes" imported="no">utils.h</includes>
+    <includes id="func_8h" name="func.h" local="yes" imported="no">func.h</includes>
+    <member kind="function">
+      <type>void</type>
+      <name>particionar</name>
+      <anchorfile>Perceptron_8cpp.html</anchorfile>
+      <anchor>aa533be52b391d646f0ef4eb8efbc5142</anchor>
+      <arglist>(int cant, float porc)</arglist>
+    </member>
   </compound>
   <compound kind="file">
     <name>Perceptron.h</name>
-    <path>/home/andres/ic/tp1/ejercicio1/</path>
+    <path>/media/Facultad/Inteligencia Computacional/TPS/ic/tp1/ejercicio1/</path>
     <filename>Perceptron_8h</filename>
     <includes id="GNUplot_8h" name="GNUplot.h" local="yes" imported="no">GNUplot.h</includes>
     <class kind="class">Perceptron</class>
   </compound>
   <compound kind="file">
     <name>utils.h</name>
-    <path>/home/andres/ic/tp1/ejercicio1/</path>
+    <path>/media/Facultad/Inteligencia Computacional/TPS/ic/tp1/ejercicio1/</path>
     <filename>utils_8h</filename>
+    <includes id="GNUplot_8h" name="GNUplot.h" local="yes" imported="no">GNUplot.h</includes>
     <member kind="function">
       <type>vector&lt; vector&lt; double &gt; &gt;</type>
       <name>leer_csv</name>
       <anchorfile>utils_8h.html</anchorfile>
-      <anchor>a1abe1999127b37bdf8a207749a486336</anchor>
-      <arglist>(const char *archivo)</arglist>
+      <anchor>a2d399755384cd96d7cab7c5ac2c6cd66</anchor>
+      <arglist>(const char *archivo, vector&lt; double &gt; &amp;sd)</arglist>
     </member>
     <member kind="function">
       <type>void</type>
@@ -168,8 +189,8 @@
       <type></type>
       <name>Perceptron</name>
       <anchorfile>classPerceptron.html</anchorfile>
-      <anchor>a8ed7e2440d119fcba987a5aa24309f67</anchor>
-      <arglist>(double t=0.05)</arglist>
+      <anchor>a1ccbe33e4e26ee0258e63ab01507498d</anchor>
+      <arglist>(double)</arglist>
     </member>
     <member kind="function">
       <type></type>
@@ -207,10 +228,10 @@
       <arglist>(const char *name)</arglist>
     </member>
     <member kind="function">
-      <type>int</type>
+      <type>double</type>
       <name>clasificar</name>
       <anchorfile>classPerceptron.html</anchorfile>
-      <anchor>aaaa0de8fac5aa03320af1093900aee57</anchor>
+      <anchor>a411b4f88cc845628eca838871c44791a</anchor>
       <arglist>(vector&lt; double &gt; &amp;datos)</arglist>
     </member>
     <member kind="function">
@@ -233,6 +254,13 @@
       <anchorfile>classPerceptron.html</anchorfile>
       <anchor>a8941a21b88515424a7dbd84c96cf9c6a</anchor>
       <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>particionar</name>
+      <anchorfile>classPerceptron.html</anchorfile>
+      <anchor>a3428383e94305e40bcc8442b9dd5ce2d</anchor>
+      <arglist>(int cant, float porc)</arglist>
     </member>
     <member kind="function">
       <type>void</type>

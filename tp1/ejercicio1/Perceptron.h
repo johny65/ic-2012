@@ -35,9 +35,12 @@ public:
 	void sel_func(int x); //Selecciono la funcion 
 	void fijar_tasa(double m);
 	void result();
+	void particionar(int cant, float porc);
 	void mostrar_pesos(); //muestra los pesos
 	void graficar();
 	
 };
 
 #endif
+
+

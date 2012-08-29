@@ -1,6 +1,19 @@
 import math
 import random
 
+def funcion(fila): #funcion logica que agrega la salida esperada para el ejercicio 2 (es a partir de la tabla del ejercicio)
+	fila_n=[]	
+	for i in fila:
+		if i>0: 
+			fila_n.append(1)
+		else:
+			fila_n.append(0);
+	d=(not(fila_n[0]) and (fila_n[2])) or (fila_n[0] and fila_n[1] and not(fila_n[2])) or (not(fila_n[0]) and not(fila_n[1]))
+	if d: return 1
+	else: return -1
+
+###-----------------------------------------------###
+
 def generar_datos(nombre,var, n):
 	tabla=[]	
 	f = open(str(nombre), "r")
@@ -30,10 +43,15 @@ def generar_datos(nombre,var, n):
 	print datos
 	f = open("salida.txt", 'w')
 	for i in datos:
+		sal_e=funcion(i)
 		for j in i:
-			f.write(str(j) + " ")
+			f.write(str(j) + ", ")
+		f.write(str(sal_e) + " ")
 		f.write('\n')
 	f.close()
+
+
+###------------------------------------------###
 
 
 generar_datos("entradas.txt", 0.05, 500)
