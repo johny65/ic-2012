@@ -160,7 +160,8 @@ void Perceptron::armar_recta(vector<double> &pesos)
 	double &w0 = pesos[0];
 	double &w1 = pesos[1];
 	double &w2 = pesos[2];
-	
+
+	///<\todo ver para que se pueda hacer zoom:
 	stringstream ss;
 	ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
 	plotter(ss.str());
