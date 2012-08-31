@@ -2,7 +2,6 @@
 
 from math import *
 import random
-import sys
 import argparse
 
 def generar_nuevo_punto(punto, var, deseada):
