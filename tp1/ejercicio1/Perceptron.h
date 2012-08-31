@@ -23,6 +23,7 @@ private:
 	int max_iter;
 	double tol; //tolerancia de corte
 	void armar_recta(vector<double>&);
+	void armar_plano(vector<double> &pesos);
 	
 public:
 	Perceptron(double);

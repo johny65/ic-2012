@@ -5,7 +5,9 @@
 #include "Perceptron.h"
 #include "utils.h"
 #include "func.h"
-
+#include "wait.h"
+#include "GNUplot.h"
+#include <sstream>
 using namespace std;
 
 Perceptron::Perceptron(double t=0.05) : eta(t), func(signo),
@@ -60,7 +62,8 @@ void Perceptron::entrenar(const char *name){
 			}
 			
 			mostrar_pesos();
-			armar_recta(this->pesos);		
+			//armar_recta(this->pesos);		
+			armar_plano(this->pesos);		
 			cout<<endl;
 			q++; i++;
 		}
@@ -161,14 +164,44 @@ void Perceptron::armar_recta(vector<double> &pesos)
 	double &w1 = pesos[1];
 	double &w2 = pesos[2];
 
-	///<\todo ver para que se pueda hacer zoom:
+	///<\Zoom con click del medio
 	stringstream ss;
+	ss<<"set xlabel \"eje X\" \n";
+	plotter(ss.str());
+	ss<<"set ylabel \"eje Y\" \n";
+	plotter(ss.str());
 	ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
 	plotter(ss.str());
 	ss.str(""); ss<<"replot \"plot.dat\" lt 3";
 	plotter(ss.str());
-	sleep(0.5);
+	//sleep(0.5);
+	wait(0.5);
 }
-void particionar(vector<vector<double> entradas,int cant, float porc){
+
+void Perceptron::armar_plano(vector<double> &pesos)
 	
+{
+	double &w0 = pesos[0];
+	double &w1 = pesos[1];
+	double &w2 = pesos[2];
+	double &w3 = pesos[3];
+	
+	///<\Zoom con click del medio
+	
+	stringstream ss;
+	ss<<"set xlabel \"eje X\" \n";
+	plotter(ss.str());
+	ss<<"set ylabel \"eje Y\" \n";
+	plotter(ss.str());
+	ss<<"set zlabel \"eje Z\" \n";
+	plotter(ss.str());
+	ss<<"splot [-2:2] [-2:2] [-2:2]"<<-1*(w2/w3)<<"*y + "<<-1*(w1/w3)<<"*x + "<<w0/w3;
+	plotter(ss.str());
+	ss.str(""); ss<<"replot \"plot3.dat\" lt 3";
+	plotter(ss.str());
+	//sleep(0.5);
+	wait(0.5);
 }
+/*void particionar(vector<vector<double> entradas,int cant, float porc){
+	
+}*/
