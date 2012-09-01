@@ -3,13 +3,12 @@
 #include <vector>
 #include <iterator>
 #include "Perceptron.h"
+//#include "func.h"
 
+#include <ctime>
 using namespace std;
 
-int sign(int x){
-	if(x>=0) return 1;
-	else return -1;
-}
+// Qué es esto? Lo usamos para algo??
 
 vector<vector<double> > generar_datprueba(double porc, int l){
 	/**
@@ -23,7 +22,7 @@ vector<vector<double> > generar_datprueba(double porc, int l){
 	srand(time(NULL));
 	for(int i=0;i<l;i++){
 		for(int j=0;j<2;j++){ //solo genero las entradas no las salidas esperadas
-			v=(((95+rand()%(6))/100.0)*sign(-10+rand()%(21)));
+	//		v=(((95+rand()%(6))/100.0)*signo(-10+rand()%(21)));
 			d.push_back(v);	
 		}
 		p.push_back(d);

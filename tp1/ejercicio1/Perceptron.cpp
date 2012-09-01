@@ -8,6 +8,7 @@
 #include "wait.h"
 #include "GNUplot.h"
 #include <sstream>
+#include <iomanip>
 using namespace std;
 
 Perceptron::Perceptron(double t=0.05) : eta(t), func(signo),
@@ -85,10 +86,10 @@ void Perceptron::entrenar(const char *name){
 	int g=0;
 	while(q!=datos.end()){
 		for (int i=0;i<(int)(*q).size();i++){
-			cout<<(*q)[i]<<"   ";
+			cout<<setw(5)<<(*q)[i];
 		}
-		cout<<" | "<<salidas_deseadas[g];
-		cout<<" | "<<salidas[g]<<endl;
+		cout<<"    |"<<setw(5)<<salidas_deseadas[g];
+		cout<<"    |"<<setw(5)<<salidas[g]<<endl;
 		g++;
 		q++;
 	}
