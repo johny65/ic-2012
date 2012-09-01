@@ -36,12 +36,13 @@ vector<vector<double> > generar_datprueba(double porc, int l){
 int main (int argc, char *argv[]) {
 	Perceptron P(0.005);
 	
-	if (argc == 2)
-		P.entrenar(argv[1]); //usa el primer parámetro como archivo de entrada
-	else
-		P.entrenar("datos.csv");
-	
+//	if (argc == 2)
+//		P.entrenar(argv[1]); //usa el primer parámetro como archivo de entrada
+//	else
+		P.entrenar("or.csv");
+//	
 	//P.probar("prueba.csv");
+	//P.val_cross();
 
 	cin.get();
 	return 0;

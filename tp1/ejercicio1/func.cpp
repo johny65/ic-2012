@@ -2,8 +2,8 @@
 #include <cmath>
 #include <ctime>
 #include <cstdlib>
-
 #include <iostream>
+
 using namespace std;
 
 vector<double> init_weight(int nd){
@@ -21,7 +21,7 @@ vector<double> init_weight(int nd){
 		pesos.push_back(w);
 	}
 	return pesos;
-};
+}
 
 vector<double> sum(vector<double> y,vector<double> x){
 	/**
@@ -33,7 +33,7 @@ vector<double> sum(vector<double> y,vector<double> x){
 		r.push_back(y[i]+x[i]);
 	}
 	return r;
-};
+}
 
 vector<double> dif(vector<double> y,vector<double> x){
 	vector<double> r;
@@ -42,7 +42,7 @@ vector<double> dif(vector<double> y,vector<double> x){
 		r.push_back(y[i]-x[i]);
 	}
 	return r;
-};
+}
 
 /**
  * Producto de un vector por un escalar (aunque el nombre no lo sugiera).
@@ -54,7 +54,7 @@ vector<double> prod_escalar(vector<double> x, double nu){
 		y.push_back(nu*x[i]);
 	}
 	return y;
-};
+}
 
 
 double dot(vector<double> &x, vector<double> &y){
@@ -69,7 +69,7 @@ double dot(vector<double> &x, vector<double> &y){
 		p+=x[i]*y[i];
 	}
 	return p;
-};
+}
 
 
 /**
@@ -86,9 +86,14 @@ vector<double> recalcular_pesos(vector<double> pv, double tasa,
 	vector<double> np; //nuevos pesos
 	np = sum(pv,prod_escalar(datos,tasa*(se-s)));
 	return np;
-};
+}
 
-
+double calc_error_x_epoca(double sal_d, double sal_o){
+	/** @param sal_d salida deseada
+	@param sal_o salida obtenida
+	*/
+	return abs(sal_d-sal_o);
+}
 double calc_error(vector<double> &x, vector<double> &y)
 {
 	double r = 0.0;
@@ -96,7 +101,7 @@ double calc_error(vector<double> &x, vector<double> &y)
 		r += (x[i] - y[i]) * (x[i] - y[i]);
 	}
 	return r / x.size();
-};
+}
 
 
 /* Funciones de activación: */
@@ -110,11 +115,10 @@ double signo(double valor, double a = 1.0)
 {
 	if(valor>=0) return 1;
 	else return -1;	
-};
+}
 
 double sigmoide(double valor, double a = 1.0)
 {
 	double res = (1.0 - exp(-a*valor)) / (1.0 + exp(-a*valor));
 	return res;
 }
-

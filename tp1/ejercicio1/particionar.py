@@ -11,8 +11,8 @@ def particionar(archivo, destino, prefijo, porc_entr, cant):
 	Crea 'cant' cantidad de particiones, y son guardadas en distintos archivos
 	dentro de la carpeta 'destino' con el siguiente formato:
 
-	'prefijo'{i}_e.csv para el conjunto de entrenamiento
-	'prefijo'{i}_p.csv para el conjunto de prueba
+	'prefijo'_e{i}.csv para el conjunto de entrenamiento
+	'prefijo'_p{i}.csv para el conjunto de prueba
 
 	donde {i} es el número de partición y 'prefijo' se puede configurar.
 	"""
@@ -32,10 +32,10 @@ def particionar(archivo, destino, prefijo, porc_entr, cant):
 		entrenamiento = datos[0:int(n*porc_entr)]
 		prueba = datos[len(entrenamiento):]
 		#guardar:
-		e = open("{}/{}{}_e.csv".format(destino, prefijo, i+1), 'w')
+		e = open("{}/{}_e{}.csv".format(destino, prefijo, i+1), 'w')
 		e.writelines(entrenamiento)
 		e.close()
-		p = open("{}/{}{}_p.csv".format(destino, prefijo, i+1), 'w')
+		p = open("{}/{}_p{}.csv".format(destino, prefijo, i+1), 'w')
 		p.writelines(prueba)
 		p.close()
 
@@ -49,10 +49,10 @@ def main():
 	#por defecto si no se pasan:
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-i", "--input", help="Archivo de entrada",
-						default="entrada.csv", dest="entrada")
+						default="salida.csv", dest="entrada")
 	
 	parser.add_argument("-o", "--output", help="Carpeta de salida (debe existir)",
-						default=".", dest="salida")
+						default="particiones", dest="salida")
 
 	parser.add_argument("-p", "--prefijo", help="Prefijo para los archivos de salida",
 						default="particion", dest="pre")

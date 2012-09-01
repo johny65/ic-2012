@@ -25,61 +25,70 @@ void Perceptron::def_epocas (int g) {
 	
 }
 
-void Perceptron::entrenar(const char *name){
+int Perceptron::entrenar(const char *name){
 	/**
 	@brief rutina con la cual el Perceptron aprende a partir de datos
 	@param name nombre del archivo .csv a leer, el mismo contiene los datos de entrenamiento.
 	*/
 	vector<vector<double> > datos=leer_csv(name, this->salidas_deseadas);
+	if(datos.empty()) {cout<<"no se pudo leer el archivo"<<endl;return -1;}
+	
 	vector<vector<double> >::iterator q=datos.begin();
 	nd=(*q).size(); //cantidad total de entradas (sesgo incluido)
-
+	
 	//archivo para gnuplot
 	crear_csv(datos, "plot.dat");
 	
 	
 	//inicializo el vector de pesos aletoriamente con valores entre [-0.5 0.5]
+	double error_e;
 	double tol;
 	int iteraciones = 0;
 	this->pesos=init_weight(nd);
 	while (iteraciones < this->max_iter){
 		salidas.clear();
 		int i = 0;
-		q=datos.begin(); tol=0;
+		q=datos.begin();
 		//Calculo la sumatoria (pasar siempre en dot en segundo lugar los pesos)
 		cout<<endl<<"Pesos nuevos"<<endl; mostrar_pesos(); cout<<endl;
-
+		error_e=0;
 		
 		while(q!=datos.end()){
-
+			
 			this->entradas = *q;
 			this->salidas.push_back(func(dot(this->entradas,pesos), 1.0)); //ver ese 1.0...
 			
-			if((*q)[nd]!=salidas.back()){ //salida deseada == salida obtenida?
+			if(this->salidas_deseadas[i]!=salidas.back()){ //salida deseada != salida obtenida?
 				tol+=1; //cuenta la cantidad salidas fallidas (criterio de parada)
 				pesos=recalcular_pesos(this->pesos, this->eta,
 					this->salidas.back(), this->salidas_deseadas[i], this->entradas);
 				
 			}
-			
+			error_e+=calc_error_x_epoca(this->salidas_deseadas[i],this->salidas.back());
 			mostrar_pesos();
-			//armar_recta(this->pesos);		
-			armar_plano(this->pesos);		
-			cout<<endl;
+			graficar(pesos);
+				cout<<endl;
 			q++; i++;
 		}
-
-		//calcular error:
+		
+		
+		
+		//calcular error por iteracion:
 		double err = calc_error(this->salidas_deseadas, this->salidas);
 		cout<<"Error: "<<err<<endl;
-
+		
 		if (err <= this->tol)
 			break;
 		
 		iteraciones++;
-		cout<<"IteraciÃ³n "<<iteraciones<<endl;
+		cout<<"Iteración "<<iteraciones<<endl;
 	}
-	cout<<"Se terminÃ³ de entrenar el perceptrÃ³n.\n";
+	this->error.push_back(error_e/datos.size()); //guardo el error
+	this->weight.push_back(pesos); //guardo los pesos 
+	
+	cout<<"Se terminó de entrenar el perceptrón.\n"<<"iteraciones "<<iteraciones<<" error "<<error.back()<<endl;
+	
+	graficar(this->pesos);
 	
 	//Muestro el resultado del entrenamiento
 	q=datos.begin();
@@ -93,8 +102,9 @@ void Perceptron::entrenar(const char *name){
 		g++;
 		q++;
 	}
+
 	salidas.clear(); //borro los datos de las salidas el Perceptron ya esta entrenado
-	
+	return 0;
 }
 
 void Perceptron::probar(const char *name){
@@ -159,48 +169,74 @@ double Perceptron::clasificar(vector<double> &D){
 	return func(dot(D, this->pesos), 1.0);
 }
 
-void Perceptron::armar_recta(vector<double> &pesos)
-{
-	double &w0 = pesos[0];
-	double &w1 = pesos[1];
-	double &w2 = pesos[2];
-
-	///<\Zoom con click del medio
-	stringstream ss;
-	ss<<"set xlabel \"eje X\" \n";
-	plotter(ss.str());
-	ss<<"set ylabel \"eje Y\" \n";
-	plotter(ss.str());
-	ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
-	ss<<", \"plot.dat\" lt 3";
-	plotter(ss.str());
-	//sleep(0.5);
-	wait(0.5);
+void Perceptron::graficar(vector<double> &pesos)
+	{
+		double &w0 = pesos[0];
+		double &w1 = pesos[1];
+		double &w2 = pesos[2];
+		
+		if(pesos.size()==3){
+			///<\Zoom con click del medio
+			stringstream ss;
+			ss<<"set xlabel \"eje X\" \n";
+			plotter(ss.str());
+			ss<<"set ylabel \"eje Y\" \n";
+			plotter(ss.str());
+			ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
+			ss<<", \"plot.dat\" lt 3";
+			plotter(ss.str());
+			//sleep(0.5);
+			wait(0.5);
+		}
+		
+		else{
+			double &w3 = pesos[3];
+			
+			///<\Zoom con click del medio
+			
+			stringstream ss;
+			ss<<"set xlabel \"eje X\" \n";
+			plotter(ss.str());
+			ss<<"set ylabel \"eje Y\" \n";
+			plotter(ss.str());
+			ss<<"set zlabel \"eje Z\" \n";
+			plotter(ss.str());
+			ss<<"splot [-2:2] [-2:2] [-2:2]"<<-1*(w2/w3)<<"*y + "<<-1*(w1/w3)<<"*x + "<<w0/w3;
+			plotter(ss.str());
+			ss<<", \"plot3.dat\" lt 3";
+			plotter(ss.str());
+			//sleep(0.5);
+			wait(0.5);
+		}
 }
+void Perceptron::val_cross(){
+	/**
+	@brief esta rutina entrena el Perceptron con varias particiones, calcula el error, y escoge el menor de ellos
+	
+	
+	*/
+	
+	vector<double> sal_esp;
+	stringstream name;
+	name<<"./particiones/particion_e1.csv";
+	int i=2;
+	while(entrenar((name.str()).c_str())==0){
+		name.str("");
+		name<<"./particiones/particion_e"<<i<<".csv";
+		i++;
+	}
+	
+	
+	//Buscar segun el minimo error y actualizar el vector de pesos
+	double menor=this->error[0];
+	int ind_m=0;
+	for (int i=1;i<this->error.size(); i++){
+		if(menor>this->error[i]){ menor=this->error[i]; ind_m=i;}
+	}
+	this->pesos.clear();
+	this->pesos=this->weight[ind_m];
 
-void Perceptron::armar_plano(vector<double> &pesos)
 	
-{
-	double &w0 = pesos[0];
-	double &w1 = pesos[1];
-	double &w2 = pesos[2];
-	double &w3 = pesos[3];
 	
-	///<\Zoom con click del medio
 	
-	stringstream ss;
-	ss<<"set xlabel \"eje X\" \n";
-	plotter(ss.str());
-	ss<<"set ylabel \"eje Y\" \n";
-	plotter(ss.str());
-	ss<<"set zlabel \"eje Z\" \n";
-	plotter(ss.str());
-	ss<<"splot [-2:2] [-2:2] [-2:2]"<<-1*(w2/w3)<<"*y + "<<-1*(w1/w3)<<"*x + "<<w0/w3;
-	ss<<", \"plot3.dat\" lt 3";
-	plotter(ss.str());
-	//sleep(0.5);
-	wait(0.5);
 }
-/*void particionar(vector<vector<double> entradas,int cant, float porc){
-	
-}*/

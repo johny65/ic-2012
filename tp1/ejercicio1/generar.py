@@ -18,8 +18,12 @@ def generar_nuevo_punto(punto, var, deseada):
 	xy = r*cos(tita1)
 	x = punto[0] + xy*cos(tita2)
 	y = punto[1] + xy*sin(tita2)
-	z = punto[2] + r*sin(tita1)
-	nuevo_punto = [x, y, z]
+	
+	if len(punto)>2:
+		z = punto[2] + r*sin(tita1)
+		nuevo_punto = [x, y, z]
+	else:
+		nuevo_punto = [x, y]
 	nuevo_punto.append(deseada)
 	return nuevo_punto
 
@@ -60,6 +64,8 @@ def generar_datos(nombre, var, n, salida):
 		datos.append(nuevo_punto)
 
 	#guardar archivo de salida:
+	random.shuffle(datos)	#antes de guadar mezclo aletoriamente la lista
+	
 	f = open(salida, 'w')
 	for d in datos:
 		for j in range(len(d)-1):
@@ -79,7 +85,7 @@ def main():
 	#por defecto si no se pasan:
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-i", "--input", help="Archivo de entrada",
-						default="entrada.csv", dest="entrada")
+						default="or.csv", dest="entrada")
 	
 	parser.add_argument("-o", "--output", help="Archivo de salida",
 						default="salida.csv", dest="salida")
