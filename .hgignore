@@ -2,3 +2,4 @@
 
 syntax: glob
 *.o
+tp1/ejercicio1/docs/*
