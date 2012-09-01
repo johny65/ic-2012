@@ -172,8 +172,7 @@ void Perceptron::armar_recta(vector<double> &pesos)
 	ss<<"set ylabel \"eje Y\" \n";
 	plotter(ss.str());
 	ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
-	plotter(ss.str());
-	ss.str(""); ss<<"replot \"plot.dat\" lt 3";
+	ss<<", \"plot.dat\" lt 3";
 	plotter(ss.str());
 	//sleep(0.5);
 	wait(0.5);
@@ -197,8 +196,7 @@ void Perceptron::armar_plano(vector<double> &pesos)
 	ss<<"set zlabel \"eje Z\" \n";
 	plotter(ss.str());
 	ss<<"splot [-2:2] [-2:2] [-2:2]"<<-1*(w2/w3)<<"*y + "<<-1*(w1/w3)<<"*x + "<<w0/w3;
-	plotter(ss.str());
-	ss.str(""); ss<<"replot \"plot3.dat\" lt 3";
+	ss<<", \"plot3.dat\" lt 3";
 	plotter(ss.str());
 	//sleep(0.5);
 	wait(0.5);
