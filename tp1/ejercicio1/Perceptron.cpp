@@ -2,34 +2,75 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 #include "Perceptron.h"
 #include "utils.h"
 #include "func.h"
 #include "wait.h"
 #include "GNUplot.h"
-#include <sstream>
-#include <iomanip>
+
 using namespace std;
 
-Perceptron::Perceptron(double t=0.05) : eta(t), func(signo),
-	max_iter(1000), tol(10e-3) {};
+/**
+ * @brief Constructor por defecto.
+ *
+ * El constructor por defecto fija los parámetros del perceptrón (tasa de
+ * aprendizaje, cantidad máxima de iteraciones, etc.) en valores predeterminados.
+ * Para configurar estos parámetros se deben usar las funciones específicas.
+ */
+Perceptron::Perceptron() : eta(0.05), max_iter(1000), func(signo),
+	tol(10e-3), tiempo_espera(0.5) {}
 
+
+/**
+ * @brief Destructor.
+ */
 Perceptron::~Perceptron() {}
 
-void Perceptron::def_epocas (int g) {
-	/**
-		@brief define el numero max de iteraciones para entrenar el Perceptron
-		@param g numero maximo de epocas.
-	*/
-	epocas=g;
-	
+
+/**
+ * @brief Define el número máximo de iteraciones para entrenar el Perceptron.
+ * @param m Cantidad máxima de iteraciones.
+ */
+void Perceptron::set_iteraciones_max(int m)
+{
+	this->max_iter = m;
 }
 
+
+/**
+ * @brief Define la tolerancia del error.
+ *
+ * A medida que va entrenando el perceptrón, se calcula una medida del error
+ * entre su salida y las salidas deseadas. Cuando este error sea menor que esta
+ * tolerancia, el entrenamiento se detiene.
+ *
+ * @param t Nueva tolerancia.
+ */
+void Perceptron::set_tolerancia(double t)
+{
+	this->tol = t;
+}
+
+
+/**
+ * @brief Establece el tiempo de espera entre frames para la animación, es
+ * decir el tiempo que hay que esperar para dibujar otra vez.
+ * @param t Tiempo de espera.
+ */
+void Perceptron::set_tiempo_espera(double t)
+{
+	this->tiempo_espera = t;
+}
+
+
+/**
+	@brief Rutina con la cual el Perceptron aprende a partir de datos.
+	@param name Nombre del archivo .csv a leer, el mismo contiene los datos de entrenamiento.
+*/
 int Perceptron::entrenar(const char *name){
-	/**
-	@brief rutina con la cual el Perceptron aprende a partir de datos
-	@param name nombre del archivo .csv a leer, el mismo contiene los datos de entrenamiento.
-	*/
+	
 	vector<vector<double> > datos=leer_csv(name, this->salidas_deseadas);
 	if(datos.empty()) {cout<<"no se pudo leer el archivo"<<endl;return -1;}
 	
@@ -66,7 +107,7 @@ int Perceptron::entrenar(const char *name){
 			}
 			error_e+=calc_error_x_epoca(this->salidas_deseadas[i],this->salidas.back());
 			mostrar_pesos();
-			graficar(pesos);
+			graficar();
 				cout<<endl;
 			q++; i++;
 		}
@@ -88,7 +129,7 @@ int Perceptron::entrenar(const char *name){
 	
 	cout<<"Se terminó de entrenar el perceptrón.\n"<<"iteraciones "<<iteraciones<<" error "<<error.back()<<endl;
 	
-	graficar(this->pesos);
+	graficar();
 	
 	//Muestro el resultado del entrenamiento
 	q=datos.begin();
@@ -149,9 +190,16 @@ void Perceptron::mostrar_pesos(){
 	cout<<endl;
 }
 
-void Perceptron::fijar_tasa(double n){
+
+/**
+ * @brief Fija la tasa de aprendizaje para el Perceptron.
+ * @param n Tasa de aprendizaje nueva.
+ */
+void Perceptron::fijar_tasa(double n)
+{
 	this->eta = n;
 }
+
 
 void Perceptron::sel_func(int x){
 	/**
@@ -169,46 +217,59 @@ double Perceptron::clasificar(vector<double> &D){
 	return func(dot(D, this->pesos), 1.0);
 }
 
-void Perceptron::graficar(vector<double> &pesos)
-	{
-		double &w0 = pesos[0];
-		double &w1 = pesos[1];
-		double &w2 = pesos[2];
+/**
+ * @brief Función para graficar.
+ *
+ * Esta función grafica, en el caso de entradas en 2 dimensiones, un plano y la
+ * recta que van formando los pesos del perceptrón. En el caso de entradas con
+ * 3 dimensiones, dibuja el plano que van formando los pesos del perceptrón.
+ * Además también dibuja los puntos de las entradas.
+ * 
+ */
+void Perceptron::graficar()
+{
+	double &w0 = pesos[0];
+	double &w1 = pesos[1];
+	double &w2 = pesos[2];
+
+	///\todo hacer que dibuje los puntos de cada clase de distintos colores
+	
+	//Zoom con click del medio!
+	
+	if(pesos.size()==3){
+		stringstream ss;
+		ss<<"set xlabel \"eje X\" \n";
+		plotter(ss.str());
+		ss<<"set ylabel \"eje Y\" \n";
+		plotter(ss.str());
+		ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
+		ss<<", \"plot.dat\" lt 3";
+		plotter(ss.str());
+		//sleep(0.5);
+		wait(this->tiempo_espera);
+	}
+	
+	else {
+
+		double &w3 = pesos[3];
 		
-		if(pesos.size()==3){
-			///<\Zoom con click del medio
-			stringstream ss;
-			ss<<"set xlabel \"eje X\" \n";
-			plotter(ss.str());
-			ss<<"set ylabel \"eje Y\" \n";
-			plotter(ss.str());
-			ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
-			ss<<", \"plot.dat\" lt 3";
-			plotter(ss.str());
-			//sleep(0.5);
-			wait(0.5);
-		}
-		
-		else{
-			double &w3 = pesos[3];
-			
-			///<\Zoom con click del medio
-			
-			stringstream ss;
-			ss<<"set xlabel \"eje X\" \n";
-			plotter(ss.str());
-			ss<<"set ylabel \"eje Y\" \n";
-			plotter(ss.str());
-			ss<<"set zlabel \"eje Z\" \n";
-			plotter(ss.str());
-			ss<<"splot [-2:2] [-2:2] [-2:2]"<<-1*(w2/w3)<<"*y + "<<-1*(w1/w3)<<"*x + "<<w0/w3;
-			plotter(ss.str());
-			ss<<", \"plot3.dat\" lt 3";
-			plotter(ss.str());
-			//sleep(0.5);
-			wait(0.5);
-		}
+		stringstream ss;
+		ss<<"set xlabel \"eje X\" \n";
+		plotter(ss.str());
+		ss<<"set ylabel \"eje Y\" \n";
+		plotter(ss.str());
+		ss<<"set zlabel \"eje Z\" \n";
+		plotter(ss.str());
+		ss<<"splot [-2:2] [-2:2] [-2:2]"<<-1*(w2/w3)<<"*y + "<<-1*(w1/w3)<<"*x + "<<w0/w3;
+		plotter(ss.str());
+		ss<<", \"plot3.dat\" lt 3";
+		plotter(ss.str());
+		//sleep(0.5);
+		wait(this->tiempo_espera);
+	}
 }
+
+
 void Perceptron::val_cross(){
 	/**
 	@brief esta rutina entrena el Perceptron con varias particiones, calcula el error, y escoge el menor de ellos

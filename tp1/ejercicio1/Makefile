@@ -4,16 +4,16 @@ FLAGS=  -g2 -Wall -O0  -D_DEBUG
 LIBS=  
 OBJS=Debug/main.o Debug/Perceptron.o Debug/func.o Debug/utils.o 
 
-all: Debug Debug/ejercicio1.bin
+all: Debug bin/ejercicio1
 
 clean:
 	rm -rf ${OBJS} Debug/ejercicio1.bin
 
-Debug/ejercicio1.bin: ${OBJS}
+bin/ejercicio1: ${OBJS}
 	${GPP} ${OBJS} ${LIBS} -o $@
 
 Debug:
-	mkdir Debug
+	mkdir Debug bin
 
 Debug/main.o: main.cpp Perceptron.h GNUplot.h
 	${GPP} ${FLAGS} -c main.cpp -o $@

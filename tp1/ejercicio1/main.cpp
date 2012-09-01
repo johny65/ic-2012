@@ -8,7 +8,7 @@
 #include <ctime>
 using namespace std;
 
-// Qu� es esto? Lo usamos para algo??
+// Qué es esto? Lo usamos para algo??
 
 vector<vector<double> > generar_datprueba(double porc, int l){
 	/**
@@ -34,12 +34,12 @@ vector<vector<double> > generar_datprueba(double porc, int l){
 }
 
 int main (int argc, char *argv[]) {
-	Perceptron P(0.005);
+	Perceptron P;
 	
 //	if (argc == 2)
 //		P.entrenar(argv[1]); //usa el primer parámetro como archivo de entrada
 //	else
-		P.entrenar("or.csv");
+		P.entrenar("tabla_XOR.csv");
 //	
 	//P.probar("prueba.csv");
 	//P.val_cross();

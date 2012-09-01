@@ -10,16 +10,18 @@
 
 using namespace std;
 
-vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd){
-	/**
-	 * @brief Rutina para leer un archivo csv.
-	 *
-	 * Lee todas las entradas más la salida deseada. La entrada del sesgo la agrega
-	 * al principio. Las salidas deseadas las mete en un vector aparte.
-	 *
-	 * @param archivo nombre del archivo que se va a leer.
-	 * @return matriz de datos leidos cuya ultima columna es el resultado esperado.
-	*/
+/**
+ * @brief Rutina para leer un archivo csv.
+ *
+ * Lee todas las entradas más la salida deseada. La entrada del sesgo la agrega
+ * al principio. Las salidas deseadas las mete en un vector aparte.
+ *
+ * @param archivo Nombre del archivo que se va a leer.
+ * @param sd Vector donde se guardarán las salidas deseadas.
+ * @return Matriz de datos leídos, cada fila corresponde a un patrón de entrada.
+*/
+vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
+{
 	vector< vector<double> > todo;
 	
 	vector<double> aux;
@@ -40,8 +42,6 @@ vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd){
 		
 		todo.push_back(aux);
 		aux.clear();
-	
-
 	}
 	return todo;
 }
