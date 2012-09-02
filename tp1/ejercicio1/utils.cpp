@@ -13,6 +13,7 @@ using namespace std;
 vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
 {
 	vector< vector<double> > todo;
+	sd.clear();
 	
 	vector<double> aux;
 	ifstream in(archivo);

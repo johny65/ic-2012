@@ -20,7 +20,10 @@ using namespace std;
  * Para configurar estos parámetros se deben usar las funciones específicas.
  */
 Perceptron::Perceptron() : eta(0.05), max_iter(1000), func(signo),
-	tol(10e-3), graficos(true), couts(true), tiempo_espera(500) {}
+	tol(10e-3), graficos(true), couts(true), tiempo_espera(500) {
+
+	srand(time(NULL));
+}
 
 
 /**
@@ -89,7 +92,7 @@ void Perceptron::set_salidas(bool s)
  * @brief Rutina con la cual el Perceptron aprende a partir de datos.
  * @param name Nombre del archivo .csv a leer, el mismo contiene los datos de
  * entrenamiento.
- * @return (Andrés poné qué devuelve, antes era void)
+ * @return -1 si no pudo leer el archivo, 0 si tuvo éxito.
  */
 int Perceptron::entrenar(const char *name)
 {
@@ -138,22 +141,22 @@ int Perceptron::entrenar(const char *name)
 		
 		//calcular error por iteracion:
 		double err = calc_error(this->salidas_deseadas, this->salidas);
-		cout<<"Error: "<<err<<endl;
-		
 		iteraciones++;
-		cout<<"Iteración "<<iteraciones<<endl;
+
+		if (this->couts){
+			cout<<"Error: "<<err<<endl;
+			cout<<"Iteración "<<iteraciones<<endl;
+		}
 		
 		if (err <= this->tol)
 			break;
 	}
 	
-	this->error.push_back(error_e/datos.size()); //guardo el error
+	this->error.push_back(error_e/datos.size()); //guardo el error (error del entrenamiento)
 	this->weight.push_back(pesos); //guardo los pesos 
 	
 	cout<<"Se terminó de entrenar el perceptrón.\n"<<"iteraciones "<<iteraciones<<" error "<<error.back()<<endl;
-	
-	if (this->graficos)
-		graficar();
+	graficar(); //resultado final siempre se muestra
 	
 	//Muestro el resultado del entrenamiento
 	if (this->couts){
@@ -174,40 +177,31 @@ int Perceptron::entrenar(const char *name)
 	return 0;
 }
 
-void Perceptron::probar(const char *name){
-	
-	/**
-		@brief Rutina que a partir de los datos de prueba genera las salidas y grafica(idea falta implementar)
-		@param datos matriz de datos de prueba en este vector no existe salida esperada a diferencia de la rutina entrenar
-	*/
-	vector<vector<double> > datos = leer_csv(name, this->salidas_deseadas);
+
+/**
+ * @brief Rutina que a partir de los datos de prueba genera las salidas y grafica(idea falta implementar)
+ * @param datos matriz de datos de prueba en este vector no existe salida esperada a diferencia de la rutina entrenar
+ */
+void Perceptron::probar(const char *name)
+{
+	vector< vector<double> > datos = leer_csv(name, this->salidas_deseadas);
 	if(pesos.empty()) {cout<<"Primero debe entrenar el Perceptron"<<endl; return;}
 	vector< vector<double> >::iterator q=datos.begin();
+
+	double error_e = 0.0;
+	int i=0;
 	
 	while(q!=datos.end()){
-		salidas.push_back(clasificar(*q));
-		q++;
+		this->salidas.push_back(clasificar(*q));
+		error_e += calc_error_x_epoca(this->salidas_deseadas[i],this->salidas.back());
+		q++; i++;
 	}
-	
-	generar_resultados(datos,salidas,"resultadoprueba.txt");
-	
-}
 
-//para qué es esta función? no se usa nunca
-/*
-void Perceptron::result(){
-	vector<double>::iterator q=entradas.begin(), p=salidas.begin();
-	cout<<"entradas:        "<< " salidas "<<endl<<"---------------------"<<endl;
-	while(p!=salidas.end()){
-		
-		while(q!=entradas.end()){
-			cout<<*q<<" ";
-			q++;
-		}
-		p++;
-	}
+	this->error.push_back(error_e); //guardo el error
+
+	cout<<"Error de la prueba: "<<error_e<<endl;
+
 }
-*/
 
 
 /**
@@ -267,7 +261,7 @@ double Perceptron::clasificar(const vector<double> &D){
  * Además también dibuja los puntos de las entradas.
  * 
  */
-void Perceptron::graficar()
+void Perceptron::graficar(const char *titulo)
 {
 	double &w0 = pesos[0];
 	double &w1 = pesos[1];
@@ -279,7 +273,7 @@ void Perceptron::graficar()
 		///<\todo acá no hace zoom ni con el click del medio!
 		stringstream ss;
 		ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
-		ss<<", \"plot.dat\" lt 3";
+		ss<<", \"plot.dat\" lt 3; set title \""<<titulo<<"\"";
 		plotter(ss.str());
 		wait(this->tiempo_espera);
 		//sleep(this->tiempo_espera);
@@ -290,14 +284,19 @@ void Perceptron::graficar()
 		double &w3 = pesos[3];
 		stringstream ss;
 		ss<<"splot [-2:2] [-2:2] [-2:2]"<<-1*(w2/w3)<<"*y + "<<-1*(w1/w3)<<"*x + "<<w0/w3;
-		ss<<", \"plot.dat\" lt 3";
+		ss<<", \"plot.dat\" lt 3; set title \""<<titulo<<"\"";
 		plotter(ss.str());
 		wait(this->tiempo_espera);
 	}
 }
 
+void Perceptron::graficar()
+{
+	graficar("");
+}
 
-void Perceptron::val_cross(){
+
+void Perceptron::val_cross(const char *ruta){
 	/**
 	@brief esta rutina entrena el Perceptron con varias particiones, calcula el error, y escoge el menor de ellos
 	
@@ -305,12 +304,17 @@ void Perceptron::val_cross(){
 	*/
 	
 	vector<double> sal_esp;
-	stringstream name;
-	name<<"./particiones/particion_e1.csv";
+	stringstream name_e, name_p;
+	name_e<<ruta<<"_e1.csv";
+	name_p<<ruta<<"_p1.csv";
 	int i=2;
-	while(entrenar((name.str()).c_str())==0){
-		name.str("");
-		name<<"./particiones/particion_e"<<i<<".csv";
+	while(entrenar((name_e.str()).c_str())==0){
+		probar(name_p.str().c_str());
+		cout<<"Terminó partición "<<i-1<<".\n";
+		name_e.str("");
+		name_e<<ruta<<"_e"<<i<<".csv";
+		name_p.str("");
+		name_p<<ruta<<"_p"<<i<<".csv";
 		i++;
 	}
 	
@@ -318,13 +322,22 @@ void Perceptron::val_cross(){
 	//Buscar segun el minimo error y actualizar el vector de pesos
 	double menor=this->error[0];
 	int ind_m=0;
-	for (int i=1;i<this->error.size(); i++){
+	for (size_t i=1;i<this->error.size(); i++){
 		if(menor>this->error[i]){ menor=this->error[i]; ind_m=i;}
 	}
 	this->pesos.clear();
-	this->pesos=this->weight[ind_m];
+	this->pesos = this->weight[ind_m];
+	graficar("Pesos ganadores");
+	
 
-	
-	
+
+	//promedio:
+	double sum = 0.0;
+	for (size_t i=0; i<this->error.size(); ++i){
+		sum += this->error[i];
+	}
+	sum /= this->error.size();
+
+	cout<<"Error de la validación cruzada: "<<sum<<endl;
 	
 }

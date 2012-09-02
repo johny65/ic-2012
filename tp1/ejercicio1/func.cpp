@@ -10,9 +10,9 @@ vector<double> init_weight(int nd)
 {
 	double w;
 	vector<double> pesos;
-	srand(time(NULL));
 	for(int i=0; i<nd; ++i){ //hasta nd xq el sesgo tambien tiene peso aletorio
 		w=(rand()*1.0/RAND_MAX) - 0.5;
+		//w = (rand()%1000) / 1000.0 - 0.5;
 		pesos.push_back(w);
 	}
 	return pesos;

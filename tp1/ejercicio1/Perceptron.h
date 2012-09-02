@@ -26,6 +26,7 @@ private:
 
 	GNUplot plotter; ///< Conexión con GNUplot
 	double tiempo_espera; ///< Tiempo entre frames para la animación
+	void graficar(const char *titulo);
 	void graficar();
 	
 public:
@@ -41,7 +42,7 @@ public:
 	void probar(const char *name);
 	double clasificar(const vector<double> &D);
 	void sel_func(int x); //Selecciono la funcion 
-	void val_cross();
+	void val_cross(const char *ruta);
 	void result();
 	void mostrar_pesos(); //muestra los pesos
 
