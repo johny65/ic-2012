@@ -15,12 +15,12 @@ using namespace std;
 /**
  * @brief Constructor por defecto.
  *
- * El constructor por defecto fija los par·metros del perceptrÛn (tasa de
- * aprendizaje, cantidad m·xima de iteraciones, etc.) en valores predeterminados.
- * Para configurar estos par·metros se deben usar las funciones especÌficas.
+ * El constructor por defecto fija los par√°metros del perceptr√≥n (tasa de
+ * aprendizaje, cantidad m√°xima de iteraciones, etc.) en valores predeterminados.
+ * Para configurar estos par√°metros se deben usar las funciones espec√≠ficas.
  */
 Perceptron::Perceptron() : eta(0.05), max_iter(1000), func(signo),
-	tol(10e-3), tiempo_espera(0.5) {}
+	tol(10e-3), graficos(true), tiempo_espera(500) {}
 
 
 /**
@@ -30,8 +30,8 @@ Perceptron::~Perceptron() {}
 
 
 /**
- * @brief Define el n˙mero m·ximo de iteraciones para entrenar el Perceptron.
- * @param m Cantidad m·xima de iteraciones.
+ * @brief Define el n√∫mero m√°ximo de iteraciones para entrenar el Perceptron.
+ * @param m Cantidad m√°xima de iteraciones.
  */
 void Perceptron::set_iteraciones_max(int m)
 {
@@ -42,7 +42,7 @@ void Perceptron::set_iteraciones_max(int m)
 /**
  * @brief Define la tolerancia del error.
  *
- * A medida que va entrenando el perceptrÛn, se calcula una medida del error
+ * A medida que va entrenando el perceptr√≥n, se calcula una medida del error
  * entre su salida y las salidas deseadas. Cuando este error sea menor que esta
  * tolerancia, el entrenamiento se detiene.
  *
@@ -55,7 +55,7 @@ void Perceptron::set_tolerancia(double t)
 
 
 /**
- * @brief Establece el tiempo de espera entre frames para la animaciÛn, es
+ * @brief Establece el tiempo de espera entre frames para la animaci√≥n, es
  * decir el tiempo que hay que esperar para dibujar otra vez.
  * @param t Tiempo de espera.
  */
@@ -66,53 +66,63 @@ void Perceptron::set_tiempo_espera(double t)
 
 
 /**
-	@brief Rutina con la cual el Perceptron aprende a partir de datos.
-	@param name Nombre del archivo .csv a leer, el mismo contiene los datos de entrenamiento.
-*/
-int Perceptron::entrenar(const char *name){
+ * @brief Establece si se deben mostrar los gr√°ficos o no.
+ * @param g true si se muestran gr√°ficos, false si no.
+ */
+void Perceptron::set_graficos(bool g)
+{
+	this->graficos = g;
+}
+
+
+/**
+ * @brief Rutina con la cual el Perceptron aprende a partir de datos.
+ * @param name Nombre del archivo .csv a leer, el mismo contiene los datos de
+ * entrenamiento.
+ * @return (Andr√©s pon√© qu√© devuelve, antes era void)
+ */
+int Perceptron::entrenar(const char *name)
+{
 	
-	vector<vector<double> > datos=leer_csv(name, this->salidas_deseadas);
-	if(datos.empty()) {cout<<"no se pudo leer el archivo"<<endl;return -1;}
+	vector< vector<double> > datos=leer_csv(name, this->salidas_deseadas);
+	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo"<<endl;return -1;}
+	vector<double> entradas;
 	
-	vector<vector<double> >::iterator q=datos.begin();
-	nd=(*q).size(); //cantidad total de entradas (sesgo incluido)
+	vector< vector<double> >::iterator q=datos.begin();
+	this->nd=(*q).size(); //cantidad total de entradas (sesgo incluido)
 	
 	//archivo para gnuplot
-	crear_csv(datos, "plot.dat");
-	
+	crear_dat(datos, "plot.dat");
 	
 	//inicializo el vector de pesos aletoriamente con valores entre [-0.5 0.5]
+	this->pesos = init_weight(nd);
+	
 	double error_e;
-	double tol;
 	int iteraciones = 0;
-	this->pesos=init_weight(nd);
 	while (iteraciones < this->max_iter){
 		salidas.clear();
 		int i = 0;
 		q=datos.begin();
-		//Calculo la sumatoria (pasar siempre en dot en segundo lugar los pesos)
-		cout<<endl<<"Pesos nuevos"<<endl; mostrar_pesos(); cout<<endl;
+		//cout<<endl<<"Pesos nuevos"<<endl; mostrar_pesos(); cout<<endl;
 		error_e=0;
 		
 		while(q!=datos.end()){
 			
-			this->entradas = *q;
-			this->salidas.push_back(func(dot(this->entradas,pesos), 1.0)); //ver ese 1.0...
+			entradas = *q;
+			this->salidas.push_back(clasificar(entradas));
 			
-			if(this->salidas_deseadas[i]!=salidas.back()){ //salida deseada != salida obtenida?
-				tol+=1; //cuenta la cantidad salidas fallidas (criterio de parada)
+			if(this->salidas_deseadas[i] != salidas.back()){ //salida deseada != salida obtenida?
 				pesos=recalcular_pesos(this->pesos, this->eta,
-					this->salidas.back(), this->salidas_deseadas[i], this->entradas);
-				
+					this->salidas.back(), this->salidas_deseadas[i], entradas);				
 			}
 			error_e+=calc_error_x_epoca(this->salidas_deseadas[i],this->salidas.back());
-			mostrar_pesos();
-			graficar();
-				cout<<endl;
+			//mostrar_pesos();
+			if (this->graficos)
+				graficar();
+			//cout<<endl;
+			
 			q++; i++;
 		}
-		
-		
 		
 		//calcular error por iteracion:
 		double err = calc_error(this->salidas_deseadas, this->salidas);
@@ -122,24 +132,26 @@ int Perceptron::entrenar(const char *name){
 			break;
 		
 		iteraciones++;
-		cout<<"IteraciÛn "<<iteraciones<<endl;
+		cout<<"Iteraci√≥n "<<iteraciones<<endl;
 	}
+	
 	this->error.push_back(error_e/datos.size()); //guardo el error
 	this->weight.push_back(pesos); //guardo los pesos 
 	
-	cout<<"Se terminÛ de entrenar el perceptrÛn.\n"<<"iteraciones "<<iteraciones<<" error "<<error.back()<<endl;
+	cout<<"Se termin√≥ de entrenar el perceptr√≥n.\n"<<"iteraciones "<<iteraciones<<" error "<<error.back()<<endl;
 	
-	graficar();
+	if (this->graficos)
+		graficar();
 	
 	//Muestro el resultado del entrenamiento
 	q=datos.begin();
 	int g=0;
 	while(q!=datos.end()){
 		for (int i=0;i<(int)(*q).size();i++){
-			cout<<setw(5)<<(*q)[i];
+			cout<<setw(8)<<setprecision(3)<<(*q)[i];
 		}
-		cout<<"    |"<<setw(5)<<salidas_deseadas[g];
-		cout<<"    |"<<setw(5)<<salidas[g]<<endl;
+		cout<<"    |"<<setw(5)<<setprecision(3)<<salidas_deseadas[g];
+		cout<<"    |"<<setw(5)<<setprecision(3)<<salidas[g]<<endl;
 		g++;
 		q++;
 	}
@@ -150,11 +162,11 @@ int Perceptron::entrenar(const char *name){
 
 void Perceptron::probar(const char *name){
 	
-	vector<vector<double> > datos = leer_csv(name, this->salidas_deseadas);
 	/**
 		@brief Rutina que a partir de los datos de prueba genera las salidas y grafica(idea falta implementar)
 		@param datos matriz de datos de prueba en este vector no existe salida esperada a diferencia de la rutina entrenar
 	*/
+	vector<vector<double> > datos = leer_csv(name, this->salidas_deseadas);
 	if(pesos.empty()) {cout<<"Primero debe entrenar el Perceptron"<<endl; return;}
 	vector< vector<double> >::iterator q=datos.begin();
 	
@@ -166,6 +178,9 @@ void Perceptron::probar(const char *name){
 	generar_resultados(datos,salidas,"resultadoprueba.txt");
 	
 }
+
+//para qu√© es esta funci√≥n? no se usa nunca
+/*
 void Perceptron::result(){
 	vector<double>::iterator q=entradas.begin(), p=salidas.begin();
 	cout<<"entradas:        "<< " salidas "<<endl<<"---------------------"<<endl;
@@ -177,12 +192,15 @@ void Perceptron::result(){
 		}
 		p++;
 	}
-	
 }
+*/
 
 
+/**
+ * @brief Funci√≥n para mostrar los pesos del perceptr√≥n.
+ */
 void Perceptron::mostrar_pesos(){
-	vector<double>::iterator q=pesos.begin();
+	vector<double>::iterator q=this->pesos.begin();
 	while(q!=pesos.end()){
 		cout<<(*q)<<" , ";
 		q++;
@@ -201,11 +219,12 @@ void Perceptron::fijar_tasa(double n)
 }
 
 
+/**
+ * @brief Rutina que permite seleccionar la funci√≥n del Perceptron.
+ * @param x Es 1-funci√≥n signo, 2-funci√≥n sigmoide, 3-funcion gaussiana (esta es la idea->no esta implementado)
+ */
 void Perceptron::sel_func(int x){
-	/**
-	@brief rutina que permite seleccionar la funcion del Perceptron
-	@param x es 1-funcion signo, 2-funcion sigmoide, 3-funcion gaussiana (esta es la idea->no esta implementado)
-	*/
+
 	if (x == 1)
 		this->func = signo;
 	else if (x == 2)
@@ -213,17 +232,25 @@ void Perceptron::sel_func(int x){
 	
 }
 
-double Perceptron::clasificar(vector<double> &D){
+
+/**
+ * @brief Devuelve la salida que calcula el perceptr√≥n para una entrada dada con los
+ * pesos actuales.
+ * @param D Vector con un patr√≥n de entrada.
+ * @return El valor de salida calculado.
+ */
+double Perceptron::clasificar(const vector<double> &D){
 	return func(dot(D, this->pesos), 1.0);
 }
 
+
 /**
- * @brief FunciÛn para graficar.
+ * @brief Funci√≥n para graficar.
  *
- * Esta funciÛn grafica, en el caso de entradas en 2 dimensiones, un plano y la
- * recta que van formando los pesos del perceptrÛn. En el caso de entradas con
- * 3 dimensiones, dibuja el plano que van formando los pesos del perceptrÛn.
- * Adem·s tambiÈn dibuja los puntos de las entradas.
+ * Esta funci√≥n grafica, en el caso de entradas en 2 dimensiones, un plano y la
+ * recta que van formando los pesos del perceptr√≥n. En el caso de entradas con
+ * 3 dimensiones, dibuja el plano que van formando los pesos del perceptr√≥n.
+ * Adem√°s tambi√©n dibuja los puntos de las entradas.
  * 
  */
 void Perceptron::graficar()
@@ -234,37 +261,22 @@ void Perceptron::graficar()
 
 	///\todo hacer que dibuje los puntos de cada clase de distintos colores
 	
-	//Zoom con click del medio!
-	
-	if(pesos.size()==3){
+	if(pesos.size()==3){ //gr√°fico en 2 dimensiones
+		///<\todo ac√° no hace zoom ni con el click del medio!
 		stringstream ss;
-		ss<<"set xlabel \"eje X\" \n";
-		plotter(ss.str());
-		ss<<"set ylabel \"eje Y\" \n";
-		plotter(ss.str());
 		ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
 		ss<<", \"plot.dat\" lt 3";
 		plotter(ss.str());
-		//sleep(0.5);
 		wait(this->tiempo_espera);
 	}
 	
-	else {
-
+	else if (pesos.size() == 4){ //gr√°fico en 3 dimensiones
+		//Zoom con click del medio!
 		double &w3 = pesos[3];
-		
 		stringstream ss;
-		ss<<"set xlabel \"eje X\" \n";
-		plotter(ss.str());
-		ss<<"set ylabel \"eje Y\" \n";
-		plotter(ss.str());
-		ss<<"set zlabel \"eje Z\" \n";
-		plotter(ss.str());
 		ss<<"splot [-2:2] [-2:2] [-2:2]"<<-1*(w2/w3)<<"*y + "<<-1*(w1/w3)<<"*x + "<<w0/w3;
+		ss<<", \"plot.dat\" lt 3";
 		plotter(ss.str());
-		ss<<", \"plot3.dat\" lt 3";
-		plotter(ss.str());
-		//sleep(0.5);
 		wait(this->tiempo_espera);
 	}
 }

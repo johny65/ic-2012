@@ -21,9 +21,9 @@ Debug/main.o: main.cpp Perceptron.h GNUplot.h
 Debug/Perceptron.o: Perceptron.cpp Perceptron.h GNUplot.h utils.h func.h wait.h
 	${GPP} ${FLAGS} -c Perceptron.cpp -o $@
 
-Debug/func.o: func.cpp
+Debug/func.o: func.cpp func.h
 	${GPP} ${FLAGS} -c func.cpp -o $@
 
-Debug/utils.o: utils.cpp GNUplot.h
+Debug/utils.o: utils.cpp utils.h GNUplot.h
 	${GPP} ${FLAGS} -c utils.cpp -o $@
 

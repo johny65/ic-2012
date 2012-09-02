@@ -10,16 +10,6 @@
 
 using namespace std;
 
-/**
- * @brief Rutina para leer un archivo csv.
- *
- * Lee todas las entradas más la salida deseada. La entrada del sesgo la agrega
- * al principio. Las salidas deseadas las mete en un vector aparte.
- *
- * @param archivo Nombre del archivo que se va a leer.
- * @param sd Vector donde se guardarán las salidas deseadas.
- * @return Matriz de datos leídos, cada fila corresponde a un patrón de entrada.
-*/
 vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
 {
 	vector< vector<double> > todo;
@@ -46,41 +36,27 @@ vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
 	return todo;
 }
 
-
-void crear_csv(vector<vector<double> > &v, const char *name){
-	/**
-		@brief Recibe una matriz de datos y genera un archivo con extension .csv (en general se usa para realizar pruebas sobre datos nunca vistos)
-		@param v matriz de datos a grabar
-		@param name es el nombre del archivo a generar
-	*/
-
+void crear_dat(vector<vector<double> > &v, const char *name)
+{
 	std::ostringstream ss;
-	ofstream out(name);
+	ofstream out(name, ios::trunc);
 	vector<vector<double> >::iterator q=v.begin();
 	while(q!=v.end()){
 		int n=(*q).size();
-		for(int i=1;i<n;i++){
+		for(int i=1;i<n;++i){
 			if(i!=n-1) ss << ((*q)[i]) << " ";
 			else ss << ((*q)[i]) << endl;
 		}
 		q++;
-		
 	}
+	out<<"# archivo temporal usado para graficar los puntos de entrada en gnuplot\n";
 	out<<ss.str();
 	out.close();
 	
 }
 
-	
-
 int generar_resultados(vector<vector<double> > &entradas,vector<double> &salidas,const char *name){
-	/**
-		@brief Rutina que genera un archivo txt que contiene las entradas de los datos de prueba y la salida obtinada por el Perceptron
-		@param entradas matriz de datos de entradas(sin resultado esperado)
-		@param salidas vector de salida calculado por el Perceptron
-		@param name nombre del archivo .txt a generar
-	*/
-
+	
 	std::ostringstream ss;
 	ofstream out(name);
 	vector<vector<double> >::iterator q=entradas.begin();

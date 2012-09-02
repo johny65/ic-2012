@@ -6,13 +6,8 @@
 
 using namespace std;
 
-vector<double> init_weight(int nd){
-	/**
-		@brief Rutina que inicializa el vector de pesos aletoriamente (valores
-		entre [-0.5, 0.5]).
-		@param nd es la longitud del vector a retornar (cantidad total de entradas teniendo en cuenta el -1)
-		@return vector de pesos inicializados al azar
-	*/
+vector<double> init_weight(int nd)
+{
 	double w;
 	vector<double> pesos;
 	srand(time(NULL));
@@ -23,10 +18,8 @@ vector<double> init_weight(int nd){
 	return pesos;
 }
 
-vector<double> sum(vector<double> y,vector<double> x){
-	/**
-		@brief rutina que suma vectores componente a componente
-	*/
+vector<double> sum(const vector<double> &y, const vector<double> &x)
+{
 	vector<double> r;
 	int n=y.size();
 	for(int i=0;i<n;++i){
@@ -35,7 +28,8 @@ vector<double> sum(vector<double> y,vector<double> x){
 	return r;
 }
 
-vector<double> dif(vector<double> y,vector<double> x){
+vector<double> dif(const vector<double> &y, const vector<double> &x)
+{
 	vector<double> r;
 	int n=y.size();
 	for(int i=0;i<n;++i){
@@ -44,10 +38,8 @@ vector<double> dif(vector<double> y,vector<double> x){
 	return r;
 }
 
-/**
- * Producto de un vector por un escalar (aunque el nombre no lo sugiera).
- */
-vector<double> prod_escalar(vector<double> x, double nu){
+vector<double> prod_escalar(const vector<double> &x, double nu)
+{
 	vector<double> y;
 	int n=x.size();
 	for(int i=0;i<n;++i){
@@ -56,8 +48,7 @@ vector<double> prod_escalar(vector<double> x, double nu){
 	return y;
 }
 
-
-double dot(vector<double> &x, vector<double> &y){
+double dot(const vector<double> &x, const vector<double> &y){
 	if(x.size()!=y.size()){
 		cerr<<"Vectores de diferente dimensión!"<<endl;
 		return 0;
@@ -71,16 +62,8 @@ double dot(vector<double> &x, vector<double> &y){
 	return p;
 }
 
-
-/**
- * @param pv Pesos anteriores (viejos).
- * @param tasa
- * @param s Salida generada.
- * @param se Salida esperada.
- * @param datos Entradas.
- */
-vector<double> recalcular_pesos(vector<double> pv, double tasa,
-	double s,double se,vector<double> datos){
+vector<double> recalcular_pesos(const vector<double> &pv, double tasa,
+	double s, double se, const vector<double> &datos){
 		
 	//np=pv+2*tasa*[se-s]*datos
 	vector<double> np; //nuevos pesos
@@ -88,12 +71,14 @@ vector<double> recalcular_pesos(vector<double> pv, double tasa,
 	return np;
 }
 
+
 double calc_error_x_epoca(double sal_d, double sal_o){
 	/** @param sal_d salida deseada
 	@param sal_o salida obtenida
 	*/
 	return abs(sal_d-sal_o);
 }
+
 double calc_error(vector<double> &x, vector<double> &y)
 {
 	double r = 0.0;

@@ -1,49 +1,73 @@
 #include <iostream>
-#include <valarray>
-#include <vector>
-#include <iterator>
+#include <sstream>
 #include "Perceptron.h"
-//#include "func.h"
 
-#include <ctime>
 using namespace std;
 
-// Qué es esto? Lo usamos para algo??
-
-vector<vector<double> > generar_datprueba(double porc, int l){
-	/**
-		@brief genera una matriz con datos para realizar las pruebas (ejercicio 1: OR o XOR)
-		@param porc es el % de desvio de los datos
-		@param l cantidad de datos a generar
-	*/
-	vector<vector<double> > p;
-	vector<double> d;
-	double v;
-	srand(time(NULL));
-	for(int i=0;i<l;i++){
-		for(int j=0;j<2;j++){ //solo genero las entradas no las salidas esperadas
-	//		v=(((95+rand()%(6))/100.0)*signo(-10+rand()%(21)));
-			d.push_back(v);	
-		}
-		p.push_back(d);
-		d.clear();
-	}
-	
-	return p;
-	
-}
-
 int main (int argc, char *argv[]) {
-	Perceptron P;
 	
-//	if (argc == 2)
-//		P.entrenar(argv[1]); //usa el primer parámetro como archivo de entrada
-//	else
-		P.entrenar("tabla_XOR.csv");
-//	
-	//P.probar("prueba.csv");
-	//P.val_cross();
+	Perceptron P;
 
-	cin.get();
+	char *archivo_entrada;
+	stringstream ss;
+
+	string ayuda = "\
+Perceptrón Simple. IC 2012\n\
+Opciones:\n\
+ -e archivo:\n\tArchivo de entrada para datos de entrenamiento.\n\
+ -n tasa:\n\tTasa de aprendizaje.\n\
+ -t tol:\n\tTolerancia de error para detener entrenamiento.\n\
+ -i cant:\n\tNúmero máximo de iteraciones para el entrenamiento.\n\
+ -w ms:\n\tTiempo entre cuadros de la animación.\n\
+ -g:\n\tNo mostrar ningún gráfico.\n\
+ -h:\n\tMuestra este mensaje de ayuda.\n\
+";
+	
+	int o;
+	while ((o = getopt(argc, argv, "e:n:w:t:i:gh")) != -1){
+		switch (o){
+			case 'e': {
+				archivo_entrada = optarg;
+				break;
+			}
+			case 'n': {
+				double tasa;
+				ss<<optarg; ss>>tasa;
+				P.fijar_tasa(tasa);
+				break;
+			}
+			case 'w': {
+				double ms;
+				ss<<optarg; ss>>ms;
+				P.set_tiempo_espera(ms);
+				break;
+			}
+			case 't': {
+				double tol;
+				ss<<optarg; ss>>tol;
+				P.set_tolerancia(tol);
+				break;
+			}
+			case 'i': {
+				int it;
+				ss<<optarg; ss>>it;
+				P.set_iteraciones_max(it);
+				break;
+			}
+			case 'g': {
+				P.set_graficos(false);
+				break;
+			}
+			case 'h':
+			case '?': {
+				cout<<ayuda<<endl;
+				return -1;
+			}
+		}
+	}
+
+	P.entrenar(archivo_entrada);
+
+	cout<<"\nPresionar una tecla para cerrar.\n"; cin.get();
 	return 0;
 }

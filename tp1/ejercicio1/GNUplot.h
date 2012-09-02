@@ -16,6 +16,10 @@ public:
 		if (!gnuplotpipe) {
 			throw("Gnuplot not found !");
 		}
+		/*configura gnuplot para que no ponga siempre la ventana del gráfico
+		 * arriba de todo en cada graficación, y los nombres de los ejes: */
+		fprintf(gnuplotpipe,"%s\n", "set terminal wxt noraise; set xlabel \"eje X\";\
+		 set ylabel \"eje Y\"; set zlabel \"eje Z\"");
 	}
 	
 	~GNUplot() {
