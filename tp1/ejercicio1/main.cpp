@@ -44,10 +44,10 @@ Opciones:\n\
 				ruta_cross_val = optarg;
 				break;
 			}
-		case 'z':{
+			case 'z': {
 				P.set_show_error(true);
 				break;
-		}
+			}
 			case 'n': {
 				double tasa;
 				ss<<optarg; ss>>tasa;

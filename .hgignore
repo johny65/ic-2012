@@ -3,3 +3,6 @@
 syntax: glob
 *.o
 tp1/ejercicio1/docs/*
+
+#archivos .dat son temporales para gnuplot
+*.dat
