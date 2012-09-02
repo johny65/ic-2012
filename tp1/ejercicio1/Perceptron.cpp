@@ -20,7 +20,7 @@ using namespace std;
  * Para configurar estos parámetros se deben usar las funciones específicas.
  */
 Perceptron::Perceptron() : eta(0.05), max_iter(1000), func(signo),
-	tol(10e-3), graficos(true), couts(true), tiempo_espera(500) {
+	tol(10e-3), graficos(true), couts(true), show_error(false),tiempo_espera(500) {
 
 	srand(time(NULL));
 }
@@ -77,7 +77,10 @@ void Perceptron::set_graficos(bool g)
 	this->graficos = g;
 }
 
-
+void Perceptron::set_show_error(bool g)
+{
+	this->show_error = g;
+}
 /**
  * @brief Establece si se deben mostrar salidas por pantalla o no.
  * @param s true: salidas activadas, false: salidas desactivadas.
@@ -111,13 +114,13 @@ int Perceptron::entrenar(const char *name)
 	this->pesos = init_weight(nd);
 	cout<<endl<<"Pesos nuevos"<<endl; mostrar_pesos(); cout<<endl;
 	
-	double error_e;
+	double err=0.0;
 	int iteraciones = 0;
 	while (iteraciones < this->max_iter){
 		salidas.clear();
 		int i = 0;
 		q=datos.begin();
-		error_e=0;
+		
 		
 		while(q!=datos.end()){
 			
@@ -128,8 +131,7 @@ int Perceptron::entrenar(const char *name)
 				pesos=recalcular_pesos(this->pesos, this->eta,
 					this->salidas.back(), this->salidas_deseadas[i], entradas);				
 			}
-			error_e+=calc_error_x_epoca(this->salidas_deseadas[i],this->salidas.back());
-
+		
 			if (this->couts)
 				mostrar_pesos();
 			
@@ -140,9 +142,11 @@ int Perceptron::entrenar(const char *name)
 		}
 		
 		//calcular error por iteracion:
-		double err = calc_error(this->salidas_deseadas, this->salidas);
+		err = calc_error(this->salidas_deseadas, this->salidas);
+		this->error_ent.push_back(err);
 		iteraciones++;
 
+				
 		if (this->couts){
 			cout<<"Error: "<<err<<endl;
 			cout<<"Iteración "<<iteraciones<<endl;
@@ -152,10 +156,15 @@ int Perceptron::entrenar(const char *name)
 			break;
 	}
 	
-	this->error.push_back(error_e/datos.size()); //guardo el error (error del entrenamiento)
+	
+	if(show_error){
+		crear_dat_vector(this->error_ent,"error.dat");
+		error_graf("plot \"error.dat\" with lines");
+	}
+	
 	this->weight.push_back(pesos); //guardo los pesos 
 	
-	cout<<"Se terminó de entrenar el perceptrón.\n"<<"iteraciones "<<iteraciones<<" error "<<error.back()<<endl;
+	cout<<"Se terminó de entrenar el perceptrón.\n"<<"iteraciones "<<iteraciones<<" error "<<err<<endl;
 	graficar(); //resultado final siempre se muestra
 	
 	//Muestro el resultado del entrenamiento
@@ -172,7 +181,8 @@ int Perceptron::entrenar(const char *name)
 			q++;
 		}
 	}
-
+	
+	error_ent.clear();
 	salidas.clear(); //borro los datos de las salidas el Perceptron ya esta entrenado
 	return 0;
 }
@@ -316,6 +326,7 @@ void Perceptron::val_cross(const char *ruta){
 		name_p.str("");
 		name_p<<ruta<<"_p"<<i<<".csv";
 		i++;
+		
 	}
 	
 	
@@ -325,9 +336,12 @@ void Perceptron::val_cross(const char *ruta){
 	for (size_t i=1;i<this->error.size(); i++){
 		if(menor>this->error[i]){ menor=this->error[i]; ind_m=i;}
 	}
-	this->pesos.clear();
+	//this->pesos.clear();
+	
 	this->pesos = this->weight[ind_m];
 	graficar("Pesos ganadores");
+	
+	
 	
 
 

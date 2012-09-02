@@ -39,6 +39,7 @@ vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd);
  * @param name Es el nombre del archivo a generar.
  */
 void crear_dat(vector<vector<double> > &v, const char *name);
+void crear_dat_vector(vector<double>  &v, const char *name);
 
 
 /**

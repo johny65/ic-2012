@@ -24,12 +24,13 @@ Opciones:\n\
  -w ms:\n\tTiempo entre cuadros de la animación.\n\
  -g:\n\tNo mostrar ningún gráfico.\n\
  -s:\n\tNo mostrar ninguna salida por consola.\n\
+ -z:\n\t Mostrar grafico de error.\n\
  -v ruta+prefijo:\n\tRealiza validación cruzada.\n\
  -h:\n\tMuestra este mensaje de ayuda.\n\
 ";
 	
 	int o;
-	while ((o = getopt(argc, argv, "e:p:n:w:t:i:v:ghs")) != -1){
+	while ((o = getopt(argc, argv, "e:p:n:w:t:i:v:ghsz")) != -1){
 		switch (o){
 			case 'e': {
 				archivo_entrada = optarg;
@@ -43,6 +44,10 @@ Opciones:\n\
 				ruta_cross_val = optarg;
 				break;
 			}
+		case 'z':{
+				P.set_show_error(true);
+				break;
+		}
 			case 'n': {
 				double tasa;
 				ss<<optarg; ss>>tasa;

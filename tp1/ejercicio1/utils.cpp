@@ -56,6 +56,22 @@ void crear_dat(vector<vector<double> > &v, const char *name)
 	
 }
 
+void crear_dat_vector(vector<double> &v, const char *name)
+{
+	std::ostringstream ss;
+	ofstream out(name, ios::trunc);
+	vector<double>::iterator q=v.begin();
+	while(q!=v.end()){
+			ss << (*q) << "\n ";
+			
+		q++;
+	}
+	out<<"# archivo temporal usado para graficar los puntos de entrada en gnuplot\n";
+	out<<ss.str();
+	out.close();
+	
+}
+
 int generar_resultados(vector<vector<double> > &entradas,vector<double> &salidas,const char *name){
 	
 	std::ostringstream ss;

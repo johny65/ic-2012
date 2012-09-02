@@ -21,10 +21,13 @@ private:
 	double tol; ///< Tolerancia del error para detener el entrenamiento
 	bool graficos; ///< Indica si se activan los gráficos o no
 	bool couts; ///< Indica si se deben mostrar salidas por consola
-	vector<double> error; //por epoca
+	bool show_error; ///< Indica si se debe mostrar el grafico de error
+	vector<double> error; //por particion
+	vector<double> error_ent; //error de entrenamiento
 	vector<vector<double> > weight;
 
 	GNUplot plotter; ///< Conexión con GNUplot
+	GNUplot error_graf; //error de entrenamiento
 	double tiempo_espera; ///< Tiempo entre frames para la animación
 	void graficar(const char *titulo);
 	void graficar();
@@ -37,7 +40,9 @@ public:
 	void set_tolerancia(double t);
 	void set_tiempo_espera(double t);
 	void set_graficos(bool g);
+	void set_show_error(bool g);
 	void set_salidas(bool s);
+	
 	int entrenar(const char *name);
 	void probar(const char *name);
 	double clasificar(const vector<double> &D);
