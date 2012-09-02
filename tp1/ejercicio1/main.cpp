@@ -24,7 +24,7 @@ Opciones:\n\
  -w ms:\n\tTiempo entre cuadros de la animación.\n\
  -g:\n\tNo mostrar ningún gráfico.\n\
  -s:\n\tNo mostrar ninguna salida por consola.\n\
- -z:\n\t Mostrar grafico de error.\n\
+ -z:\n\tMostrar gráfico de error.\n\
  -v ruta+prefijo:\n\tRealiza validación cruzada.\n\
  -h:\n\tMuestra este mensaje de ayuda.\n\
 ";
@@ -88,7 +88,8 @@ Opciones:\n\
 		}
 	}
 
-	P.entrenar(archivo_entrada);
+	if (archivo_entrada != NULL)
+		P.entrenar(archivo_entrada);
 	if (archivo_prueba != NULL)
 		P.probar(archivo_prueba);
 	if (ruta_cross_val != NULL)

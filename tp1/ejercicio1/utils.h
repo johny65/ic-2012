@@ -39,16 +39,14 @@ vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd);
  * @param name Es el nombre del archivo a generar.
  */
 void crear_dat(vector<vector<double> > &v, const char *name);
-void crear_dat_vector(vector<double>  &v, const char *name);
 
 
 /**
- * @brief Rutina que genera un archivo txt que contiene las entradas de los
- * datos de prueba y la salida obtinada por el Perceptron.
- * @param entradas matriz de datos de entradas(sin resultado esperado)
- * @param salidas vector de salida calculado por el Perceptron
- * @param name nombre del archivo .txt a generar
-*/
-int generar_resultados(vector<vector<double> > &entradas,vector<double> &salidas,const char *name);
+ * @brief Recibe un vector de datos y genera un archivo que puede ser usado
+ * por GNUplot para graficar esos datos.
+ * @param v Vector de datos a grabar.
+ * @param name Es el nombre del archivo a generar.
+ */
+void crear_dat_vector(vector<double> &v, const char *name);
 
 #endif

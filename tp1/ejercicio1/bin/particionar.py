@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*- #para que se puedan escribir acentos :p
 
 import random

@@ -20,8 +20,9 @@ using namespace std;
  * Para configurar estos parámetros se deben usar las funciones específicas.
  */
 Perceptron::Perceptron() : eta(0.05), max_iter(1000), func(signo),
-	tol(10e-3), graficos(true), couts(true), show_error(false),tiempo_espera(500) {
-
+	tol(10e-3), graficos(true), couts(true), show_error(false),
+	tiempo_espera(500)
+{
 	srand(time(NULL));
 }
 
@@ -77,10 +78,16 @@ void Perceptron::set_graficos(bool g)
 	this->graficos = g;
 }
 
+
+/**
+ * @brief Establece si se debe graficar el error por cada iteración.
+ */
 void Perceptron::set_show_error(bool g)
 {
 	this->show_error = g;
 }
+
+
 /**
  * @brief Establece si se deben mostrar salidas por pantalla o no.
  * @param s true: salidas activadas, false: salidas desactivadas.
@@ -114,13 +121,12 @@ int Perceptron::entrenar(const char *name)
 	this->pesos = init_weight(nd);
 	cout<<endl<<"Pesos nuevos"<<endl; mostrar_pesos(); cout<<endl;
 	
-	double err=0.0;
+	double err = 0.0;
 	int iteraciones = 0;
 	while (iteraciones < this->max_iter){
 		salidas.clear();
 		int i = 0;
 		q=datos.begin();
-		
 		
 		while(q!=datos.end()){
 			
@@ -141,11 +147,11 @@ int Perceptron::entrenar(const char *name)
 			q++; i++;
 		}
 		
-		//calcular error por iteracion:
+		//calcular error por iteración:
 		err = calc_error(this->salidas_deseadas, this->salidas);
 		this->error_ent.push_back(err);
-		iteraciones++;
 
+		iteraciones++;
 				
 		if (this->couts){
 			cout<<"Error: "<<err<<endl;
@@ -157,8 +163,8 @@ int Perceptron::entrenar(const char *name)
 	}
 	
 	
-	if(show_error){
-		crear_dat_vector(this->error_ent,"error.dat");
+	if (this->show_error){
+		crear_dat_vector(this->error_ent, "error.dat");
 		error_graf("plot \"error.dat\" with lines");
 	}
 	
@@ -182,7 +188,7 @@ int Perceptron::entrenar(const char *name)
 		}
 	}
 	
-	error_ent.clear();
+	error_ent.clear(); //borro errores
 	salidas.clear(); //borro los datos de las salidas el Perceptron ya esta entrenado
 	return 0;
 }
@@ -269,6 +275,8 @@ double Perceptron::clasificar(const vector<double> &D){
  * recta que van formando los pesos del perceptrón. En el caso de entradas con
  * 3 dimensiones, dibuja el plano que van formando los pesos del perceptrón.
  * Además también dibuja los puntos de las entradas.
+ *
+ * @param titulo Título para el gráfico.
  * 
  */
 void Perceptron::graficar(const char *titulo)
@@ -278,6 +286,7 @@ void Perceptron::graficar(const char *titulo)
 	double &w2 = pesos[2];
 
 	///\todo hacer que dibuje los puntos de cada clase de distintos colores
+	///\todo hacer que el plano sea sólido
 	
 	if(pesos.size()==3){ //gráfico en 2 dimensiones
 		///<\todo acá no hace zoom ni con el click del medio!
@@ -300,25 +309,33 @@ void Perceptron::graficar(const char *titulo)
 	}
 }
 
+
+/**
+ * @brief Función wrapper que dibuja un gráfico sin título.
+ */
 void Perceptron::graficar()
 {
 	graficar("");
 }
 
 
-void Perceptron::val_cross(const char *ruta){
-	/**
-	@brief esta rutina entrena el Perceptron con varias particiones, calcula el error, y escoge el menor de ellos
-	
-	
-	*/
-	
-	vector<double> sal_esp;
+/**
+ * @brief Validación cruzada.
+ *
+ * Esta rutina entrena el Perceptron con varias particiones, realiza las pruebas,
+ * calcula el error de las mismas y escoge los pesos que tuvieron el menor error.
+ *
+ * @param ruta Ruta (carpeta y prefijo) de los archivos para realizar la
+ * validación cruzada.
+ */
+void Perceptron::val_cross(const char *ruta)
+{	
 	stringstream name_e, name_p;
 	name_e<<ruta<<"_e1.csv";
 	name_p<<ruta<<"_p1.csv";
 	int i=2;
 	while(entrenar((name_e.str()).c_str())==0){
+		//mientras encuentre archivos de entrenamiento-prueba, seguir
 		probar(name_p.str().c_str());
 		cout<<"Terminó partición "<<i-1<<".\n";
 		name_e.str("");
@@ -326,25 +343,22 @@ void Perceptron::val_cross(const char *ruta){
 		name_p.str("");
 		name_p<<ruta<<"_p"<<i<<".csv";
 		i++;
-		
 	}
 	
 	
-	//Buscar segun el minimo error y actualizar el vector de pesos
-	double menor=this->error[0];
-	int ind_m=0;
-	for (size_t i=1;i<this->error.size(); i++){
+	//Buscar según el mínimo error y actualizar el vector de pesos
+	double menor = this->error[0];
+	int ind_m = 0;
+	for (size_t i=1; i<this->error.size(); ++i){
 		if(menor>this->error[i]){ menor=this->error[i]; ind_m=i;}
 	}
-	//this->pesos.clear();
 	
 	this->pesos = this->weight[ind_m];
+	cout<<"\nPesos ganadores:\n";
+	mostrar_pesos();
 	graficar("Pesos ganadores");
 	
 	
-	
-
-
 	//promedio:
 	double sum = 0.0;
 	for (size_t i=0; i<this->error.size(); ++i){
