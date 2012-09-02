@@ -20,6 +20,7 @@ private:
 	double (*func)(double, double); ///< Función de activación
 	double tol; ///< Tolerancia del error para detener el entrenamiento
 	bool graficos; ///< Indica si se activan los gráficos o no
+	bool couts; ///< Indica si se deben mostrar salidas por consola
 	vector<double> error; //por epoca
 	vector<vector<double> > weight;
 
@@ -35,6 +36,7 @@ public:
 	void set_tolerancia(double t);
 	void set_tiempo_espera(double t);
 	void set_graficos(bool g);
+	void set_salidas(bool s);
 	int entrenar(const char *name);
 	void probar(const char *name);
 	double clasificar(const vector<double> &D);

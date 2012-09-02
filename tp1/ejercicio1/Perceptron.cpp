@@ -20,7 +20,7 @@ using namespace std;
  * Para configurar estos parámetros se deben usar las funciones específicas.
  */
 Perceptron::Perceptron() : eta(0.05), max_iter(1000), func(signo),
-	tol(10e-3), graficos(true), tiempo_espera(500) {}
+	tol(10e-3), graficos(true), couts(true), tiempo_espera(500) {}
 
 
 /**
@@ -76,6 +76,16 @@ void Perceptron::set_graficos(bool g)
 
 
 /**
+ * @brief Establece si se deben mostrar salidas por pantalla o no.
+ * @param s true: salidas activadas, false: salidas desactivadas.
+ */
+void Perceptron::set_salidas(bool s)
+{
+	this->couts = s;
+}
+
+
+/**
  * @brief Rutina con la cual el Perceptron aprende a partir de datos.
  * @param name Nombre del archivo .csv a leer, el mismo contiene los datos de
  * entrenamiento.
@@ -96,6 +106,7 @@ int Perceptron::entrenar(const char *name)
 	
 	//inicializo el vector de pesos aletoriamente con valores entre [-0.5 0.5]
 	this->pesos = init_weight(nd);
+	cout<<endl<<"Pesos nuevos"<<endl; mostrar_pesos(); cout<<endl;
 	
 	double error_e;
 	int iteraciones = 0;
@@ -103,7 +114,6 @@ int Perceptron::entrenar(const char *name)
 		salidas.clear();
 		int i = 0;
 		q=datos.begin();
-		//cout<<endl<<"Pesos nuevos"<<endl; mostrar_pesos(); cout<<endl;
 		error_e=0;
 		
 		while(q!=datos.end()){
@@ -116,10 +126,12 @@ int Perceptron::entrenar(const char *name)
 					this->salidas.back(), this->salidas_deseadas[i], entradas);				
 			}
 			error_e+=calc_error_x_epoca(this->salidas_deseadas[i],this->salidas.back());
-			//mostrar_pesos();
+
+			if (this->couts)
+				mostrar_pesos();
+			
 			if (this->graficos)
 				graficar();
-			//cout<<endl;
 			
 			q++; i++;
 		}
@@ -128,11 +140,11 @@ int Perceptron::entrenar(const char *name)
 		double err = calc_error(this->salidas_deseadas, this->salidas);
 		cout<<"Error: "<<err<<endl;
 		
-		if (err <= this->tol)
-			break;
-		
 		iteraciones++;
 		cout<<"Iteración "<<iteraciones<<endl;
+		
+		if (err <= this->tol)
+			break;
 	}
 	
 	this->error.push_back(error_e/datos.size()); //guardo el error
@@ -144,16 +156,18 @@ int Perceptron::entrenar(const char *name)
 		graficar();
 	
 	//Muestro el resultado del entrenamiento
-	q=datos.begin();
-	int g=0;
-	while(q!=datos.end()){
-		for (int i=0;i<(int)(*q).size();i++){
-			cout<<setw(8)<<setprecision(3)<<(*q)[i];
+	if (this->couts){
+		q=datos.begin();
+		int g=0;
+		while(q!=datos.end()){
+			for (int i=0;i<(int)(*q).size();i++){
+				cout<<setw(8)<<setprecision(3)<<(*q)[i];
+			}
+			cout<<"    |"<<setw(5)<<setprecision(3)<<salidas_deseadas[g];
+			cout<<"    |"<<setw(5)<<setprecision(3)<<salidas[g]<<endl;
+			g++;
+			q++;
 		}
-		cout<<"    |"<<setw(5)<<setprecision(3)<<salidas_deseadas[g];
-		cout<<"    |"<<setw(5)<<setprecision(3)<<salidas[g]<<endl;
-		g++;
-		q++;
 	}
 
 	salidas.clear(); //borro los datos de las salidas el Perceptron ya esta entrenado
@@ -268,6 +282,7 @@ void Perceptron::graficar()
 		ss<<", \"plot.dat\" lt 3";
 		plotter(ss.str());
 		wait(this->tiempo_espera);
+		//sleep(this->tiempo_espera);
 	}
 	
 	else if (pesos.size() == 4){ //gráfico en 3 dimensiones

@@ -20,11 +20,12 @@ Opciones:\n\
  -i cant:\n\tNúmero máximo de iteraciones para el entrenamiento.\n\
  -w ms:\n\tTiempo entre cuadros de la animación.\n\
  -g:\n\tNo mostrar ningún gráfico.\n\
+ -s:\n\tNo mostrar ninguna salida por consola.\n\
  -h:\n\tMuestra este mensaje de ayuda.\n\
 ";
 	
 	int o;
-	while ((o = getopt(argc, argv, "e:n:w:t:i:gh")) != -1){
+	while ((o = getopt(argc, argv, "e:n:w:t:i:ghs")) != -1){
 		switch (o){
 			case 'e': {
 				archivo_entrada = optarg;
@@ -56,6 +57,10 @@ Opciones:\n\
 			}
 			case 'g': {
 				P.set_graficos(false);
+				break;
+			}
+			case 's': {
+				P.set_salidas(false);
 				break;
 			}
 			case 'h':
