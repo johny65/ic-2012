@@ -21,7 +21,13 @@ private:
 public:
 	Layer();
 	~Layer();
+	void calcular_salida();
+	dense_vector<double> out_layer();
+	void corregir_pesos(); 
+	void recibir_entradas(dense_vector<double> a);
 };
 
 #endif
+
+
 
