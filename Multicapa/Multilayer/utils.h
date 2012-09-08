@@ -9,10 +9,10 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
-#include <boost/numeric/mtl/mtl.hpp>
+#include "GNUplot.h"
+
 
 using namespace std;
-using namespace mtl;
 
 /**
  * @file utils.h Maneja todas las rutinas de entrada/salida de archivos.
@@ -29,9 +29,24 @@ using namespace mtl;
  * @param sd Vector donde se guardarán las salidas deseadas.
  * @return Matriz de datos leídos, cada fila corresponde a un patrón de entrada.
 */
-dense2D<double> leer_csv(const char *archivo, dense_vector<double> &sd);
+vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd);
 
 
+/**
+ * @brief Recibe una matriz de datos y genera un archivo que puede ser usado
+ * por GNUplot para graficar esos datos.
+ * @param v Matriz de datos a grabar.
+ * @param name Es el nombre del archivo a generar.
+ */
+void crear_dat(vector<vector<double> > &v, const char *name);
 
+
+/**
+ * @brief Recibe un vector de datos y genera un archivo que puede ser usado
+ * por GNUplot para graficar esos datos.
+ * @param v Vector de datos a grabar.
+ * @param name Es el nombre del archivo a generar.
+ */
+void crear_dat_vector(vector<double> &v, const char *name);
 
 #endif

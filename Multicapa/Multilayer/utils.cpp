@@ -6,37 +6,67 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
-#include <boost/numeric/mtl/mtl.hpp>
-
-
+#include "GNUplot.h"
 
 using namespace std;
-using namespace mtl;
 
-dense2D<double> leer_csv(const char *archivo, dense_vector<double> &sd)
+vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
 {
-	dense2D<double> todo(50,50);
-	//sd.clear();
+	vector< vector<double> > todo;
+	sd.clear();
 	
-	//std::vector<double> aux;
-	int r=0,c=0; //r: rows c: column
+	vector<double> aux;
 	ifstream in(archivo);
 	string linea, temp;
 	double val;
 	while (getline(in, linea)){
-		todo(r,c)=-1; c++;
+		aux.push_back(-1);
 		stringstream ss(linea);
 		while(getline(ss, temp, ',')){
 			stringstream ss2(temp);
 			ss2>>val;
-			todo(r,c)=val;
-			c++;
+			aux.push_back(val);
 		}
-		sd[r]=todo(r,c);
-		r++;
+		//pasar la salida deseada al vector de salidas deseadas:
+		sd.push_back(aux.back());
+		aux.erase(aux.end()-1);
+		
+		todo.push_back(aux);
+		aux.clear();
 	}
-	
 	return todo;
 }
 
+void crear_dat(vector<vector<double> > &v, const char *name)
+{
+	std::ostringstream ss;
+	ofstream out(name, ios::trunc);
+	vector<vector<double> >::iterator q=v.begin();
+	while(q!=v.end()){
+		int n=(*q).size();
+		for(int i=1;i<n;++i){
+			if(i!=n-1) ss << ((*q)[i]) << " ";
+			else ss << ((*q)[i]) << endl;
+		}
+		q++;
+	}
+	out<<"# archivo temporal usado para graficar los puntos de entrada en gnuplot\n";
+	out<<ss.str();
+	out.close();
+	
+}
 
+void crear_dat_vector(vector<double> &v, const char *name)
+{
+	std::ostringstream ss;
+	ofstream out(name, ios::trunc);
+	vector<double>::iterator q=v.begin();
+	while(q!=v.end()){
+		ss << (*q) << "\n";
+		q++;
+	}
+	out<<"# archivo temporal usado para graficar error en gnuplot\n";
+	out<<ss.str();
+	out.close();
+	
+}
