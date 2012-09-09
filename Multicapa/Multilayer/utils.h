@@ -9,7 +9,6 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
-#include "GNUplot.h"
 
 
 using namespace std;

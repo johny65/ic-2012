@@ -2,7 +2,8 @@
 #define PERCEPTRON_H
 
 #include <vector>
-#include "GNUplot.h"
+#include "utils.h"
+#include "func.h"
 
 using namespace std;
 

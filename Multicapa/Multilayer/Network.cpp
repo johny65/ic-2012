@@ -33,11 +33,13 @@ void Network::entrenar (const char * name) {
 	*/
 	///< 1- Abro el archivo de datos;
 	this->datos = leer_csv(name, this->salidas_deseadas);
+	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo"<<endl;return;}
 	inicializar_pesos();
 	
 	vector<double> &entradas = this->datos[0];
 	
 	//paso hacia adelante:
+	
 	for (size_t i=0; i<this->capas.size(); ++i){
 		Layer &capa = this->capas[i];
 		vector<double> salida_capa(capa.size());
@@ -51,19 +53,18 @@ void Network::entrenar (const char * name) {
 	}
 	vector<double> salidas = entradas;
 	
-	
 	//hacia atras:
 	
-	for (size_t i=this->capas.size(); i>=0; --i){
-		Layer &capa = this->capas[i];
-		
-	}
+//	for (size_t i=this->capas.size(); i>=0; --i){
+//		Layer &capa = this->capas[i];
+//		
+//	}
 	
 	
-//	vector<double> salidas = entradas;
-//	for (size_t i=0; i<salidas.size(); ++i)
-//		cout<<salidas[i]<<" ";
-//	cout<<endl;
+	//vector<double> salidas = entradas;
+	for (size_t i=0; i<salidas.size(); ++i)
+		cout<<salidas[i]<<" ";
+	cout<<endl;
 	
 }
 
@@ -76,3 +77,46 @@ void Network::probar (const char * name) {
 }
 
 
+void Network::graficar_puntos(const char *archivo, const char *titulo)
+{
+	vector< vector<double> > datos;
+	vector<double> salidas;
+	vector<double> clases;
+	
+	std::ostringstream sp;
+	datos=leer_csv(archivo, salidas);
+	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo"<<endl;return;}
+	int j=0;
+	vector< vector<double> >::iterator q=datos.begin();
+	
+	//archivo para gnuplot		
+	while(q!=datos.end()){
+		std::ostringstream ss;
+		char nombre[15];
+		sprintf(nombre, "clase %d.dat",  (int)salidas[j]);
+		ofstream out(nombre, ios::app);
+		int n=(*q).size();
+		for(int i=1;i<n;++i){
+			if(i!=n-1) ss << ((*q)[i]) << " ";
+			else ss << ((*q)[i]) << endl;
+		}
+		out<<ss.str();
+		out.close();
+		//Cargamos la clase en el vector de clases
+		if (find(clases.begin(), clases.end(), salidas[j])==clases.end()){
+			clases.push_back(salidas[j]);
+		}
+		q++;
+		j++;
+	}
+	
+	//Para que GNUPLOT Grafique todas las clases
+	sp<<"plot ";
+	for (int k=0; k<clases.size()-1;k++){
+		sp<<"\"clase "<<clases[k]<<".dat\" lt "<<clases[k]+1<<", ";
+	}
+	//Este hay q separarlo porque no tiene que incluir la ',' al final
+	sp<<" \"clase "<<clases[clases.size()-1]<<".dat\" lt "<<clases[clases.size()-1]+1<<" ; set title \""<<titulo<<"\"";
+	plotter(sp.str());
+	//wait(this->tiempo_espera);
+}

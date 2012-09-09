@@ -6,6 +6,7 @@
 //#include "armadillo"
 #include <vector>
 #include "Perceptron.h"
+#include "GNUplot.h"
 #include "utils.h"
 
 
@@ -32,9 +33,10 @@ private:
 	bool graficos; ///< Indica si se activan los gráficos o no
 	bool couts; ///< Indica si se deben mostrar salidas por consola
 	bool show_error; ///< Indica si se debe mostrar el gráfico de error
-	
+	void graficar_puntos(const char *archivo, const char *titulo);
 	void inicializar_pesos();
-	
+	GNUplot plotter; ///< Conexión con GNUplot
+	double tiempo_espera; ///< Tiempo entre frames para la animación
 	//Col <double> Datos;
 	//Col <double> d;///< salida esperada para cada fila de la matrix Datos;
 public:

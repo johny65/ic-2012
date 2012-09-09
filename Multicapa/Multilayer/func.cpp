@@ -1,8 +1,8 @@
 #include <vector>
 #include <cmath>
-#include <ctime>
 #include <cstdlib>
 #include <iostream>
+#include "func.h"
 
 using namespace std;
 

@@ -1,7 +1,6 @@
 #include<iostream>
-//#include "armadillo"
-
 #include "Network.h"
+
 using namespace std;
 
 int main (int argc, char *argv[]) {
@@ -11,8 +10,8 @@ int main (int argc, char *argv[]) {
 	p.push_back(2);
 	p.push_back(2);
 	Network A(3, p);
+	
 	A.entrenar("tabla_OR.csv");
 	
 	return 0;
 }
-

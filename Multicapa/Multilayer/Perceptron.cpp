@@ -5,10 +5,6 @@
 #include <sstream>
 #include <iomanip>
 #include "Perceptron.h"
-#include "utils.h"
-#include "func.h"
-#include "wait.h"
-#include "GNUplot.h"
 
 using namespace std;
 
