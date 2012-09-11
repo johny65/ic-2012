@@ -2,8 +2,7 @@
 #define PERCEPTRON_H
 
 #include <vector>
-#include "utils.h"
-#include "func.h"
+#include "GNUplot.h"
 
 using namespace std;
 
@@ -14,8 +13,9 @@ class Perceptron {
 private:
 	int nd; ///< Cantidad total de entradas del perceptrón (incluye sesgo)
 	vector<double> pesos; ///< Vector de pesos
-	double delta;
-	
+	double delta; ///< Gradiente local
+	bool hidden; ///< Indica si pertenece a una capa oculta
+	double v; ///< Campo inducido local (o salida lineal del perceptrón, es decir, v es igual a la suma de los pesos por las entradas sin pasar por la función de activación)
 	
 	//vector<double> salidas; ///< Vector de salidas
 	//vector<double> salidas_deseadas; ///< Vector con las salidas esperadas
@@ -40,7 +40,9 @@ private:
 	
 public:
 	Perceptron();
+	Perceptron(bool);
 	~Perceptron();
+	double get_delta();
 	//void fijar_tasa(double m);
 	//void set_iteraciones_max(int m);
 	//void set_tolerancia(double t);
@@ -53,7 +55,8 @@ public:
 	//void probar(const char *name);
 	void inicializar_pesos(int);
 	double clasificar(const vector<double> &D);
-	double calcular_delta(vector<double> ds);
+	void calcular_delta(vector<double> &ds);
+
 	//void sel_func(int x); //Selecciono la funcion 
 	//void val_cross(const char *ruta);
 	void mostrar_pesos(); //muestra los pesos

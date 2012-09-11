@@ -5,18 +5,34 @@
 #include <sstream>
 #include <iomanip>
 #include "Perceptron.h"
+#include "utils.h"
+#include "func.h"
+#include "wait.h"
+#include "GNUplot.h"
 
 using namespace std;
 
 /**
  * @brief Constructor por defecto.
  *
- * El constructor por defecto fija los parámetros del perceptrón (tasa de
- * aprendizaje, cantidad máxima de iteraciones, etc.) en valores predeterminados.
- * Para configurar estos parámetros se deben usar las funciones específicas.
+ * Por defecto el perceptrón es establecido como perteneciente a una capa
+ * oculta.
  */
-Perceptron::Perceptron()
+Perceptron::Perceptron() : hidden(true)
 {
+	srand(time(NULL));
+}
+
+
+/**
+ * @brief Constructor con parámetro para establecer si es oculta o no.
+ *
+ * @param h true si el perceptrón está en una capa oculta, false en caso
+ * contrario.
+ */
+Perceptron::Perceptron(bool h)
+{
+	this->hidden = h;
 	srand(time(NULL));
 }
 
@@ -27,9 +43,52 @@ Perceptron::Perceptron()
 Perceptron::~Perceptron() {}
 
 
+/**
+ * Inicializa los pesos del perceptrón en valores aleatorios.
+ *
+ * @param num_entradas Cantidad de pesos (cantidad de entradas que tiene el
+ * perceptrón contando el sesgo)
+ */
 void Perceptron::inicializar_pesos(int num_entradas)
 {
 	this->pesos = init_weight(num_entradas);
+}
+
+
+/**
+ * @brief Calcula el gradiente local de la neurona teniendo en cuenta si se
+ * encuentra en la capa de salida o en una capa oculta.
+ *
+ * @param ds Vector con los gradientes locales (deltas) de las neuronas de la
+ * capa siguiente. Si la neurona se encuentra en la capa de salida, ds incluye
+ * un solo valor (ds[0]) que corresponde al error en la salida de la neurona
+ * (es decir:
+ *     ds[0] = e
+ * donde:
+ *     e = d - y
+ * y donde:
+ *     d = salida deseada para la neurona
+ *     y = salida obtenida por la neurona).
+ *
+ */
+void Perceptron::calcular_delta(vector<double> &ds)
+{
+	if(this->hidden){
+		this->delta = derivada_sigmoide(this->v)*dot(ds, this->pesos);
+		///\todo ESTÁ MAL, NO HAY QUE USAR THIS->PESOS
+	}
+	else{
+		double &ej = ds[0];
+		this->delta = ej*derivada_sigmoide(this->v);	
+	}
+}
+
+
+/**
+ * @brief Devuelve el gradiente local de la neurona.
+ */
+double Perceptron::get_delta(){
+	return this->delta;
 }
 
 
@@ -222,7 +281,7 @@ void Perceptron::probar(const char *name)
 */
 
 /**
- * @brief Función para mostrar los pesos del perceptrón.
+ * @brief Función para mostrar por consola los pesos del perceptrón.
  */
 void Perceptron::mostrar_pesos(){
 	vector<double>::iterator q=this->pesos.begin();
@@ -259,13 +318,15 @@ void Perceptron::sel_func(int x){
 */
 
 /**
- * @brief Devuelve la salida que calcula el perceptrón para una entrada dada con los
- * pesos actuales.
+ * @brief Devuelve la salida que calcula el perceptrón para una entrada dada
+ * con los pesos actuales.
+ * 
  * @param D Vector con un patrón de entrada.
  * @return El valor de salida calculado.
  */
 double Perceptron::clasificar(const vector<double> &D){
-	return sigmoide(dot(D, this->pesos), 1.0);
+	this->v = dot(D, this->pesos);
+	return sigmoide(this->v, 1.0);
 }
 
 

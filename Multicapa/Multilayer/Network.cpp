@@ -1,45 +1,124 @@
 #include "Network.h"
+#include "func.h"
 
-Network::Network(int cant_capas, vector<double> perceptrones_por_capa) {
-	
-	for (int i=0; i<cant_capas; ++i){
+/**
+ * @brief Constructor.
+ * Inicializa la arquitectura de la red con las capas y neuronas fijadas.
+ *
+ * @param perceptrones_por_capa Vector donde cada elemento indica la cantidad
+ * de perceptrones que va a haber en esa capa (la cantidad de capas la establece
+ * la longitud del vector).
+ */
+Network::Network(vector<double> perceptrones_por_capa)
+{
+	//capas ocultas
+	int t = perceptrones_por_capa.size() - 1;
+	for (int i=0; i<t; ++i){
 		Layer nueva(perceptrones_por_capa[i]);
 		this->capas.push_back(nueva);
 	}
-	
+
+	//capa de salida (pongo a los perceptrones como hidden = false)
+	Layer nueva(perceptrones_por_capa[t], false);
+	this->capas.push_back(nueva);
+	cout<<"red lista\n";
 }
 
+
+/**
+ * @brief Devuelve la cantidad de capas de la red.
+ */
+int Network::cant_capas()
+{
+	return this->capas.size();
+}
+
+
+/**
+ * @brief Para inicializar todos los pesos de la red (los pesos de todas las
+ * neuronas que tiene).
+ */
 void Network::inicializar_pesos()
 {
-	for (int j=0; j<this->capas[0].size(); ++j){
+	//recorro todos los perceptrones diciéndoles que inicializen sus pesos
+
+	//para los que están en la capa de entrada, la cantidad de pesos que tienen
+	//es igual al número de entradas)
+	for (size_t j=0; j<this->capas[0].size(); ++j){
 		this->capas[0][j].inicializar_pesos(this->datos[0].size());
 	}
-	
-	for (int i=1; i<this->capas.size(); ++i){
-		for (int j=0; j<this->capas[i].size(); ++j){
-			this->capas[i][j].inicializar_pesos(capas[i-1].size());
+
+	//para los demás la cantidad de pesos es igual a la cantidad de perceptrones
+	//en la capa anterior más el peso correspondiente al sesgo
+	for (size_t i=1; i<this->capas.size(); ++i){
+		for (size_t j=0; j<this->capas[i].size(); ++j){
+			this->capas[i][j].inicializar_pesos(capas[i-1].size() + 1);
 		}
 	}
+	
 }
 
 Network::~Network() {
 	
 }
 
+
+vector< vector<double> > Network::mapear(vector<double> &x){
+	/**
+		@param x vector de salidas deseadas escalares.
+	*/
+
+	int c = this->capas.back().size(); //si la función es de la clase no hace falta pasar esto como parámetro
+	cout<<"neuronas de salidas: "<<c<<endl;
+
+	vector< vector<double> > sal_m;
+	if(c==1){
+		//si hay una sola neurona en la última capa, las salidas no tiene mapeo
+		//(-1 ó 1), solamente se pone cada valor en un vector aparte
+		for (size_t i=0; i<x.size(); ++i) {
+			sal_m.push_back(vector<double>(1, x[i]));
+		}
+	}
+	else {
+		//sino se hace el mapeo doble->vector, donde queda en +1 el elemento
+		//correspondiente al valor
+		vector<double> n(c, -1.0);
+		for (size_t i=0; i<x.size(); ++i) {
+			sal_m.push_back(n);
+			sal_m[i].at(x[i]) = 1.0; //pongo el at para que tire error si tenemos menos neuronas que las que necesita el mapeo
+		}
+	}
+
+	/*
+	for (int i=0; i<sal_m.size(); ++i){
+		cout<<"salida: "<<x[i]<<" mapeo: ";
+		for (int j=0; j<sal_m[i].size(); ++j){
+			cout<<sal_m[i][j]<<" ";
+		}
+		cout<<endl;
+	}
+	*/
+	
+	return sal_m;
+	
+}
+
+
 void Network::entrenar (const char * name) {
 	/** 
 		@brief entrena la red neuronal
 		@param name nombre del archivo que contiene los datos
 	*/
-	///< 1- Abro el archivo de datos;
+
+	//1- Abro el archivo de datos;
 	this->datos = leer_csv(name, this->salidas_deseadas);
 	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo"<<endl;return;}
 	inicializar_pesos();
+	cout<<"Listo...\n";
 	
 	vector<double> &entradas = this->datos[0];
 	
 	//paso hacia adelante:
-	
 	for (size_t i=0; i<this->capas.size(); ++i){
 		Layer &capa = this->capas[i];
 		vector<double> salida_capa(capa.size());
@@ -53,18 +132,26 @@ void Network::entrenar (const char * name) {
 	}
 	vector<double> salidas = entradas;
 	
+	
 	//hacia atras:
 	
+	vector<double> d= dif(salidas, this->salidas_deseadas);
+	double error=energia(d)/2.0;
+	//error: en la capa de salida 
+	
+	
+//
+//	
 //	for (size_t i=this->capas.size(); i>=0; --i){
 //		Layer &capa = this->capas[i];
 //		
 //	}
+//	
 	
-	
-	//vector<double> salidas = entradas;
-	for (size_t i=0; i<salidas.size(); ++i)
-		cout<<salidas[i]<<" ";
-	cout<<endl;
+//	vector<double> salidas = entradas;
+//	for (size_t i=0; i<salidas.size(); ++i)
+//		cout<<salidas[i]<<" ";
+//	cout<<endl;
 	
 }
 
@@ -75,7 +162,6 @@ void Network::val_cross (const char * ruta) {
 void Network::probar (const char * name) {
 	
 }
-
 
 void Network::graficar_puntos(const char *archivo, const char *titulo)
 {
@@ -120,3 +206,4 @@ void Network::graficar_puntos(const char *archivo, const char *titulo)
 	plotter(sp.str());
 	//wait(this->tiempo_espera);
 }
+

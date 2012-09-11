@@ -1,8 +1,8 @@
 #include <vector>
 #include <cmath>
+#include <ctime>
 #include <cstdlib>
 #include <iostream>
-#include "func.h"
 
 using namespace std;
 
@@ -112,4 +112,12 @@ double derivada_sigmoide(double x, double a = 1.0)
 {
 	double res = 2.0 * a * exp(a*x) / pow((exp(a*x) + 1), 2.0);
 	return res;
+}
+
+double energia(const vector<double> &s){
+	double e=0;
+	for(int i=0;i<s.size();i++) { 
+		e+=s[i]*s[i];
+	}
+	return e;
 }

@@ -6,7 +6,6 @@
 //#include "armadillo"
 #include <vector>
 #include "Perceptron.h"
-#include "GNUplot.h"
 #include "utils.h"
 
 
@@ -25,7 +24,7 @@ private:
 	
 	vector< vector<double> > datos;
 	vector<Perceptron*> neuronas; ///< Vector con punteros a todos los perceptrones de la red
-	
+	int cant_clases;
 	double eta; ///< Tasa de aprendizaje
 	int max_iter; ///< Cantidad máxima de iteraciones
 	//double (*func)(double, double); ///< Función de activación
@@ -33,18 +32,21 @@ private:
 	bool graficos; ///< Indica si se activan los gráficos o no
 	bool couts; ///< Indica si se deben mostrar salidas por consola
 	bool show_error; ///< Indica si se debe mostrar el gráfico de error
-	void graficar_puntos(const char *archivo, const char *titulo);
-	void inicializar_pesos();
 	GNUplot plotter; ///< Conexión con GNUplot
-	double tiempo_espera; ///< Tiempo entre frames para la animación
+
+
+	vector< vector<double> > mapear(vector<double>&);
+	void inicializar_pesos();
+	void graficar_puntos(const char *archivo, const char *titulo);
+	
 	//Col <double> Datos;
 	//Col <double> d;///< salida esperada para cada fila de la matrix Datos;
 public:
 	//Setear_arquitectura()  (idea funcion que setee las conexiones de las capas todos contra todos o como sea)
-	Network(int cant_capas, vector<double> perceptrones_por_capa);
+	Network(vector<double> perceptrones_por_capa);
 	~Network();
 	
-	
+	int cant_capas();
 	void entrenar(const char *name);
 	void val_cross(const char *ruta);
 	void probar(const char *name);

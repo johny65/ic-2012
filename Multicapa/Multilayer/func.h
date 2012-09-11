@@ -58,9 +58,10 @@ vector<double> recalcular_pesos(const vector<double>&, double, double, double, c
 
 double calc_error_x_epoca(double sal_d, double sal_o);
 double calc_error(vector<double> &x, vector<double> &y);
-double signo(double valor, double a);
-	
-double sigmoide(double valor, double a);
-double derivada_sigmoide(double valor, double a);
+double signo(double valor, double a = 1.0);
+
+double sigmoide(double valor, double a = 1.0);
+double derivada_sigmoide(double valor, double a = 1.0);
+double energia(const vector<double> &s);
 
 #endif

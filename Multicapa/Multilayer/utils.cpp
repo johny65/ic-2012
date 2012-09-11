@@ -6,7 +6,7 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
-#include "utils.h"
+#include "GNUplot.h"
 
 using namespace std;
 
