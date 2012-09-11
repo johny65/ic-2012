@@ -110,35 +110,52 @@ void Network::entrenar (const char * name) {
 		@param name nombre del archivo que contiene los datos
 	*/
 
-	//1- Abro el archivo de datos;
-	this->datos = leer_csv(name, this->salidas_deseadas);
-	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo"<<endl;return;}
+	//Abro el archivo de datos;
+	vector<double> salidas_escalares;
+	this->datos = leer_csv(name, salidas_escalares);
+	
+	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
+
+	//mapeo las salidas deseadas a las neuronas de salida
+	this->salidas_deseadas = mapear(salidas_escalares);
+
+	//inicializo los pesos de la red
 	inicializar_pesos();
-	cout<<"Listo...\n";
 	
-	vector<double> &entradas = this->datos[0];
 	
-	//paso hacia adelante:
-	for (size_t i=0; i<this->capas.size(); ++i){
-		Layer &capa = this->capas[i];
-		vector<double> salida_capa(capa.size());
-		//meter las entradas por los perceptrones de la capa
-		for (size_t j=0; j<capa.size(); ++j){
-			salida_capa[j] = capa[j].clasificar(entradas);
+	vector< vector<double> >::iterator q;
+	//int epocas = 0;
+	///\todo hacer todo lo siguiente para muchas épocas
+	int i = 0;
+	q = datos.begin();
+	while (q != datos.end()){ //recorro todo el set de datos
+		///\todo hacer que lo recorra de forma aleatoria, no secuencial
+
+		vector<double> *entradas = &(*q); //un patrón de entrada (no todas)
+		
+		//paso hacia adelante:
+		for (size_t k=0; k<this->capas.size(); ++k){
+			Layer &capa = this->capas[k];
+			vector<double> salida_capa(capa.size());
+			//meter las entradas por los perceptrones de la capa
+			for (size_t j=0; j<capa.size(); ++j){
+				salida_capa[j] = capa[j].clasificar(*entradas); ///<\todo ver bien qué está mal, el dot del clasificar tira "diferente dimensiones"
+			}
+			
+			entradas = &salida_capa;
+			
 		}
+		vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
 		
-		entradas = salida_capa;
 		
+		//hacia atras:
+		
+		vector<double> d = dif(salidas, this->salidas_deseadas[i]);
+		//double error=energia(d)/2.0;
+		//error: en la capa de salida
+
+		i++;
 	}
-	vector<double> salidas = entradas;
-	
-	
-	//hacia atras:
-	
-	vector<double> d= dif(salidas, this->salidas_deseadas);
-	double error=energia(d)/2.0;
-	//error: en la capa de salida 
-	
 	
 //
 //	

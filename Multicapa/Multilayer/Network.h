@@ -20,7 +20,7 @@ typedef vector<Perceptron> Layer;
 class Network {
 private:
 	vector<Layer> capas; /** R (capas) es el vector de capas, es decir la longitud del vector R determina la cantidad de capas en la red, siendo R[R.size()-1] la capa de salida*/
-	vector<double> salidas_deseadas; ///< Vector con las salidas esperadas
+	vector< vector<double> > salidas_deseadas; ///< Vector con las salidas esperadas (en forma de vectores)
 	
 	vector< vector<double> > datos;
 	vector<Perceptron*> neuronas; ///< Vector con punteros a todos los perceptrones de la red
