@@ -50,7 +50,7 @@ vector<double> prod_escalar(const vector<double> &x, double nu)
 
 double dot(const vector<double> &x, const vector<double> &y){
 	if(x.size()!=y.size()){
-		cerr<<"Vectores de diferente dimensión!"<<endl;
+		cerr<<"Vectores de diferente dimensió  !"<<"vector x: "<<x.size()<<" vector y "<<y.size()<<endl;
 		return 0;
 	}
 	double p=0;
@@ -116,7 +116,7 @@ double derivada_sigmoide(double x, double a = 1.0)
 
 double energia(const vector<double> &s){
 	double e=0;
-	for(int i=0;i<s.size();i++) { 
+	for(size_t i=0;i<s.size();i++) { 
 		e+=s[i]*s[i];
 	}
 	return e;

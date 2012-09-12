@@ -43,6 +43,7 @@ public:
 	Perceptron(bool);
 	~Perceptron();
 	double get_delta();
+	bool get_hidden();
 	//void fijar_tasa(double m);
 	//void set_iteraciones_max(int m);
 	//void set_tolerancia(double t);

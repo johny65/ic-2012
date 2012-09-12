@@ -55,6 +55,10 @@ void Perceptron::inicializar_pesos(int num_entradas)
 }
 
 
+bool Perceptron::get_hidden(){
+	return hidden;
+}
+
 /**
  * @brief Calcula el gradiente local de la neurona teniendo en cuenta si se
  * encuentra en la capa de salida o en una capa oculta.

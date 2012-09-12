@@ -14,7 +14,7 @@ Network::Network(vector<double> perceptrones_por_capa)
 	//capas ocultas
 	int t = perceptrones_por_capa.size() - 1;
 	for (int i=0; i<t; ++i){
-		Layer nueva(perceptrones_por_capa[i]);
+		Layer nueva(perceptrones_por_capa[i],true);
 		this->capas.push_back(nueva);
 	}
 
@@ -52,7 +52,8 @@ void Network::inicializar_pesos()
 	//en la capa anterior más el peso correspondiente al sesgo
 	for (size_t i=1; i<this->capas.size(); ++i){
 		for (size_t j=0; j<this->capas[i].size(); ++j){
-			this->capas[i][j].inicializar_pesos(capas[i-1].size() + 1);
+			this->capas[i][j].inicializar_pesos(capas[i-1].size()+1);
+			cout<<"capa hidden "<<capas[i-1].size()<<endl;
 		}
 	}
 	
@@ -103,6 +104,10 @@ vector< vector<double> > Network::mapear(vector<double> &x){
 	
 }
 
+bool Network::is_hidden(Layer x){
+	Layer::iterator q=x.begin();
+	return (*q).get_hidden();
+}
 
 void Network::entrenar (const char * name) {
 	/** 
@@ -126,34 +131,47 @@ void Network::entrenar (const char * name) {
 	vector< vector<double> >::iterator q;
 	//int epocas = 0;
 	///\todo hacer todo lo siguiente para muchas épocas
-	int i = 0;
+	int i = 1;
 	q = datos.begin();
 	while (q != datos.end()){ //recorro todo el set de datos
 		///\todo hacer que lo recorra de forma aleatoria, no secuencial
 
-		vector<double> *entradas = &(*q); //un patrón de entrada (no todas)
+		vector<double> entradas = (*q); //un patrón de entrada (no todas)
 		
 		//paso hacia adelante:
 		for (size_t k=0; k<this->capas.size(); ++k){
-			Layer &capa = this->capas[k];
-			vector<double> salida_capa(capa.size());
+			Layer &capa = this->capas[k]; //parado en la capa k
+			vector<double> salida_capa(capa.size()); //salida de la capa k
+			cout<<"salida de la capa_"<<k<<" "<<capa.size()<<endl;
+			cout<<"tamanio entradas a la capa_"<< k <<" "<<(entradas).size()<<endl;
 			//meter las entradas por los perceptrones de la capa
-			for (size_t j=0; j<capa.size(); ++j){
-				salida_capa[j] = capa[j].clasificar(*entradas); ///<\todo ver bien qué está mal, el dot del clasificar tira "diferente dimensiones"
+			for (size_t j=0; j<capa.size(); ++j){ //for por cada neurona de la capa k
+				salida_capa[j] = capa[j].clasificar(entradas); ///<\todo ver bien qué está mal, el dot del clasificar tira "diferente dimensiones"
+				cout<<salida_capa[j]<< " ";
 			}
-			
-			entradas = &salida_capa;
-			
-		}
-		vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
+			cout<<endl;
+			if(k!=capas.size()-1){ //Agrago el bias si estoy en una capa hidden
+				cout<<"la capa es oculta"<<endl;
+				salida_capa.push_back(1); //por el bias
+				entradas = salida_capa; // el tamanio de el vector entradas es igual al numero de Perceptrones de la capa anterior  + 1 (por el bias)
+			}
+			else{
+				entradas= salida_capa;
+				cout<<"ultima capa tamanio salida"<<salida_capa.size()<<endl;
+			}
+		} //termina forward para el primer dato del archivo
 		
+		vector<double> &salidas = entradas; //salida de la última capa (salida de la red)
+		cout<<"salida de la red: "<<entradas.back();
+		cout<<"Paso a la iteracion "<<i+1<<endl<<"-------------------------"<<endl;
 		
 		//hacia atras:
 		
-		vector<double> d = dif(salidas, this->salidas_deseadas[i]);
+		//vector<double> d = dif(salidas, this->salidas_deseadas[i]);
 		//double error=energia(d)/2.0;
 		//error: en la capa de salida
-
+		//break;
+		q++;
 		i++;
 	}
 	

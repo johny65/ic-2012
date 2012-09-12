@@ -38,6 +38,7 @@ private:
 	vector< vector<double> > mapear(vector<double>&);
 	void inicializar_pesos();
 	void graficar_puntos(const char *archivo, const char *titulo);
+	bool is_hidden(Layer x);
 	
 	//Col <double> Datos;
 	//Col <double> d;///< salida esperada para cada fila de la matrix Datos;
