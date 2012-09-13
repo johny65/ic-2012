@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "Network.h"
 #include "func.h"
 
@@ -14,14 +15,14 @@ Network::Network(vector<double> perceptrones_por_capa)
 	//capas ocultas
 	int t = perceptrones_por_capa.size() - 1;
 	for (int i=0; i<t; ++i){
-		Layer nueva(perceptrones_por_capa[i],true);
+		Layer nueva(perceptrones_por_capa[i], true);
 		this->capas.push_back(nueva);
 	}
 
 	//capa de salida (pongo a los perceptrones como hidden = false)
 	Layer nueva(perceptrones_por_capa[t], false);
 	this->capas.push_back(nueva);
-	cout<<"red lista\n";
+	
 }
 
 
@@ -53,7 +54,6 @@ void Network::inicializar_pesos()
 	for (size_t i=1; i<this->capas.size(); ++i){
 		for (size_t j=0; j<this->capas[i].size(); ++j){
 			this->capas[i][j].inicializar_pesos(capas[i-1].size()+1);
-			cout<<"capa hidden "<<capas[i-1].size()<<endl;
 		}
 	}
 	
@@ -86,7 +86,13 @@ vector< vector<double> > Network::mapear(vector<double> &x){
 		vector<double> n(c, -1.0);
 		for (size_t i=0; i<x.size(); ++i) {
 			sal_m.push_back(n);
-			sal_m[i].at(x[i]) = 1.0; //pongo el at para que tire error si tenemos menos neuronas que las que necesita el mapeo
+			try {
+				sal_m[i].at(x[i]) = 1.0; //pongo el at para que tire error si tenemos menos neuronas que las que necesita el mapeo
+			} catch (out_of_range ex) {
+				cout<<"Error: no se pueden mapear las salidas con la cantidad \
+de neuronas establecidas para la capa de salida ("<<ex.what()<<")\n";
+				exit(-1);
+			}
 		}
 	}
 
@@ -104,12 +110,18 @@ vector< vector<double> > Network::mapear(vector<double> &x){
 	
 }
 
+
+/**
+ * @brief Devuelve si una capa es oculta o no.
+ * @param x Capa a evaluar.
+ */
 bool Network::is_hidden(Layer x){
 	Layer::iterator q=x.begin();
 	return (*q).get_hidden();
 }
 
-void Network::entrenar (const char * name) {
+
+void Network::entrenar(const char * name) {
 	/** 
 		@brief entrena la red neuronal
 		@param name nombre del archivo que contiene los datos
@@ -132,42 +144,51 @@ void Network::entrenar (const char * name) {
 	//int epocas = 0;
 	///\todo hacer todo lo siguiente para muchas épocas
 	int i = 1;
+	int ic; //índice de capa para llenar el vector de salida de cada capa
 	q = datos.begin();
 	while (q != datos.end()){ //recorro todo el set de datos
 		///\todo hacer que lo recorra de forma aleatoria, no secuencial
 
-		vector<double> entradas = (*q); //un patrón de entrada (no todas)
+		vector<double> *entradas = &(*q); //un patrón de entrada (no todas)
 		
 		//paso hacia adelante:
 		for (size_t k=0; k<this->capas.size(); ++k){
 			Layer &capa = this->capas[k]; //parado en la capa k
-			vector<double> salida_capa(capa.size()); //salida de la capa k
-			cout<<"salida de la capa_"<<k<<" "<<capa.size()<<endl;
-			cout<<"tamanio entradas a la capa_"<< k <<" "<<(entradas).size()<<endl;
+			vector<double> *salida_capa;
+			if (is_hidden(capa)) {
+				//si la capa es oculta, su salida será la entrada para otra capa,
+				//entonces hay que agregar el sesgo
+				salida_capa = new vector<double>(capa.size() + 1, -1);
+				ic = 1; //empezar a llenar salida_capa desde el índice 1 (el 0 es el -1 del sesgo)
+			}
+			else {
+				//si la capa no es oculta (es la capa de salida), no agregar el -1
+				salida_capa = new vector<double>(capa.size());
+				ic = 0; //empezar a llenar salida_capa desde el índice 0
+			}
+
+			cout<<"Capa "<<k+1<<" - Tamaño de la entrada: "<<entradas->size()<<endl;
+
 			//meter las entradas por los perceptrones de la capa
-			for (size_t j=0; j<capa.size(); ++j){ //for por cada neurona de la capa k
-				salida_capa[j] = capa[j].clasificar(entradas); ///<\todo ver bien qué está mal, el dot del clasificar tira "diferente dimensiones"
-				cout<<salida_capa[j]<< " ";
+			for (size_t j = ic; j<capa.size(); ++j){ //for por cada neurona de la capa k
+				salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
 			}
-			cout<<endl;
-			if(k!=capas.size()-1){ //Agrago el bias si estoy en una capa hidden
-				cout<<"la capa es oculta"<<endl;
-				salida_capa.push_back(1); //por el bias
-				entradas = salida_capa; // el tamanio de el vector entradas es igual al numero de Perceptrones de la capa anterior  + 1 (por el bias)
-			}
-			else{
-				entradas= salida_capa;
-				cout<<"ultima capa tamanio salida"<<salida_capa.size()<<endl;
-			}
+
+			cout<<"Tamaño salida: "<<salida_capa->size()<<endl;
+
+			if (k != 0) //eliminar los vectores que quedan sueltos en memoria (menos cuando k==0 porque entradas apunta a datos[0])
+				delete entradas;
+			entradas = salida_capa;
 		} //termina forward para el primer dato del archivo
 		
-		vector<double> &salidas = entradas; //salida de la última capa (salida de la red)
-		cout<<"salida de la red: "<<entradas.back();
+		vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
+
+		cout<<"salida de la red: "<<entradas->back()<<endl;
 		cout<<"Paso a la iteracion "<<i+1<<endl<<"-------------------------"<<endl;
 		
 		//hacia atras:
 		
-		//vector<double> d = dif(salidas, this->salidas_deseadas[i]);
+		vector<double> d = dif(salidas, this->salidas_deseadas[i-1]);
 		//double error=energia(d)/2.0;
 		//error: en la capa de salida
 		//break;
@@ -233,7 +254,7 @@ void Network::graficar_puntos(const char *archivo, const char *titulo)
 	
 	//Para que GNUPLOT Grafique todas las clases
 	sp<<"plot ";
-	for (int k=0; k<clases.size()-1;k++){
+	for (size_t k=0; k<clases.size()-1;k++){
 		sp<<"\"clase "<<clases[k]<<".dat\" lt "<<clases[k]+1<<", ";
 	}
 	//Este hay q separarlo porque no tiene que incluir la ',' al final

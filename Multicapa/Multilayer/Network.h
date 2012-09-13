@@ -23,7 +23,6 @@ private:
 	vector< vector<double> > salidas_deseadas; ///< Vector con las salidas esperadas (en forma de vectores)
 	
 	vector< vector<double> > datos;
-	vector<Perceptron*> neuronas; ///< Vector con punteros a todos los perceptrones de la red
 	int cant_clases;
 	double eta; ///< Tasa de aprendizaje
 	int max_iter; ///< Cantidad máxima de iteraciones
