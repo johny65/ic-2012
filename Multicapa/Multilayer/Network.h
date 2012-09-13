@@ -23,6 +23,8 @@ private:
 	vector< vector<double> > salidas_deseadas; ///< Vector con las salidas esperadas (en forma de vectores)
 	
 	vector< vector<double> > datos;
+	
+	vector<vector<double > > salida_de_capa; ///<es necesario guardar cada una de las salidas de las capas para hacer el paso hacia atras
 	int cant_clases;
 	double eta; ///< Tasa de aprendizaje
 	int max_iter; ///< Cantidad máxima de iteraciones
@@ -50,6 +52,7 @@ public:
 	void entrenar(const char *name);
 	void val_cross(const char *ruta);
 	void probar(const char *name);
+	
 	//Col <double> clasificar(); //el dense_vector de salida contiene 1 solo elemento en caso que en la capa de salida solo exista una sola neurona
 	
 };

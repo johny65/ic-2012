@@ -70,3 +70,15 @@ void crear_dat_vector(vector<double> &v, const char *name)
 	out.close();
 	
 }
+
+void mostrar_sdcapa(vector<vector<double> > x){
+	vector<vector<double> >::iterator q=x.begin();
+	
+	while(q!=x.end()){
+		for(int i=0;i<(*q).size();i++) { 
+			cout<<(*q)[i]<<" ";
+		}
+		cout<<endl;
+		q++;
+	}
+}

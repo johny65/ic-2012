@@ -49,4 +49,6 @@ void crear_dat(vector<vector<double> > &v, const char *name);
  */
 void crear_dat_vector(vector<double> &v, const char *name);
 
+
+void mostrar_sdcapa(vector<vector<double> > x);
 #endif

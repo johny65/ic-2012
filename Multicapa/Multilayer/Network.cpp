@@ -143,7 +143,7 @@ void Network::entrenar(const char * name) {
 	vector< vector<double> >::iterator q;
 	//int epocas = 0;
 	///\todo hacer todo lo siguiente para muchas épocas
-	int i = 1;
+	int i = 0;
 	int ic; //índice de capa para llenar el vector de salida de cada capa
 	q = datos.begin();
 	while (q != datos.end()){ //recorro todo el set de datos
@@ -167,32 +167,33 @@ void Network::entrenar(const char * name) {
 				ic = 0; //empezar a llenar salida_capa desde el índice 0
 			}
 
-			cout<<"Capa "<<k+1<<" - Tamaño de la entrada: "<<entradas->size()<<endl;
+			cout<<"Capa "<<k+1<<" - Tamano de la entrada: "<<entradas->size()<<endl;
 
 			//meter las entradas por los perceptrones de la capa
 			for (size_t j = ic; j<capa.size(); ++j){ //for por cada neurona de la capa k
 				salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
 			}
-
-			cout<<"Tamaño salida: "<<salida_capa->size()<<endl;
+			//En este punto guardo la salida de la capa 
+			this->salida_de_capa.push_back(*salida_capa); //Aqui hay que sacar el bias y solo guardar los valores de la salida de cada neurona. VER
+			
+			cout<<"Tamano salida: "<<salida_capa->size()<<endl;
 
 			if (k != 0) //eliminar los vectores que quedan sueltos en memoria (menos cuando k==0 porque entradas apunta a datos[0])
 				delete entradas;
 			entradas = salida_capa;
 		} //termina forward para el primer dato del archivo
 		
-		vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
-
-		cout<<"salida de la red: "<<entradas->back()<<endl;
-		cout<<"Paso a la iteracion "<<i+1<<endl<<"-------------------------"<<endl;
+		//vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
+		cout<<endl<<"---------------------"<<endl;
+		mostrar_sdcapa(this->salida_de_capa);
+		cout<<endl<<"---------------------"<<endl;
+		//paso hacia atra:
 		
-		//hacia atras:
-		
-		vector<double> d = dif(salidas, this->salidas_deseadas[i-1]);
+		//vector<double> d = dif(salidas, this->salidas_deseadas[i]);//
 		//double error=energia(d)/2.0;
 		//error: en la capa de salida
-		//break;
-		q++;
+		break;
+		//q++;
 		i++;
 	}
 	
@@ -210,6 +211,8 @@ void Network::entrenar(const char * name) {
 //	cout<<endl;
 	
 }
+
+
 
 void Network::val_cross (const char * ruta) {
 	
