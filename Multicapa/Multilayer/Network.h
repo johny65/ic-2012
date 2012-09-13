@@ -11,7 +11,6 @@
 
 using namespace std;
 
-typedef vector<Perceptron> Layer;
 
 /**
 	@class Network se encarga de la comunicacion de las capas
@@ -24,7 +23,8 @@ private:
 	
 	vector< vector<double> > datos;
 	
-	vector<vector<double > > salida_de_capa; ///<es necesario guardar cada una de las salidas de las capas para hacer el paso hacia atras
+	vector< vector<double>* > salidas_capas; ///<es necesario guardar cada una de las salidas de las capas para hacer el paso hacia atras
+	
 	int cant_clases;
 	double eta; ///< Tasa de aprendizaje
 	int max_iter; ///< Cantidad máxima de iteraciones

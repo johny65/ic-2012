@@ -3,6 +3,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
+#include <cassert>
 
 using namespace std;
 
@@ -30,6 +31,7 @@ vector<double> sum(const vector<double> &y, const vector<double> &x)
 
 vector<double> dif(const vector<double> &y, const vector<double> &x)
 {
+	assert(y.size() == x.size());
 	vector<double> r;
 	int n=y.size();
 	for(int i=0;i<n;++i){
@@ -48,11 +50,9 @@ vector<double> prod_escalar(const vector<double> &x, double nu)
 	return y;
 }
 
-double dot(const vector<double> &x, const vector<double> &y){
-	if(x.size()!=y.size()){
-		cerr<<"Vectores de diferente dimensió  !"<<"vector x: "<<x.size()<<" vector y "<<y.size()<<endl;
-		return 0;
-	}
+double dot(const vector<double> &x, const vector<double> &y)
+{
+	assert(y.size() == x.size());
 	double p=0;
 	//vector de pesos sin sesgo
 	int n=x.size();

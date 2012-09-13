@@ -6,6 +6,9 @@
 
 using namespace std;
 
+class Perceptron;
+typedef vector<Perceptron> Layer;
+
 class Perceptron {
 	/**
 	@brief Clase Perceptron Simple
@@ -13,9 +16,11 @@ class Perceptron {
 private:
 	int nd; ///< Cantidad total de entradas del perceptrón (incluye sesgo)
 	vector<double> pesos; ///< Vector de pesos
+	vector<double> pesos_anteriores; ///< Vector de pesos pasados, para usarlos con el término de momento
 	double delta; ///< Gradiente local
 	bool hidden; ///< Indica si pertenece a una capa oculta
 	double v; ///< Campo inducido local (o salida lineal del perceptrón, es decir, v es igual a la suma de los pesos por las entradas sin pasar por la función de activación)
+	double y; ///< Salida del perceptrón (y = phi(v))
 	
 	//vector<double> salidas; ///< Vector de salidas
 	//vector<double> salidas_deseadas; ///< Vector con las salidas esperadas
@@ -44,6 +49,9 @@ public:
 	~Perceptron();
 	double get_delta();
 	bool get_hidden();
+	double get_salida();
+	double get_peso(int peso);
+	
 	//void fijar_tasa(double m);
 	//void set_iteraciones_max(int m);
 	//void set_tolerancia(double t);
@@ -56,7 +64,9 @@ public:
 	//void probar(const char *name);
 	void inicializar_pesos(int);
 	double clasificar(const vector<double> &D);
-	void calcular_delta(vector<double> &ds);
+	void calcular_delta(double ej);
+	void calcular_delta(Layer&, int);
+	void actualizar_pesos(vector<double>&, double eta, double alfa = 0.0);
 
 	//void sel_func(int x); //Selecciono la funcion 
 	//void val_cross(const char *ruta);
@@ -66,5 +76,3 @@ public:
 };
 
 #endif
-
-

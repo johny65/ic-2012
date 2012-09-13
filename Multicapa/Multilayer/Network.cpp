@@ -12,7 +12,7 @@
  */
 Network::Network(vector<double> perceptrones_por_capa)
 {
-	//capas ocultas
+	//capas ocultas (la capa de entrada es considerada capa oculta)
 	int t = perceptrones_por_capa.size() - 1;
 	for (int i=0; i<t; ++i){
 		Layer nueva(perceptrones_por_capa[i], true);
@@ -22,6 +22,17 @@ Network::Network(vector<double> perceptrones_por_capa)
 	//capa de salida (pongo a los perceptrones como hidden = false)
 	Layer nueva(perceptrones_por_capa[t], false);
 	this->capas.push_back(nueva);
+
+	//ya aloco el espacio para los vectores de salida de las capas;
+	
+	this->salidas_capas = vector< vector<double>* >(cant_capas());
+	for (int i=0; i<cant_capas()-1; ++i){
+		//si la capa es oculta, su salida será la entrada para otra capa,
+		//entonces hay que agregar el -1 del sesgo
+		this->salidas_capas[i] = new vector<double>(this->capas[i].size() + 1, -1);
+	}
+	//a la capa de salida no
+	this->salidas_capas.back() = new vector<double>(this->capas.back().size());
 	
 }
 
@@ -74,7 +85,7 @@ vector< vector<double> > Network::mapear(vector<double> &x){
 
 	vector< vector<double> > sal_m;
 	if(c==1){
-		//si hay una sola neurona en la última capa, las salidas no tiene mapeo
+		//si hay una sola neurona en la última capa, las salidas no tienen mapeo
 		//(-1 ó 1), solamente se pone cada valor en un vector aparte
 		for (size_t i=0; i<x.size(); ++i) {
 			sal_m.push_back(vector<double>(1, x[i]));
@@ -116,8 +127,7 @@ de neuronas establecidas para la capa de salida ("<<ex.what()<<")\n";
  * @param x Capa a evaluar.
  */
 bool Network::is_hidden(Layer x){
-	Layer::iterator q=x.begin();
-	return (*q).get_hidden();
+	return x[0].get_hidden();
 }
 
 
@@ -145,64 +155,94 @@ void Network::entrenar(const char * name) {
 	///\todo hacer todo lo siguiente para muchas épocas
 	int i = 0;
 	int ic; //índice de capa para llenar el vector de salida de cada capa
-	q = datos.begin();
+	q = datos.begin(); cout<<"Cantidad de patrones: "<<datos.size()<<endl;
 	while (q != datos.end()){ //recorro todo el set de datos
 		///\todo hacer que lo recorra de forma aleatoria, no secuencial
 
 		vector<double> *entradas = &(*q); //un patrón de entrada (no todas)
 		
-		//paso hacia adelante:
-		for (size_t k=0; k<this->capas.size(); ++k){
-			Layer &capa = this->capas[k]; //parado en la capa k
-			vector<double> *salida_capa;
-			if (is_hidden(capa)) {
-				//si la capa es oculta, su salida será la entrada para otra capa,
-				//entonces hay que agregar el sesgo
-				salida_capa = new vector<double>(capa.size() + 1, -1);
-				ic = 1; //empezar a llenar salida_capa desde el índice 1 (el 0 es el -1 del sesgo)
-			}
-			else {
-				//si la capa no es oculta (es la capa de salida), no agregar el -1
-				salida_capa = new vector<double>(capa.size());
-				ic = 0; //empezar a llenar salida_capa desde el índice 0
-			}
 
-			cout<<"Capa "<<k+1<<" - Tamano de la entrada: "<<entradas->size()<<endl;
+		/*----------- paso hacia adelante: --------------*/
+		
+		for (size_t k=0; k<this->capas.size(); ++k){
+			
+			Layer &capa = this->capas[k]; //parado en la capa k
+			if (is_hidden(capa))
+				ic = 1; //empezar a llenar salida_capa desde el índice 1 (el 0 es el -1 del sesgo)
+			else
+				ic = 0; //empezar a llenar salida_capa desde el índice 0
+
+			//cout<<"Capa "<<k+1<<" - Tamano de la entrada: "<<entradas->size()<<endl;
 
 			//meter las entradas por los perceptrones de la capa
+			vector<double> *salida_capa = this->salidas_capas[k];
 			for (size_t j = ic; j<capa.size(); ++j){ //for por cada neurona de la capa k
 				salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
 			}
-			//En este punto guardo la salida de la capa 
-			this->salida_de_capa.push_back(*salida_capa); //Aqui hay que sacar el bias y solo guardar los valores de la salida de cada neurona. VER
 			
-			cout<<"Tamano salida: "<<salida_capa->size()<<endl;
+			//cout<<"Tamaño salida: "<<salida_capa->size()<<endl;
 
-			if (k != 0) //eliminar los vectores que quedan sueltos en memoria (menos cuando k==0 porque entradas apunta a datos[0])
-				delete entradas;
 			entradas = salida_capa;
+			
 		} //termina forward para el primer dato del archivo
 		
-		//vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
-		cout<<endl<<"---------------------"<<endl;
-		mostrar_sdcapa(this->salida_de_capa);
-		cout<<endl<<"---------------------"<<endl;
-		//paso hacia atra:
+		vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
+
 		
-		//vector<double> d = dif(salidas, this->salidas_deseadas[i]);//
-		//double error=energia(d)/2.0;
+
+		/*------------- paso hacia atrás: --------------*/
+		
+		vector<double> e = dif(salidas, this->salidas_deseadas.at(i)); //errores en la salida de cada neurona
+
+		/* primero última capa:
+		 * me paro en la última capa y recorro las neuronas calculando el gradiente
+		 * local en cada una con el error en sus salidas (e)
+		 */
+		Layer &ultima_capa = this->capas.back();
+		for (size_t j=0; j<ultima_capa.size(); ++j){
+			ultima_capa[j].calcular_delta(e[j]);
+		}
+
+		/* ahora las otras:
+		 * recorro las demás capas; me paro en la capa k y recorro sus neuronas
+		 * calculando el gradiente local en cada una mediante los calculados en
+		 * la capa k+1
+		 */
+		for (int k = this->capas.size()-2; k>=0; --k){
+			
+			Layer &capa = this->capas[k];
+			Layer &capa_posterior = this->capas[k+1];
+			
+			for (size_t j=0; j<capa.size(); ++j){
+				capa[j].calcular_delta(capa_posterior, j);
+			}
+
+			/* actualizar pesos de la capa k+1:
+			 * una vez calculados los gradientes locales en la capa k, puedo
+			 * actualizar los pesos en la capa k+1
+			 */
+			for (size_t j=0; j<capa_posterior.size(); ++j){
+				capa_posterior[j].actualizar_pesos(*this->salidas_capas[k], this->eta);
+			}
+
+		}
+
+		//en este punto me falta actualizar los pesos de la primera capa
+		for (size_t j=0; j<this->capas.front().size(); ++j){
+			this->capas.front()[j].actualizar_pesos(*q, this->eta);
+		}
+		
+		
+		//double error=energia(e)/2.0;
 		//error: en la capa de salida
-		break;
-		//q++;
+		//break;
+		q++;
 		i++;
 	}
 	
 //
 //	
-//	for (size_t i=this->capas.size(); i>=0; --i){
-//		Layer &capa = this->capas[i];
-//		
-//	}
+
 //	
 	
 //	vector<double> salidas = entradas;

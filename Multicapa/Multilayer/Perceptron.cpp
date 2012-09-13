@@ -75,14 +75,32 @@ bool Perceptron::get_hidden(){
  *     y = salida obtenida por la neurona).
  *
  */
-void Perceptron::calcular_delta(vector<double> &ds)
+
+
+
+void Perceptron::calcular_delta(Layer &capa_posterior, int indice)
 {
-	if(this->hidden){
-		this->delta = derivada_sigmoide(this->v)*dot(ds, this->pesos);
-		///\todo ESTÁ MAL, NO HAY QUE USAR THIS->PESOS
+	if (!this->hidden){
+		cout<<"Error: calculando delta de capa oculta en una capa de salida.\n";
+		exit(-1);
 	}
-	else{
-		double &ej = ds[0];
+	else {
+		double s = 0.0;
+		for (size_t i=0; i<capa_posterior.size(); ++i){
+			s += capa_posterior[i].get_delta() * capa_posterior[i].get_peso(indice + 1);
+		}
+		this->delta = derivada_sigmoide(this->v)*s;
+	}
+}
+
+
+void Perceptron::calcular_delta(double ej)
+{
+	if (this->hidden) {
+		cout<<"Error: calculando delta de capa de salida en una capa oculta.\n";
+		exit(-1);
+	}
+	else {
 		this->delta = ej*derivada_sigmoide(this->v);	
 	}
 }
@@ -94,6 +112,18 @@ void Perceptron::calcular_delta(vector<double> &ds)
 double Perceptron::get_delta(){
 	return this->delta;
 }
+
+
+void Perceptron::actualizar_pesos(vector<double> &ys, double eta, double alfa)
+{
+
+	//copiar fórmula
+	
+	for (size_t i=0; i<this->pesos.size(); ++i){
+		this->pesos[i] += eta * this->delta * ys[i]; //+    alfa*this->
+	}
+}
+
 
 
 /**
@@ -330,7 +360,32 @@ void Perceptron::sel_func(int x){
  */
 double Perceptron::clasificar(const vector<double> &D){
 	this->v = dot(D, this->pesos);
-	return sigmoide(this->v, 1.0);
+	this->y = sigmoide(this->v, 1.0);
+	return this->y;
+}
+
+
+/**
+ * @brief Devuelve la salida del perceptrón.
+ *
+ * Devuelve la salida no lineal `y` del perceptrón (y = phi(v), donde `phi` es
+ * la función de activación y `v` es la salida lineal). Este valor es calculado
+ * en la llamada a Perceptron::clasificar(entrada).
+ */
+double Perceptron::get_salida()
+{
+	return this->y;
+}
+
+
+/**
+ * @brief Devuelve el valor de un peso particular (tener en cuenta que
+ * `get_peso(0)` corresponde al sesgo).
+ * @param peso Índice del peso.
+ */
+double Perceptron::get_peso(int peso)
+{
+	return this->pesos.at(peso);
 }
 
 
