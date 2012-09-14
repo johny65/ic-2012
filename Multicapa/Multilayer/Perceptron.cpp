@@ -163,31 +163,7 @@ void Perceptron::actualizar_pesos(vector<double> &ys, double eta, double alfa)
 }
 
 
-/**
- * @brief Define el número máximo de iteraciones para entrenar el Perceptron.
- * @param m Cantidad máxima de iteraciones.
- */
-/*void Perceptron::set_iteraciones_max(int m)
-{
-	this->max_iter = m;
-}*/
 
-
-/**
- * @brief Define la tolerancia del error.
- *
- * A medida que va entrenando el perceptrón, se calcula una medida del error
- * entre su salida y las salidas deseadas. Cuando este error sea menor que esta
- * tolerancia, el entrenamiento se detiene.
- *
- * @param t Nueva tolerancia.
- */
-/*
-void Perceptron::set_tolerancia(double t)
-{
-	this->tol = t;
-}
-*/
 
 /**
  * @brief Establece el tiempo de espera entre frames para la animación, es

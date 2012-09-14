@@ -23,8 +23,6 @@ private:
 	
 	//vector<double> salidas; ///< Vector de salidas
 	//vector<double> salidas_deseadas; ///< Vector con las salidas esperadas
-	//double eta; ///< Tasa de aprendizaje
-	//int max_iter; ///< Cantidad máxima de iteraciones
 	//double (*func)(double, double); ///< Función de activación
 	//double tol; ///< Tolerancia del error para detener el entrenamiento
 	//bool graficos; ///< Indica si se activan los gráficos o no
@@ -52,7 +50,6 @@ public:
 	double get_peso(int peso);
 	
 	//void fijar_tasa(double m);
-	//void set_iteraciones_max(int m);
 	//void set_tolerancia(double t);
 	//void set_tiempo_espera(double t);
 	//void set_graficos(bool g);

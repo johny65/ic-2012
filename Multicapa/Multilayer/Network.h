@@ -18,6 +18,13 @@ using namespace std;
 
 class Network {
 private:
+
+	double eta; ///< Tasa de aprendizaje
+	double alfa; ///< Coeficiente para el término de momento
+	int max_epocas; ///< Cantidad máxima de épocas
+	double tol; ///< Tolerancia del error para detener el entrenamiento
+
+	
 	vector<Layer> capas; /** R (capas) es el vector de capas, es decir la longitud del vector R determina la cantidad de capas en la red, siendo R[R.size()-1] la capa de salida*/
 	vector< vector<double> > salidas_deseadas; ///< Vector con las salidas esperadas (en forma de vectores)
 	
@@ -25,11 +32,7 @@ private:
 	
 	vector< vector<double>* > salidas_capas; ///<es necesario guardar cada una de las salidas de las capas para hacer el paso hacia atras
 	
-	int cant_clases;
-	double eta; ///< Tasa de aprendizaje
-	int max_iter; ///< Cantidad máxima de iteraciones
-	//double (*func)(double, double); ///< Función de activación
-	double tol; ///< Tolerancia del error para detener el entrenamiento
+
 	bool graficos; ///< Indica si se activan los gráficos o no
 	bool couts; ///< Indica si se deben mostrar salidas por consola
 	bool show_error; ///< Indica si se debe mostrar el gráfico de error
@@ -49,6 +52,8 @@ public:
 	~Network();
 	
 	int cant_capas();
+	void set_max_epocas(int m);
+	void set_tolerancia(double t);
 	void entrenar(const char *name);
 	void val_cross(const char *ruta);
 	void probar(const char *name);

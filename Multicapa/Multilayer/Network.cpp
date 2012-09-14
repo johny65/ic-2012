@@ -4,14 +4,17 @@
 
 /**
  * @brief Constructor.
- * Inicializa la arquitectura de la red con las capas y neuronas fijadas.
+ * Inicializa la arquitectura de la red con las capas y neuronas fijadas (y fija
+ * los parámetros por defecto).
  *
  * @param perceptrones_por_capa Vector donde cada elemento indica la cantidad
  * de perceptrones que va a haber en esa capa (la cantidad de capas la establece
  * la longitud del vector).
  */
-Network::Network(vector<double> perceptrones_por_capa)
+Network::Network(vector<double> perceptrones_por_capa) :
+	eta(0.001), alfa(0.0), max_epocas(500), tol(1e-3)
 {
+	
 	//capas ocultas (la capa de entrada es considerada capa oculta)
 	int t = perceptrones_por_capa.size() - 1;
 	for (int i=0; i<t; ++i){
@@ -74,7 +77,12 @@ void Network::inicializar_pesos()
 /**
  * @brief Destructor.
  */
-Network::~Network() {}
+Network::~Network()
+{
+	for (size_t i=0; i<this->salidas_capas.size(); ++i){
+		delete this->salidas_capas[i];
+	}
+}
 
 
 /**
@@ -166,96 +174,103 @@ void Network::entrenar(const char * name) {
 	//inicializo los pesos de la red
 	inicializar_pesos();
 	
-	
+	//empiezo el entrenamiento
 	vector< vector<double> >::iterator q;
-	//int epocas = 0;
-	///\todo hacer todo lo siguiente para muchas épocas
-	int i = 0;
-	int ic; //índice de capa para llenar el vector de salida de cada capa
-	q = datos.begin(); cout<<"Cantidad de patrones: "<<datos.size()<<endl;
-	while (q != datos.end()){ //recorro todo el set de datos
-		///\todo hacer que lo recorra de forma aleatoria, no secuencial
-
-		vector<double> *entradas = &(*q); //un patrón de entrada (no todas)
+	int epocas = 0;
+	while (epocas < this->max_epocas){
 		
+		int i = 0;
+		int ic; //índice de capa para llenar el vector de salida de cada capa
+		q = datos.begin();
+		while (q != datos.end()){ //recorro todo el set de datos
+			///\todo hacer que lo recorra de forma aleatoria, no secuencial
 
-		/*----------- paso hacia adelante: --------------*/
-		
-		for (size_t k=0; k<this->capas.size(); ++k){
+			vector<double> *entradas = &(*q); //un patrón de entrada (no todas)
 			
-			Layer &capa = this->capas[k]; //parado en la capa k
-			if (is_hidden(capa))
-				ic = 1; //empezar a llenar salida_capa desde el índice 1 (el 0 es el -1 del sesgo)
-			else
-				ic = 0; //empezar a llenar salida_capa desde el índice 0
 
-			//cout<<"Capa "<<k+1<<" - Tamano de la entrada: "<<entradas->size()<<endl;
-
-			//meter las entradas por los perceptrones de la capa
-			vector<double> *salida_capa = this->salidas_capas[k];
-			for (size_t j = ic; j<capa.size(); ++j){ //for por cada neurona de la capa k
-				salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
-			}
+			/*----------- paso hacia adelante: --------------*/
 			
-			//cout<<"Tamaño salida: "<<salida_capa->size()<<endl;
+			for (size_t k=0; k<this->capas.size(); ++k){
+				
+				Layer &capa = this->capas[k]; //parado en la capa k
+				if (is_hidden(capa))
+					ic = 1; //empezar a llenar salida_capa desde el índice 1 (el 0 es el -1 del sesgo)
+				else
+					ic = 0; //empezar a llenar salida_capa desde el índice 0
 
-			entradas = salida_capa;
+				//cout<<"Capa "<<k+1<<" - Tamano de la entrada: "<<entradas->size()<<endl;
+
+				//meter las entradas por los perceptrones de la capa
+				vector<double> *salida_capa = this->salidas_capas[k];
+				for (size_t j = ic; j<capa.size(); ++j){ //for por cada neurona de la capa k
+					salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
+				}
+				
+				//cout<<"Tamaño salida: "<<salida_capa->size()<<endl;
+
+				entradas = salida_capa;
+				
+			} //termina feed-forward
 			
-		} //termina forward para el primer dato del archivo
-		
-		vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
+			vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
 
-		
-
-		/*------------- paso hacia atrás: --------------*/
-		
-		vector<double> e = dif(salidas, this->salidas_deseadas.at(i)); //errores en la salida de cada neurona
-
-		/* primero última capa:
-		 * me paro en la última capa y recorro las neuronas calculando el gradiente
-		 * local en cada una con el error en sus salidas (e)
-		 */
-		Layer &ultima_capa = this->capas.back();
-		for (size_t j=0; j<ultima_capa.size(); ++j){
-			ultima_capa[j].calcular_delta(e[j]);
-		}
-
-		/* ahora las otras:
-		 * recorro las demás capas; me paro en la capa k y recorro sus neuronas
-		 * calculando el gradiente local en cada una mediante los calculados en
-		 * la capa k+1
-		 */
-		for (int k = this->capas.size()-2; k>=0; --k){
 			
-			Layer &capa = this->capas[k];
-			Layer &capa_posterior = this->capas[k+1];
-			
-			for (size_t j=0; j<capa.size(); ++j){
-				capa[j].calcular_delta(capa_posterior, j);
-			}
 
-			/* actualizar pesos de la capa k+1:
-			 * una vez calculados los gradientes locales en la capa k, puedo
-			 * actualizar los pesos en la capa k+1
+			/*------------- paso hacia atrás: --------------*/
+			
+			vector<double> e = dif(salidas, this->salidas_deseadas.at(i)); //errores en la salida de cada neurona
+
+			/* primero última capa:
+			 * me paro en la última capa y recorro las neuronas calculando el gradiente
+			 * local en cada una con el error en sus salidas (e)
 			 */
-			for (size_t j=0; j<capa_posterior.size(); ++j){
-				capa_posterior[j].actualizar_pesos(*this->salidas_capas[k], this->eta);
+			Layer &ultima_capa = this->capas.back();
+			for (size_t j=0; j<ultima_capa.size(); ++j){
+				ultima_capa[j].calcular_delta(e[j]);
 			}
 
-		}
+			/* ahora las otras:
+			 * recorro las demás capas; me paro en la capa k y recorro sus neuronas
+			 * calculando el gradiente local en cada una mediante los calculados en
+			 * la capa k+1
+			 */
+			for (int k = this->capas.size()-2; k>=0; --k){
+				
+				Layer &capa = this->capas[k];
+				Layer &capa_posterior = this->capas[k+1];
+				
+				for (size_t j=0; j<capa.size(); ++j){
+					capa[j].calcular_delta(capa_posterior, j);
+				}
 
-		//en este punto me falta actualizar los pesos de la primera capa
-		for (size_t j=0; j<this->capas.front().size(); ++j){
-			this->capas.front()[j].actualizar_pesos(*q, this->eta);
-		}
+				/* actualizar pesos de la capa k+1:
+				 * una vez calculados los gradientes locales en la capa k, puedo
+				 * actualizar los pesos en la capa k+1
+				 */
+				for (size_t j=0; j<capa_posterior.size(); ++j){
+					capa_posterior[j].actualizar_pesos(*this->salidas_capas[k], this->eta);
+				}
+
+			}
+
+			//en este punto me falta actualizar los pesos de la primera capa
+			for (size_t j=0; j<this->capas.front().size(); ++j){
+				this->capas.front()[j].actualizar_pesos(*q, this->eta);
+			}
+			
+			
+			//double error=energia(e)/2.0;
+			//error: en la capa de salida
+			//break;
+			q++;
+			i++;
+			
+		} //termina un patrón de entrada, seguir con el siguiente
+
+		epocas++;
+		cout<<"Época: "<<epocas<<endl;
 		
-		
-		//double error=energia(e)/2.0;
-		//error: en la capa de salida
-		//break;
-		q++;
-		i++;
-	}
+	} //termina una época, seguir con otra
 	
 //
 //	
@@ -323,3 +338,29 @@ void Network::graficar_puntos(const char *archivo, const char *titulo)
 	//wait(this->tiempo_espera);
 }
 
+
+/**
+ * @brief Define el número máximo de épocas (iteraciones) para entrenar la
+ * red.
+ * @param m Cantidad máxima de épocas (presentación completa de todos los patrones
+ * de entrada).
+ */
+void Network::set_max_epocas(int m)
+{
+	this->max_epocas = m;
+}
+
+
+/**
+ * @brief Define la tolerancia del error.
+ *
+ * A medida que va entrenando la red, se calcula una medida del error
+ * entre su salida y las salidas deseadas. Cuando este error sea menor que esta
+ * tolerancia, el entrenamiento se detiene.
+ *
+ * @param t Nueva tolerancia.
+ */
+void Network::set_tolerancia(double t)
+{
+	this->tol = t;
+}
