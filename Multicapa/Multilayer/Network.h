@@ -57,6 +57,8 @@ public:
 	void entrenar(const char *name);
 	void val_cross(const char *ruta);
 	void probar(const char *name);
+	void mostrar_salida(vector<double>);
+	vector<double> clasificar(vector<double> Datos);
 	
 	//Col <double> clasificar(); //el dense_vector de salida contiene 1 solo elemento en caso que en la capa de salida solo exista una sola neurona
 	

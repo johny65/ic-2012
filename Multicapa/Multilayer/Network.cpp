@@ -161,7 +161,7 @@ bool Network::is_hidden(Layer x){
  * @param name Nombre del archivo que contiene los datos.
  */
 void Network::entrenar(const char * name) {
-
+	
 	//Abro el archivo de datos;
 	vector<double> salidas_escalares;
 	this->datos = leer_csv(name, salidas_escalares);
@@ -170,15 +170,15 @@ void Network::entrenar(const char * name) {
 
 	//mapeo las salidas deseadas a las neuronas de salida
 	this->salidas_deseadas = mapear(salidas_escalares);
-
+	int contar_errores;
 	//inicializo los pesos de la red
 	inicializar_pesos();
 	
 	//empiezo el entrenamiento
 	vector< vector<double> >::iterator q;
 	int epocas = 0;
-	while (epocas < this->max_epocas){
-		
+	while (epocas < this->max_epocas){ //Epoca=conjunto de datos entero es decir el archivo completo
+		contar_errores=0;
 		int i = 0;
 		int ic; //índice de capa para llenar el vector de salida de cada capa
 		q = datos.begin();
@@ -213,8 +213,8 @@ void Network::entrenar(const char * name) {
 			} //termina feed-forward
 			
 			vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
-
-			
+			//cout<<"longitud de la capa de salida"<<salidas.size()<<endl;
+			if(signo(salidas.back(),1.0)-this->salidas_deseadas[i][0]==(-2) or signo(salidas.back(),1.0)-this->salidas_deseadas[i][0]==(1)) {cout<<salidas.back()<<"  "<<this->salidas_deseadas[i][0]<<endl;contar_errores++;}
 
 			/*------------- paso hacia atrás: --------------*/
 			
@@ -265,23 +265,21 @@ void Network::entrenar(const char * name) {
 			q++;
 			i++;
 			
+		//	mostrar_salida(salidas);
+			
 		} //termina un patrón de entrada, seguir con el siguiente
-
 		epocas++;
-		cout<<"Época: "<<epocas<<endl;
+		//cout<<"Época: "<<epocas<<endl;
 		
 	} //termina una época, seguir con otra
 	
-//
-//	
+	cout<<"La cantidad de errores fue: "<<contar_errores<<endl;
+	
+//	graficar_puntos(name,"concent");
+	
+//	cin.get();
 
-//	
-	
-//	vector<double> salidas = entradas;
-//	for (size_t i=0; i<salidas.size(); ++i)
-//		cout<<salidas[i]<<" ";
-//	cout<<endl;
-	
+	cout<<"Porcentaje de errores: "<<(contar_errores*100)/2500<<endl;
 }
 
 
@@ -363,4 +361,36 @@ void Network::set_max_epocas(int m)
 void Network::set_tolerancia(double t)
 {
 	this->tol = t;
+}
+
+
+void Network::mostrar_salida(vector<double> v){
+		for(size_t i=0;i<v.size();i++) { 
+			cout<<v[i]<<endl;
+		}
+		//cout<<endl;
+}
+
+vector<double> Network::clasificar(vector<double> Datos){
+	Datos.push_back(-1);
+	int ic;
+	vector<double> *entradas = &(Datos);
+	//Calcula la salida para los Datos (esto una vez que ya esta entrenado)
+	for (size_t k=0; k<this->capas.size(); ++k){
+		Layer &capa = this->capas[k]; //parado en la capa k
+		if (is_hidden(capa))
+			ic = 1; //empezar a llenar salida_capa desde el índice 1 (el 0 es el -1 del sesgo)
+		else
+			ic = 0; //empezar a llenar salida_capa desde el índice 0
+		//meter las entradas por los perceptrones de la capa
+		vector<double> *salida_capa = this->salidas_capas[k];
+		for (size_t j = ic; j<capa.size(); ++j){ //for por cada neurona de la capa k
+			salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
+		}
+		
+		
+		entradas=salida_capa;
+		
+	}
+	return *entradas;
 }
