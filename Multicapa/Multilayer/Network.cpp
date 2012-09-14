@@ -12,7 +12,7 @@
  * la longitud del vector).
  */
 Network::Network(vector<double> perceptrones_por_capa) :
-	eta(0.001), alfa(0.0), max_epocas(500), tol(1e-3)
+	eta(0.01), alfa(0.1), max_epocas(1), tol(1e-3)
 {
 	
 	//capas ocultas (la capa de entrada es considerada capa oculta)
@@ -36,6 +36,8 @@ Network::Network(vector<double> perceptrones_por_capa) :
 	}
 	//a la capa de salida no
 	this->salidas_capas.back() = new vector<double>(this->capas.back().size());
+	
+	srand(time(NULL));
 	
 }
 
@@ -209,7 +211,7 @@ void Network::entrenar(const char * name) {
 				//cout<<"Tamaño salida: "<<salida_capa->size()<<endl;
 
 				entradas = salida_capa;
-				
+				cout<<"Pesos para este dato"<<endl; mostrar_pesos(); 
 			} //termina feed-forward
 			
 			vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
@@ -393,4 +395,18 @@ vector<double> Network::clasificar(vector<double> Datos){
 		
 	}
 	return *entradas;
+}
+
+void Network::mostrar_pesos(){
+	vector<Layer>::iterator q=this->capas.begin();
+	while(q!=capas.end()){
+		cout<<"Capa i"<<endl<<" --------------------------------"<<endl;
+		vector<Perceptron>::iterator u=(*q).begin();
+		while(u!=(*q).end()) { 
+			(*u).mostrar_pesos();
+			u++;
+		}
+		q++;
+		cout<<endl;
+	}
 }

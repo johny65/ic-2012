@@ -490,3 +490,5 @@ void Perceptron::val_cross(const char *ruta)
 	
 }
 */
+
+

@@ -63,10 +63,11 @@ public:
 	void calcular_delta(double ej);
 	void calcular_delta(Layer&, int);
 	void actualizar_pesos(vector<double>&, double eta, double alfa = 0.0);
+	void mostrar_pesos();
 
 	//void sel_func(int x); //Selecciono la funcion 
 	//void val_cross(const char *ruta);
-	void mostrar_pesos(); //muestra los pesos
+	
 
 	
 };

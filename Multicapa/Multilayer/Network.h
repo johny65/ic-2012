@@ -59,6 +59,7 @@ public:
 	void probar(const char *name);
 	void mostrar_salida(vector<double>);
 	vector<double> clasificar(vector<double> Datos);
+	void mostrar_pesos();
 	
 	//Col <double> clasificar(); //el dense_vector de salida contiene 1 solo elemento en caso que en la capa de salida solo exista una sola neurona
 	
