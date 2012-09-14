@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <cassert>
 #include "Perceptron.h"
 #include "utils.h"
 #include "func.h"
@@ -55,29 +56,56 @@ void Perceptron::inicializar_pesos(int num_entradas)
 }
 
 
+/**
+ * @brief Devuelve si el perceptrón se encuentra en una capa oculta.
+ * @return true si está en una capa oculta, false si está en la capa de salida.
+ */
 bool Perceptron::get_hidden(){
 	return hidden;
 }
 
+
 /**
- * @brief Calcula el gradiente local de la neurona teniendo en cuenta si se
- * encuentra en la capa de salida o en una capa oculta.
+ * @brief Calcula el gradiente local de una neurona que se encuentra en la
+ * capa de salida.
  *
- * @param ds Vector con los gradientes locales (deltas) de las neuronas de la
- * capa siguiente. Si la neurona se encuentra en la capa de salida, ds incluye
- * un solo valor (ds[0]) que corresponde al error en la salida de la neurona
- * (es decir:
- *     ds[0] = e
+ * Fórmula: deltaj = ej * phi'(vj)
+ *
+ * (Pág. 175 Haykin: Neural Networks - A Comprehensive Foundation - 2º Ed.)
+ *
+ * @param ej Valor que corresponde al error en la salida de la neurona (es
+ * decir:
+ *     ej = dj - yj
  * donde:
- *     e = d - y
- * y donde:
- *     d = salida deseada para la neurona
- *     y = salida obtenida por la neurona).
- *
+ *     dj = salida deseada para la neurona
+ *     yj = salida obtenida por la neurona).
  */
+void Perceptron::calcular_delta(double ej)
+{
+	if (this->hidden) {
+		cout<<"Error: calculando delta de capa de salida en una capa oculta.\n";
+		exit(-1);
+	}
+	else {
+		this->delta = ej*derivada_sigmoide(this->v);
+	}
+}
 
 
-
+/**
+ * @brief Calcula el gradiente local de una neurona que se encuentra en una
+ * capa oculta.
+ *
+ * Fórmula: deltaj = phi'(vj) * sum_k( deltak * wkj )
+ * 
+ * (Pág. 175 Haykin: Neural Networks - A Comprehensive Foundation - 2º Ed.)
+ *
+ * @param capa_posterior Referencia a la capa posterior (la de la derecha) de
+ * la capa donde se encuentra el perceptrón. De esta forma recorre las neuronas
+ * de esa capa pidiéndoles sus gradientes locales y sus pesos que las unen a
+ * ella.
+ * @param indice Índice de la neurona en su capa (posición).
+ */
 void Perceptron::calcular_delta(Layer &capa_posterior, int indice)
 {
 	if (!this->hidden){
@@ -87,6 +115,13 @@ void Perceptron::calcular_delta(Layer &capa_posterior, int indice)
 	else {
 		double s = 0.0;
 		for (size_t i=0; i<capa_posterior.size(); ++i){
+			/* por cada neurona de la capa posterior, le pido su delta y el peso
+			 * que la une a mí (este peso lo guarda ella, no yo) y con esto
+			 * hago la sumatoria.
+			 * Tener en cuenta que el peso que corresponde a la neurona k, está
+			 * guardado en el índice k+1, ya que el índice 0 corresponde al peso
+			 * del sesgo. Por eso el "indice + 1".
+			 */
 			s += capa_posterior[i].get_delta() * capa_posterior[i].get_peso(indice + 1);
 		}
 		this->delta = derivada_sigmoide(this->v)*s;
@@ -94,36 +129,38 @@ void Perceptron::calcular_delta(Layer &capa_posterior, int indice)
 }
 
 
-void Perceptron::calcular_delta(double ej)
-{
-	if (this->hidden) {
-		cout<<"Error: calculando delta de capa de salida en una capa oculta.\n";
-		exit(-1);
-	}
-	else {
-		this->delta = ej*derivada_sigmoide(this->v);	
-	}
-}
-
-
 /**
  * @brief Devuelve el gradiente local de la neurona.
  */
-double Perceptron::get_delta(){
+double Perceptron::get_delta()
+{
 	return this->delta;
 }
 
 
+/**
+ * @brief Actualiza los pesos del perceptrón.
+ *
+ * Fórmula: wji(n+1) = wji(n) + eta * deltaj(n) * yi(n) + alfa * wji(n-1)
+ *
+ * (yi es de la capa anterior)
+ * (Pág. 175 Haykin: Neural Networks - A Comprehensive Foundation - 2º Ed.)
+ *
+ * @param ys Vector con las salidas de las neuronas de la capa anterior
+ * conectadas a mí (serían los yi).
+ * @param eta Tasa de aprendizaje.
+ * @param alfa Coeficiente de momento.
+ */
 void Perceptron::actualizar_pesos(vector<double> &ys, double eta, double alfa)
 {
+	assert(ys.size() == this->pesos.size());
 
-	//copiar fórmula
+	///\todo guardar los pesos pasados para usar el momento
 	
 	for (size_t i=0; i<this->pesos.size(); ++i){
 		this->pesos[i] += eta * this->delta * ys[i]; //+    alfa*this->
 	}
 }
-
 
 
 /**
@@ -360,21 +397,7 @@ void Perceptron::sel_func(int x){
  */
 double Perceptron::clasificar(const vector<double> &D){
 	this->v = dot(D, this->pesos);
-	this->y = sigmoide(this->v, 1.0);
-	return this->y;
-}
-
-
-/**
- * @brief Devuelve la salida del perceptrón.
- *
- * Devuelve la salida no lineal `y` del perceptrón (y = phi(v), donde `phi` es
- * la función de activación y `v` es la salida lineal). Este valor es calculado
- * en la llamada a Perceptron::clasificar(entrada).
- */
-double Perceptron::get_salida()
-{
-	return this->y;
+	return sigmoide(this->v, 1.0);
 }
 
 
@@ -385,7 +408,7 @@ double Perceptron::get_salida()
  */
 double Perceptron::get_peso(int peso)
 {
-	return this->pesos.at(peso);
+	return this->pesos[peso];
 }
 
 

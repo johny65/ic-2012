@@ -20,7 +20,6 @@ private:
 	double delta; ///< Gradiente local
 	bool hidden; ///< Indica si pertenece a una capa oculta
 	double v; ///< Campo inducido local (o salida lineal del perceptrón, es decir, v es igual a la suma de los pesos por las entradas sin pasar por la función de activación)
-	double y; ///< Salida del perceptrón (y = phi(v))
 	
 	//vector<double> salidas; ///< Vector de salidas
 	//vector<double> salidas_deseadas; ///< Vector con las salidas esperadas

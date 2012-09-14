@@ -70,29 +70,45 @@ void Network::inicializar_pesos()
 	
 }
 
-Network::~Network() {
+
+/**
+ * @brief Destructor.
+ */
+Network::~Network() {}
+
+
+/**
+ * @brief Mapea las salidas deseadas escalares a salidas vectoriales.
+ *
+ * Por ejemplo, si la salida deseada puede ser una de 3 clases (0, 1 ó 2), la
+ * red debería tener 3 neuronas de salida donde se activará una sola de ellas
+ * indicando la clase elegida en la clasificación. Por lo tanto las salidas
+ * deseadas de la red quedan mapeadas de la siguiente forma:
+ *
+ * 0 => +1 -1 -1
+ * 1 => -1 +1 -1
+ * 2 => -1 -1 +1
+ *
+ * @param x vector de salidas deseadas escalares.
+ */
+vector< vector<double> > Network::mapear(vector<double> &x)
+{
+
+	///\todo ver bien lo de los valores de salida deseadas (deberían estar en el rango de la sigmoide)
+	///\todo ver eso del epsilon
 	
-}
-
-
-vector< vector<double> > Network::mapear(vector<double> &x){
-	/**
-		@param x vector de salidas deseadas escalares.
-	*/
-
 	int c = this->capas.back().size(); //si la función es de la clase no hace falta pasar esto como parámetro
-	cout<<"neuronas de salidas: "<<c<<endl;
 
 	vector< vector<double> > sal_m;
 	if(c==1){
 		//si hay una sola neurona en la última capa, las salidas no tienen mapeo
-		//(-1 ó 1), solamente se pone cada valor en un vector aparte
+		//(-1 ó +1), solamente se pone cada valor en un vector aparte
 		for (size_t i=0; i<x.size(); ++i) {
 			sal_m.push_back(vector<double>(1, x[i]));
 		}
 	}
 	else {
-		//sino se hace el mapeo doble->vector, donde queda en +1 el elemento
+		//sino, se hace el mapeo doble->vector, donde queda en +1 el elemento
 		//correspondiente al valor
 		vector<double> n(c, -1.0);
 		for (size_t i=0; i<x.size(); ++i) {
@@ -107,6 +123,7 @@ de neuronas establecidas para la capa de salida ("<<ex.what()<<")\n";
 		}
 	}
 
+	//descomentar para ver cómo quedó el mapeo:
 	/*
 	for (int i=0; i<sal_m.size(); ++i){
 		cout<<"salida: "<<x[i]<<" mapeo: ";
@@ -131,11 +148,11 @@ bool Network::is_hidden(Layer x){
 }
 
 
+/**
+ * @brief Entrena la red neuronal.
+ * @param name Nombre del archivo que contiene los datos.
+ */
 void Network::entrenar(const char * name) {
-	/** 
-		@brief entrena la red neuronal
-		@param name nombre del archivo que contiene los datos
-	*/
 
 	//Abro el archivo de datos;
 	vector<double> salidas_escalares;
