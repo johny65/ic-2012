@@ -56,12 +56,16 @@ double dot(const vector<double> &x, const vector<double> &y);
  */
 vector<double> recalcular_pesos(const vector<double>&, double, double, double, const vector<double>&);
 
-double calc_error_x_epoca(double sal_d, double sal_o);
-double calc_error(vector<double> &x, vector<double> &y);
-double signo(double valor, double a = 1.0);
 
+/**
+ * @brief Calcula la energía de un vector (suma de los cuadrados).
+ * @param s Vector.
+ */
+double energia(const vector<double> &s);
+
+
+double signo(double valor, double a = 1.0);
 double sigmoide(double valor, double a = 1.0);
 double derivada_sigmoide(double valor, double a = 1.0);
-double energia(const vector<double> &s);
 
 #endif

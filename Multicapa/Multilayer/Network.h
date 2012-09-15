@@ -2,8 +2,6 @@
 #define NETWORK_H
 
 
-//#include "Layer.h"
-//#include "armadillo"
 #include <vector>
 #include "Perceptron.h"
 #include "utils.h"
@@ -60,6 +58,7 @@ public:
 	void mostrar_salida(vector<double>);
 	vector<double> clasificar(vector<double> Datos);
 	void mostrar_pesos();
+	void test();
 	
 	//Col <double> clasificar(); //el dense_vector de salida contiene 1 solo elemento en caso que en la capa de salida solo exista una sola neurona
 	

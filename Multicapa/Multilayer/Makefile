@@ -1,6 +1,6 @@
 GPP=g++
 GCC=gcc
-FLAGS=  -g2 -Wall -O0 -larmadillo -D_DEBUG 
+FLAGS=  -g2 -Wall -O0 -D_DEBUG 
 LIBS=  
 OBJS=Debug/main.o Debug/Network.o Debug/func.o Debug/Perceptron.o Debug/utils.o 
 

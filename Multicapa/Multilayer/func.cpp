@@ -12,10 +12,9 @@ vector<double> init_weight(int nd)
 	double w;
 	vector<double> pesos;
 	for(int i=0; i<nd; ++i){ //hasta nd xq el sesgo tambien tiene peso aletorio
-		//w=(rand()*1.0/RAND_MAX) - 0.5;
+		w=(rand()*1.0/RAND_MAX) - 0.5;
 		//w = (rand()%1000) / 1000.0 - 0.5;
-		//pesos.push_back(w);
-		pesos.push_back(0.5);
+		pesos.push_back(w);
 	}
 	return pesos;
 }
@@ -63,30 +62,12 @@ double dot(const vector<double> &x, const vector<double> &y)
 	return p;
 }
 
-vector<double> recalcular_pesos(const vector<double> &pv, double tasa,
-	double s, double se, const vector<double> &datos){
-		
-	//np=pv+2*tasa*[se-s]*datos
-	vector<double> np; //nuevos pesos
-	np = sum(pv,prod_escalar(datos,tasa*(se-s)));
-	return np;
-}
-
-
-double calc_error_x_epoca(double sal_d, double sal_o){
-	/** @param sal_d salida deseada
-	@param sal_o salida obtenida
-	*/
-	return abs(sal_d-sal_o);
-}
-
-double calc_error(vector<double> &x, vector<double> &y)
-{
-	double r = 0.0;
-	for (size_t i=0; i<x.size(); ++i){
-		r += (x[i] - y[i]) * (x[i] - y[i]);
+double energia(const vector<double> &s){
+	double e=0;
+	for(size_t i=0;i<s.size();i++) { 
+		e+=s[i]*s[i];
 	}
-	return r / x.size();
+	return e;
 }
 
 
@@ -103,22 +84,15 @@ double signo(double valor, double a = 1.0)
 	else return -1;	
 }
 
-double sigmoide(double valor, double a = 1.0)
+double sigmoide(double valor, double a)
 {
+	//double res = (1.0 - exp(-a*valor)) / (1.0 + exp(-a*valor));
 	double res = (2.0/(1.0 + exp(-a*valor)))-1;
 	return res;
 }
 
-double derivada_sigmoide(double x, double a = 1.0)
+double derivada_sigmoide(double x, double a)
 {
-	double res = 2*exp(-a*x)/(pow(1+exp(-a*x),2));
+	double res = 2.0 * a * exp(a*x) / pow((exp(a*x) + 1), 2.0);
 	return res;
-}
-
-double energia(const vector<double> &s){
-	double e=0;
-	for(size_t i=0;i<s.size();i++) { 
-		e+=s[i]*s[i];
-	}
-	return e;
 }

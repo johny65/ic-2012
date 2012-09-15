@@ -65,6 +65,8 @@ public:
 	void actualizar_pesos(vector<double>&, double eta, double alfa = 0.0);
 	void mostrar_pesos();
 
+	//vector<double>& get_pesos(){ return pesos; }
+
 	//void sel_func(int x); //Selecciono la funcion 
 	//void val_cross(const char *ruta);
 	
