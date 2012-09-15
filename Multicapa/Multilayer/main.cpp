@@ -14,8 +14,16 @@ int main (int argc, char *argv[]) {
 	p.push_back(1);
 	Network A(p);
 	//cout<<A.cant_capas()<<endl;
-	A.entrenar("concent.csv");
-	A.mostrar_pesos();
+	A.entrenar("tabla_XOR.csv");
+	cout<<"Pesos Entrenados "<<endl;A.mostrar_pesos();
+	
+	//pruebo con un dato 
+	vector<double> x,s;
+	x.push_back(-1); 	x.push_back(-1);
+	s=A.clasificar(x);
+	cout<<"Resultado "<<endl;
+	for(int i=0;i<s.size();i++) { cout<<s[i]<<endl; }
+	
 	//cout<<"Resultado de la clasificacion "<<s.back()<<endl;
 	return 0;
 }

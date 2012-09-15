@@ -12,7 +12,7 @@ custom_tabs=0
 tab_use_spaces=0
 use_wxfb=0
 explorer_path=
-current_source=Network.cpp
+current_source=func.cpp
 path_char=/
 [source]
 path=main.cpp
@@ -20,7 +20,7 @@ cursor=142
 open=true
 [source]
 path=Network.cpp
-cursor=473
+cursor=10166
 open=true
 [source]
 path=func.cpp

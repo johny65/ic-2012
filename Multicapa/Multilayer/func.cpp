@@ -104,13 +104,13 @@ double signo(double valor, double a = 1.0)
 
 double sigmoide(double valor, double a = 1.0)
 {
-	double res = (1.0 - exp(-a*valor)) / (1.0 + exp(-a*valor));
+	double res = (2.0/(1.0 + exp(-a*valor)))-1;
 	return res;
 }
 
 double derivada_sigmoide(double x, double a = 1.0)
 {
-	double res = 2.0 * a * exp(a*x) / pow((exp(a*x) + 1), 2.0);
+	double res = 2*(exp(-a*x)/(pow(1+exp(-a*x),2)));
 	return res;
 }
 

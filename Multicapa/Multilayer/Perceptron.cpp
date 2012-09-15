@@ -88,6 +88,7 @@ void Perceptron::calcular_delta(double ej)
 	}
 	else {
 		this->delta = ej*derivada_sigmoide(this->v);
+		//cout<<"Delta "<<this->delta<<endl;
 	}
 }
 

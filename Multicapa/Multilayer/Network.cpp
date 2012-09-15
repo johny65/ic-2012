@@ -12,7 +12,7 @@
  * la longitud del vector).
  */
 Network::Network(vector<double> perceptrones_por_capa) :
-	eta(0.01), alfa(0.1), max_epocas(1), tol(1e-3)
+	eta(0.1), alfa(0.1), max_epocas(100), tol(1e-3)
 {
 	
 	//capas ocultas (la capa de entrada es considerada capa oculta)
@@ -184,6 +184,7 @@ void Network::entrenar(const char * name) {
 		int i = 0;
 		int ic; //índice de capa para llenar el vector de salida de cada capa
 		q = datos.begin();
+		cout<<"Pesos iniciales "<<endl; mostrar_pesos(); 
 		while (q != datos.end()){ //recorro todo el set de datos
 			///\todo hacer que lo recorra de forma aleatoria, no secuencial
 
@@ -211,12 +212,12 @@ void Network::entrenar(const char * name) {
 				//cout<<"Tamaño salida: "<<salida_capa->size()<<endl;
 
 				entradas = salida_capa;
-				cout<<"Pesos para este dato"<<endl; mostrar_pesos(); 
+				
 			} //termina feed-forward
-			
+			cout<<"Pesos para el dato "<<i<<endl; mostrar_pesos(); 
 			vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
 			//cout<<"longitud de la capa de salida"<<salidas.size()<<endl;
-			if(signo(salidas.back(),1.0)-this->salidas_deseadas[i][0]==(-2) or signo(salidas.back(),1.0)-this->salidas_deseadas[i][0]==(1)) {cout<<salidas.back()<<"  "<<this->salidas_deseadas[i][0]<<endl;contar_errores++;}
+			//if(signo(salidas.back(),1.0)-this->salidas_deseadas[i][0]==(-2) or signo(salidas.back(),1.0)-this->salidas_deseadas[i][0]==(1)) {cout<<salidas.back()<<"  "<<this->salidas_deseadas[i][0]<<endl;contar_errores++;}
 
 			/*------------- paso hacia atrás: --------------*/
 			
@@ -260,6 +261,8 @@ void Network::entrenar(const char * name) {
 				this->capas.front()[j].actualizar_pesos(*q, this->eta);
 			}
 			
+			cout<<"Pesos corregidos"<<endl; mostrar_pesos();
+			
 			
 			//double error=energia(e)/2.0;
 			//error: en la capa de salida
@@ -275,7 +278,7 @@ void Network::entrenar(const char * name) {
 		
 	} //termina una época, seguir con otra
 	
-	cout<<"La cantidad de errores fue: "<<contar_errores<<endl;
+	//cout<<"La cantidad de errores fue: "<<contar_errores<<endl;
 	
 //	graficar_puntos(name,"concent");
 	
@@ -399,14 +402,16 @@ vector<double> Network::clasificar(vector<double> Datos){
 
 void Network::mostrar_pesos(){
 	vector<Layer>::iterator q=this->capas.begin();
+	int i=0;
 	while(q!=capas.end()){
-		cout<<"Capa i"<<endl<<" --------------------------------"<<endl;
+		cout<<"Capa "<<i<<endl<<" --------------------------------"<<endl;
 		vector<Perceptron>::iterator u=(*q).begin();
 		while(u!=(*q).end()) { 
 			(*u).mostrar_pesos();
 			u++;
 		}
 		q++;
+		i++;
 		cout<<endl;
 	}
 }
