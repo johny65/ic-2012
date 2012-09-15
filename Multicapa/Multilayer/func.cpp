@@ -12,9 +12,10 @@ vector<double> init_weight(int nd)
 	double w;
 	vector<double> pesos;
 	for(int i=0; i<nd; ++i){ //hasta nd xq el sesgo tambien tiene peso aletorio
-		w=(rand()*1.0/RAND_MAX) - 0.5;
+		//w=(rand()*1.0/RAND_MAX) - 0.5;
 		//w = (rand()%1000) / 1000.0 - 0.5;
-		pesos.push_back(w);
+		//pesos.push_back(w);
+		pesos.push_back(0.5);
 	}
 	return pesos;
 }
@@ -110,7 +111,7 @@ double sigmoide(double valor, double a = 1.0)
 
 double derivada_sigmoide(double x, double a = 1.0)
 {
-	double res = 2*(exp(-a*x)/(pow(1+exp(-a*x),2)));
+	double res = 2*exp(-a*x)/(pow(1+exp(-a*x),2));
 	return res;
 }
 

@@ -21,7 +21,7 @@ using namespace std;
  */
 Perceptron::Perceptron() : hidden(true)
 {
-	srand(time(NULL));
+	//srand(time(NULL));
 }
 
 
@@ -88,7 +88,10 @@ void Perceptron::calcular_delta(double ej)
 	}
 	else {
 		this->delta = ej*derivada_sigmoide(this->v);
-		//cout<<"Delta "<<this->delta<<endl;
+		cout<<"Delta ultimo perceptron "<<this->delta<<endl;
+		cout<<"Derivada sigmoide "<<derivada_sigmoide(this->v)<<endl;
+		cout<<"Error "<<ej<<endl;
+		cout<<"campo inducido "<<this->v<<endl;
 	}
 }
 
@@ -126,6 +129,7 @@ void Perceptron::calcular_delta(Layer &capa_posterior, int indice)
 			s += capa_posterior[i].get_delta() * capa_posterior[i].get_peso(indice + 1);
 		}
 		this->delta = derivada_sigmoide(this->v)*s;
+		cout<<this->delta<<endl;
 	}
 }
 

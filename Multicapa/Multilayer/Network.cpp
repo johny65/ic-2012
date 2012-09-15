@@ -12,7 +12,7 @@
  * la longitud del vector).
  */
 Network::Network(vector<double> perceptrones_por_capa) :
-	eta(0.1), alfa(0.1), max_epocas(100), tol(1e-3)
+	eta(1), alfa(0.1), max_epocas(1), tol(1e-3)
 {
 	
 	//capas ocultas (la capa de entrada es considerada capa oculta)
@@ -37,7 +37,8 @@ Network::Network(vector<double> perceptrones_por_capa) :
 	//a la capa de salida no
 	this->salidas_capas.back() = new vector<double>(this->capas.back().size());
 	
-	srand(time(NULL));
+	//srand(time(NULL));
+	//inicializar_pesos();
 	
 }
 
@@ -190,7 +191,8 @@ void Network::entrenar(const char * name) {
 
 			vector<double> *entradas = &(*q); //un patrón de entrada (no todas)
 			
-
+			cout<<"Cantidad de datos "<<(*q).size()<<endl;
+			cout<<"Dato a procesar "<<(*q)[0]<<" "<<(*q)[1]<<" "<<(*q)[2]<<endl;
 			/*----------- paso hacia adelante: --------------*/
 			
 			for (size_t k=0; k<this->capas.size(); ++k){
@@ -201,17 +203,24 @@ void Network::entrenar(const char * name) {
 				else
 					ic = 0; //empezar a llenar salida_capa desde el índice 0
 
+				cout<<"entradas de la capa "<<k<<endl;
+				for(int i=0;i<entradas->size();i++) { 
+					cout<<(*entradas)[i]<<endl;
+				}
 				//cout<<"Capa "<<k+1<<" - Tamano de la entrada: "<<entradas->size()<<endl;
-
+				cout<<"Salida de la capa "<<k<<endl;
 				//meter las entradas por los perceptrones de la capa
 				vector<double> *salida_capa = this->salidas_capas[k];
-				for (size_t j = ic; j<capa.size(); ++j){ //for por cada neurona de la capa k
+				for (size_t j = ic; j<capa.size()+ic; ++j){ //for por cada neurona de la capa k
 					salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
+					cout<<"salida de la neurona "<<j<<": "<<capa[j-ic].clasificar(*entradas)<<endl;
 				}
 				
+				//if(k==0){cout<<"salida de la primer capa"<<*salidas_capa[0]<<*salidas_capa[1]<<endl};
 				//cout<<"Tamaño salida: "<<salida_capa->size()<<endl;
-
+				
 				entradas = salida_capa;
+			
 				
 			} //termina feed-forward
 			cout<<"Pesos para el dato "<<i<<endl; mostrar_pesos(); 
@@ -222,7 +231,8 @@ void Network::entrenar(const char * name) {
 			/*------------- paso hacia atrás: --------------*/
 			
 			vector<double> e = dif(salidas, this->salidas_deseadas.at(i)); //errores en la salida de cada neurona
-
+			cout<<"Salida esperada "<<this->salidas_deseadas[0][0]<<endl;
+			cout<<"error"<<e.back()<<endl;
 			/* primero última capa:
 			 * me paro en la última capa y recorro las neuronas calculando el gradiente
 			 * local en cada una con el error en sus salidas (e)
@@ -250,6 +260,7 @@ void Network::entrenar(const char * name) {
 				 * una vez calculados los gradientes locales en la capa k, puedo
 				 * actualizar los pesos en la capa k+1
 				 */
+				cout<<"Deltas de las capas ocultas"<<endl;
 				for (size_t j=0; j<capa_posterior.size(); ++j){
 					capa_posterior[j].actualizar_pesos(*this->salidas_capas[k], this->eta);
 				}
@@ -271,7 +282,7 @@ void Network::entrenar(const char * name) {
 			i++;
 			
 		//	mostrar_salida(salidas);
-			
+			break;
 		} //termina un patrón de entrada, seguir con el siguiente
 		epocas++;
 		//cout<<"Época: "<<epocas<<endl;
@@ -377,9 +388,12 @@ void Network::mostrar_salida(vector<double> v){
 }
 
 vector<double> Network::clasificar(vector<double> Datos){
-	Datos.push_back(-1);
+	//Datos.push_back(-1);
+	vector<double> aux;
+	aux.push_back(-1);
+	aux.push_back(Datos[0]);aux.push_back(Datos[1]); 
 	int ic;
-	vector<double> *entradas = &(Datos);
+	vector<double> *entradas=&aux;
 	//Calcula la salida para los Datos (esto una vez que ya esta entrenado)
 	for (size_t k=0; k<this->capas.size(); ++k){
 		Layer &capa = this->capas[k]; //parado en la capa k
