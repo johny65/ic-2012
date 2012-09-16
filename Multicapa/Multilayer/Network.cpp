@@ -306,7 +306,7 @@ void Network::entrenar(const char * name) {
 		crear_dat_vector(error_ent, "error.dat");
 		error_graf("plot \"error.dat\" with lines");
 	//}
-	
+	dibujar_red();
 }
 
 
@@ -322,8 +322,7 @@ void Network::probar (const char * name) {
 	vector<double> salidas_escalares;
 	this->datos.clear();
 	this->datos = leer_csv(name, salidas_escalares);
-	
-	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
+	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo de prueba."<<endl; return;}
 	
 	//mapeo las salidas deseadas a las neuronas de salida
 	this->salidas_deseadas = mapear(salidas_escalares);
@@ -331,7 +330,6 @@ void Network::probar (const char * name) {
 	int aciertos=0;//para contar la cantidad de aciertos
 	//vector<double> e; //para los errores por cada dato 
 	double e=0.0; //E_av, error promedio para un set completa
-	int ic; //índice de capa para llenar el vector de salida de cada capa
 	vector<vector<double> > result_c; //resultado de la clasificacion de los datos vector<vector<>> xq tengo un vector de salida por cada dato (por el mapear)
 	for(int i=0;i<this->datos.size();i++) {  
 		//cout<<"dimension de datos "<<datos[i][0]<<"   "<<datos[i][1]<<"   "<<datos[i][2]<<endl;
@@ -349,8 +347,7 @@ void Network::probar (const char * name) {
 	this->porcentaje.push_back(aciertos*100/this->datos.size());
 	cout<<"% de aciertos "<<this->porcentaje.back()<<endl;
 	//generar un archivo .txt para graficar los puntos con la clasificacion obtenida
-	
-	
+
 }
 
 void Network::graficar_puntos(const char *archivo, const char *titulo)
@@ -503,4 +500,52 @@ void Network::mostrar_pesos(){
 		i++;
 		cout<<endl;
 	}
+}
+
+
+/**
+ * @brief Función para dibujar la estructura de la red neuronal.
+ *
+ * Hace un grafiquito mostrando cómo es la estructura de la red según se
+ * configuró. Requiere tener `graphviz` instalado (el programa `dot`) e
+ * `ImageMagick` para mostrar la imagen (el programa `display`).
+ */
+void Network::dibujar_red()
+{
+	ofstream f("red.gv");
+	f<<"digraph {\nrankdir=LR\n";
+	for (int i=0; i<this->datos[0].size()-1; ++i){
+		f<<"x"<<i<<" [shape=point, label=\"\"]\n";
+	}
+	for (int i=0; i<this->capas.size(); ++i){
+		for (int j=0; j<this->capas[i].size(); ++j){
+			f<<"c"<<i<<"p"<<j<<" [shape=circle, label=\"\"]\n";
+		}
+	}
+	for (int i=0; i<this->capas.back().size(); ++i){
+		f<<"s"<<i<<" [style=invisible, shape=point, label=\"\"]\n";
+	}
+	
+	for (int i=0; i<this->datos[0].size()-1; ++i){
+		for (int j=0; j<this->capas[0].size(); ++j){
+			f<<"x"<<i<<" -> "<<"c0p"<<j<<endl;
+		}
+	}
+	
+	for (int i=0; i<this->capas.size()-1; ++i){
+		for (int j=0; j<this->capas[i].size(); ++j){
+			for (int k=0; k<this->capas[i+1].size(); ++k){
+				f<<"c"<<i<<"p"<<j<<" -> "<<"c"<<i+1<<"p"<<k<<endl;
+			}
+		}
+	}
+
+	for (int i=0; i<this->capas.back().size(); ++i){
+		f<<"c"<<this->capas.size()-1<<"p"<<i<<" -> s"<<i<<endl;
+	}
+	
+	f<<"\n}";
+	f.close();
+	system("./dot -Tpng -ored.png red.gv");
+	system("display red.png");
 }

@@ -62,7 +62,8 @@ public:
 	vector<double> clasificar(vector<double> Datos);
 	void mostrar_pesos();
 	void test();
-	
+
+	void dibujar_red();
 };
 
 #endif

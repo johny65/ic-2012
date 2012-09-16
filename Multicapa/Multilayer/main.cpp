@@ -31,7 +31,7 @@ Opciones:\n\
 	string ayuda = "\
 Perceptrón Multicapa. IC 2012\n\
 Uso:\n\
-\tmulticapa [opciones] p1 p2 ... pn\n\
+\tmulticapa [opciones] p1 p2 ... pn\n\n\
 donde p1 es la cantidad de neuronas en la capa 1, p2 es la cantidad de neuronas\
  en la capa 2, y pn es la cantidad de neuronas en la capa n.\n\
 Opciones:\n\
