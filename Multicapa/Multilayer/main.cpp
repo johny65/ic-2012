@@ -126,7 +126,7 @@ Opciones:\n\
 	//if (ruta_cross_val != NULL)
 		//P.val_cross(ruta_cross_val);
 
-	//cout<<"\nPresionar una tecla para cerrar.\n"; cin.get();
+	cout<<"\nPresionar una tecla para cerrar.\n"; cin.get();
 	return 0;
 	
 /*

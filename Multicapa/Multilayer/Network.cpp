@@ -329,24 +329,33 @@ void Network::probar (const char * name) {
 	
 	int aciertos=0;//para contar la cantidad de aciertos
 	//vector<double> e; //para los errores por cada dato 
-	double e=0.0; //E_av, error promedio para un set completa
+	//double e=0.0; //E_av, error promedio para un set completa
 	vector<vector<double> > result_c; //resultado de la clasificacion de los datos vector<vector<>> xq tengo un vector de salida por cada dato (por el mapear)
-	for(int i=0;i<this->datos.size();i++) {  
+	for(size_t i=0;i<this->datos.size();i++) {  
 		//cout<<"dimension de datos "<<datos[i][0]<<"   "<<datos[i][1]<<"   "<<datos[i][2]<<endl;
 		result_c.push_back(clasificar(this->datos[i])); //guardo el resultado de la clasificacion de cada dato
 		vec_dif.push_back(dif(this->salidas_deseadas[i],result_c.back()));
 		if(this->salidas_deseadas.back().size()==1){//si pasa por aca quiere decir que las salidas son solo 1 o -1 (no hay mapeo a vector)
-			if(abs(vec_dif[i][0])<0.7) {aciertos++; cout<<"entro"<<endl;}
+			if(abs(vec_dif[i][0])<0.7) {aciertos++;} ///<\todo acá capaz convenga poner signo
+			this->datos[i].push_back(signo(vec_dif[i][0])); //agrego mi salida para ya dibujar
 		}
-		else{//tengo que ver que neurona se activo busco el maximo valor 
-			
+		else{//tengo que ver que neurona se activo busco el maximo valor
+			vector<double>::iterator m = max_element(vec_dif[i].begin(), vec_dif[i].end());
+			int ind = distance(vec_dif[i].begin(), m);
+			if (this->salidas_deseadas[i][ind] == 1)
+				aciertos++;
+			this->datos[i].push_back(ind); //agrego mi salida para ya dibujar
 		}
 	}
 
 	cout<<"numero de aciertos "<<aciertos<<endl;
 	this->porcentaje.push_back(aciertos*100/this->datos.size());
 	cout<<"% de aciertos "<<this->porcentaje.back()<<endl;
+	
 	//generar un archivo .txt para graficar los puntos con la clasificacion obtenida
+	guardar_csv("resultados.csv", this->datos);
+	graficar_puntos("resultados.csv", "resultados");
+	
 
 }
 
@@ -514,33 +523,33 @@ void Network::dibujar_red()
 {
 	ofstream f("red.gv");
 	f<<"digraph {\nrankdir=LR\n";
-	for (int i=0; i<this->datos[0].size()-1; ++i){
+	for (size_t i=0; i<this->datos[0].size()-1; ++i){
 		f<<"x"<<i<<" [shape=point, label=\"\"]\n";
 	}
-	for (int i=0; i<this->capas.size(); ++i){
-		for (int j=0; j<this->capas[i].size(); ++j){
+	for (size_t i=0; i<this->capas.size(); ++i){
+		for (size_t j=0; j<this->capas[i].size(); ++j){
 			f<<"c"<<i<<"p"<<j<<" [shape=circle, label=\"\"]\n";
 		}
 	}
-	for (int i=0; i<this->capas.back().size(); ++i){
+	for (size_t i=0; i<this->capas.back().size(); ++i){
 		f<<"s"<<i<<" [style=invisible, shape=point, label=\"\"]\n";
 	}
 	
-	for (int i=0; i<this->datos[0].size()-1; ++i){
-		for (int j=0; j<this->capas[0].size(); ++j){
+	for (size_t i=0; i<this->datos[0].size()-1; ++i){
+		for (size_t j=0; j<this->capas[0].size(); ++j){
 			f<<"x"<<i<<" -> "<<"c0p"<<j<<endl;
 		}
 	}
 	
-	for (int i=0; i<this->capas.size()-1; ++i){
-		for (int j=0; j<this->capas[i].size(); ++j){
-			for (int k=0; k<this->capas[i+1].size(); ++k){
+	for (size_t i=0; i<this->capas.size()-1; ++i){
+		for (size_t j=0; j<this->capas[i].size(); ++j){
+			for (size_t k=0; k<this->capas[i+1].size(); ++k){
 				f<<"c"<<i<<"p"<<j<<" -> "<<"c"<<i+1<<"p"<<k<<endl;
 			}
 		}
 	}
 
-	for (int i=0; i<this->capas.back().size(); ++i){
+	for (size_t i=0; i<this->capas.back().size(); ++i){
 		f<<"c"<<this->capas.size()-1<<"p"<<i<<" -> s"<<i<<endl;
 	}
 	

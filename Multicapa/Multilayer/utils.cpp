@@ -71,11 +71,23 @@ void crear_dat_vector(vector<double> &v, const char *name)
 	
 }
 
+void guardar_csv(const char *file, vector< vector<double> > &datos)
+{
+	ofstream out(file, ios::trunc);
+	for (size_t i=0; i<datos.size(); ++i){
+		for (size_t j=1; j<datos[i].size()-1; ++j){
+			out<<datos[i][j]<<", ";
+		}
+		out<<datos[i].back()<<endl;
+	}
+	out.close();
+}
+
 void mostrar_sdcapa(vector<vector<double> > x){
 	vector<vector<double> >::iterator q=x.begin();
 	
 	while(q!=x.end()){
-		for(int i=0;i<(*q).size();i++) { 
+		for(size_t i=0;i<(*q).size();i++) { 
 			cout<<(*q)[i]<<" ";
 		}
 		cout<<endl;

@@ -50,5 +50,12 @@ void crear_dat(vector<vector<double> > &v, const char *name);
 void crear_dat_vector(vector<double> &v, const char *name);
 
 
+/**
+ * @brief Guarda un archivo .csv con los datos pasados.
+ * @param file Nombre del archivo para guardar.
+ * @param datos Matriz con los datos.
+ */
+void guardar_csv(const char *file, vector< vector<double> > &datos);
+
 void mostrar_sdcapa(vector<vector<double> > x);
 #endif
