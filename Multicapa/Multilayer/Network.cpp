@@ -546,6 +546,6 @@ void Network::dibujar_red()
 	
 	f<<"\n}";
 	f.close();
-	system("./dot -Tpng -ored.png red.gv");
+	system("dot -Tpng -ored.png red.gv");
 	system("display red.png");
 }
