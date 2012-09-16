@@ -34,7 +34,7 @@ Perceptron::Perceptron() : hidden(true)
 Perceptron::Perceptron(bool h)
 {
 	this->hidden = h;
-	srand(time(NULL));
+	//srand(time(NULL));
 }
 
 
@@ -53,6 +53,9 @@ Perceptron::~Perceptron() {}
 void Perceptron::inicializar_pesos(int num_entradas)
 {
 	this->pesos = init_weight(num_entradas);
+
+	this->dw_anteriores = vector<double>(this->pesos.size(), 0.0);
+	
 }
 
 
@@ -88,10 +91,6 @@ void Perceptron::calcular_delta(double ej)
 	}
 	else {
 		this->delta = ej*derivada_sigmoide(this->v);
-		cout<<"Delta ultimo perceptron "<<this->delta<<endl;
-		cout<<"Derivada sigmoide "<<derivada_sigmoide(this->v)<<endl;
-		cout<<"Error "<<ej<<endl;
-		cout<<"campo inducido "<<this->v<<endl;
 	}
 }
 
@@ -129,7 +128,6 @@ void Perceptron::calcular_delta(Layer &capa_posterior, int indice)
 			s += capa_posterior[i].get_delta() * capa_posterior[i].get_peso(indice + 1);
 		}
 		this->delta = derivada_sigmoide(this->v)*s;
-		cout<<this->delta<<endl;
 	}
 }
 
@@ -146,25 +144,27 @@ double Perceptron::get_delta()
 /**
  * @brief Actualiza los pesos del perceptrón.
  *
- * Fórmula: wji(n+1) = wji(n) + eta * deltaj(n) * yi(n) + alfa * wji(n-1)
+ * Fórmula: Δwji(n) = eta * 𝛅j(n) * yi(n) + alfa * Δwji(n-1)
  *
  * (yi es de la capa anterior)
- * (Pág. 175 Haykin: Neural Networks - A Comprehensive Foundation - 2º Ed.)
+ * (Pág. 170 Haykin: Neural Networks - A Comprehensive Foundation - 2º Ed.)
  *
  * @param ys Vector con las salidas de las neuronas de la capa anterior
  * conectadas a mí (serían los yi).
  * @param eta Tasa de aprendizaje.
- * @param alfa Coeficiente de momento.
+ * @param alfa Coeficiente de momento (0 <= |alfa| < 1).
  */
 void Perceptron::actualizar_pesos(vector<double> &ys, double eta, double alfa)
 {
 	assert(ys.size() == this->pesos.size());
 
-	///\todo guardar los pesos pasados para usar el momento
-	
+	double dw;
 	for (size_t i=0; i<this->pesos.size(); ++i){
-		this->pesos[i] += eta * this->delta * ys[i]; //+    alfa*this->
+		dw = eta * this->delta * ys[i] + alfa * this->dw_anteriores[i];
+		this->pesos[i] += dw;
+		this->dw_anteriores[i] = dw;
 	}
+	
 }
 
 
@@ -346,30 +346,6 @@ void Perceptron::mostrar_pesos(){
 
 
 /**
- * @brief Fija la tasa de aprendizaje para el Perceptron.
- * @param n Tasa de aprendizaje nueva.
- *//*
-void Perceptron::fijar_tasa(double n)
-{
-	this->eta = n;
-}
-*/
-
-/**
- * @brief Rutina que permite seleccionar la función del Perceptron.
- * @param x Es 1-función signo, 2-función sigmoide, 3-funcion gaussiana (esta es la idea->no esta implementado)
- *//*
-void Perceptron::sel_func(int x){
-
-	if (x == 1)
-		this->func = signo;
-	else if (x == 2)
-		this->func = sigmoide;
-	
-}
-*/
-
-/**
  * @brief Devuelve la salida que calcula el perceptrón para una entrada dada
  * con los pesos actuales.
  * 
@@ -392,57 +368,6 @@ double Perceptron::get_peso(int peso)
 	return this->pesos[peso];
 }
 
-
-/**
- * @brief Función para graficar.
- *
- * Esta función grafica, en el caso de entradas en 2 dimensiones, un plano y la
- * recta que van formando los pesos del perceptrón. En el caso de entradas con
- * 3 dimensiones, dibuja el plano que van formando los pesos del perceptrón.
- * Además también dibuja los puntos de las entradas.
- *
- * @param titulo Título para el gráfico.
- * 
- *//*
-void Perceptron::graficar(const char *titulo)
-{
-	double &w0 = pesos[0];
-	double &w1 = pesos[1];
-	double &w2 = pesos[2];
-
-	///\todo hacer que dibuje los puntos de cada clase de distintos colores
-	///\todo hacer que el plano sea sólido
-	
-	if(pesos.size()==3){ //gráfico en 2 dimensiones
-		///<\todo acá no hace zoom ni con el click del medio!
-		stringstream ss;
-		ss<<"plot [-2:2] [-2:2]"<<-1*(w1/w2)<<"*x + "<<w0/w2;
-		ss<<", \"plot.dat\" lt 3; set title \""<<titulo<<"\"";
-		plotter(ss.str());
-		wait(this->tiempo_espera);
-		//sleep(this->tiempo_espera);
-	}
-	
-	else if (pesos.size() == 4){ //gráfico en 3 dimensiones
-		//Zoom con click del medio!
-		double &w3 = pesos[3];
-		stringstream ss;
-		ss<<"splot [-2:2] [-2:2] [-2:2]"<<-1*(w2/w3)<<"*y + "<<-1*(w1/w3)<<"*x + "<<w0/w3;
-		ss<<", \"plot.dat\" lt 3; set title \""<<titulo<<"\"";
-		plotter(ss.str());
-		wait(this->tiempo_espera);
-	}
-}
-*/
-
-/**
- * @brief Función wrapper que dibuja un gráfico sin título.
- *//*
-void Perceptron::graficar()
-{
-	graficar("");
-}
-*/
 
 /**
  * @brief Validación cruzada.

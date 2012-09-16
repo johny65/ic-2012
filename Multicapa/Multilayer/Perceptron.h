@@ -16,7 +16,7 @@ class Perceptron {
 private:
 	int nd; ///< Cantidad total de entradas del perceptrón (incluye sesgo)
 	vector<double> pesos; ///< Vector de pesos
-	vector<double> pesos_anteriores; ///< Vector de pesos pasados, para usarlos con el término de momento
+	vector<double> dw_anteriores; ///< Vector de incrementos pasados de pesos, para usarlos con el término de momento
 	double delta; ///< Gradiente local
 	bool hidden; ///< Indica si pertenece a una capa oculta
 	double v; ///< Campo inducido local (o salida lineal del perceptrón, es decir, v es igual a la suma de los pesos por las entradas sin pasar por la función de activación)
@@ -56,8 +56,6 @@ public:
 	//void set_show_error(bool g);
 	//void set_salidas(bool s);
 	
-	//int entrenar(const char *name);
-	//void probar(const char *name);
 	void inicializar_pesos(int);
 	double clasificar(const vector<double> &D);
 	void calcular_delta(double ej);
@@ -66,10 +64,6 @@ public:
 	void mostrar_pesos();
 
 	//vector<double>& get_pesos(){ return pesos; }
-
-	//void sel_func(int x); //Selecciono la funcion 
-	//void val_cross(const char *ruta);
-	
 
 	
 };

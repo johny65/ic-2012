@@ -3,16 +3,23 @@
 #include "func.h"
 
 /**
- * @brief Constructor.
- * Inicializa la arquitectura de la red con las capas y neuronas fijadas (y fija
- * los parámetros por defecto).
+ * @brief Constructor, fija los parámetros por defecto.
+ */
+Network::Network() :
+	eta(0.01), alfa(0.0), max_epocas(1000000), tol(1e-3), sig_a(1.0)
+{
+	srand(time(NULL) + getpid());
+}
+
+
+/**
+ * @brief Inicializa la arquitectura de la red con las capas y neuronas fijadas.
  *
  * @param perceptrones_por_capa Vector donde cada elemento indica la cantidad
  * de perceptrones que va a haber en esa capa (la cantidad de capas la establece
  * la longitud del vector).
  */
-Network::Network(vector<double> perceptrones_por_capa) :
-	eta(0.1), alfa(0.1), max_epocas(1000000), tol(1e-3)
+void Network::setear_arquitectura(vector<int> perceptrones_por_capa)
 {
 	
 	//capas ocultas (la capa de entrada es considerada capa oculta)
@@ -36,34 +43,8 @@ Network::Network(vector<double> perceptrones_por_capa) :
 	}
 	//a la capa de salida no
 	this->salidas_capas.back() = new vector<double>(this->capas.back().size());
-	
-	srand(time(NULL));
-	
+		
 }
-
-/*
-void Network::test()
-{
-	Perceptron &p1 = this->capas[0][0];
-	p1.get_pesos()[0] = -1;
-	p1.get_pesos()[1] = 1;
-	p1.get_pesos()[2] = 1;
-
-	Perceptron &p2 = this->capas[0][1];
-	p2.get_pesos()[0] = 1;
-	p2.get_pesos()[1] = 1;
-	p2.get_pesos()[2] = 1;
-	
-	Perceptron &p3 = this->capas[1][0];
-	p3.get_pesos()[0] = 1;
-	p3.get_pesos()[1] = 1;
-	p3.get_pesos()[2] = -1;
-
-	cout<<"Pesos p1: "; p1.mostrar_pesos();
-	cout<<"Pesos p2: "; p2.mostrar_pesos();
-	cout<<"Pesos p3: "; p3.mostrar_pesos();
-}
-*/
 
 	
 /**
@@ -127,8 +108,6 @@ Network::~Network()
  */
 vector< vector<double> > Network::mapear(vector<double> &x)
 {
-
-	///\todo ver bien lo de los valores de salida deseadas (deberían estar en el rango de la sigmoide)
 	///\todo ver eso del epsilon
 	
 	int c = this->capas.back().size(); //si la función es de la clase no hace falta pasar esto como parámetro
@@ -191,12 +170,16 @@ void Network::entrenar(const char * name) {
 	//Abro el archivo de datos;
 	vector<double> salidas_escalares;
 	this->datos = leer_csv(name, salidas_escalares);
-	
+
+	if (!this->cant_capas()){
+		cout<<"No se configuró ninguna arquitectura para la red.\n";
+		exit(-1);
+	}
 	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
 
 	//mapeo las salidas deseadas a las neuronas de salida
 	this->salidas_deseadas = mapear(salidas_escalares);
-	//int contar_errores;
+	
 	//inicializo los pesos de la red
 	inicializar_pesos();
 
@@ -209,6 +192,7 @@ void Network::entrenar(const char * name) {
 	
 	//empiezo el entrenamiento
 	int epocas = 0;
+	vector<double> error_ent;
 	while (epocas < this->max_epocas){ //Epoca=conjunto de datos entero es decir el archivo completo
 		//contar_errores=0;
 		double error = 0.0; //E_av, error promedio para un set completo
@@ -280,30 +264,26 @@ void Network::entrenar(const char * name) {
 				 * actualizar los pesos en la capa k+1
 				 */
 				for (size_t j=0; j<capa_posterior.size(); ++j){
-					capa_posterior[j].actualizar_pesos(*this->salidas_capas[k], this->eta);
+					capa_posterior[j].actualizar_pesos(*this->salidas_capas[k], this->eta, this->alfa);
 				}
 
 			}
 
 			//en este punto me falta actualizar los pesos de la primera capa
 			for (size_t j=0; j<this->capas.front().size(); ++j){
-				this->capas.front()[j].actualizar_pesos(datos[indices[i]], this->eta);
+				this->capas.front()[j].actualizar_pesos(datos[indices[i]], this->eta, this->alfa);
 			}
 			
 			
 			double E = energia(e)/2.0; //E(n), suma del error cuadrático instantáneo
 			error += E;
-			//mostrar_pesos();
-			//break;
-			
-		//	mostrar_salida(salidas);
 			
 		} //termina un patrón de entrada, seguir con el siguiente
 
-		epocas++;
-		//cout<<"Época: "<<epocas<<endl;
+		epocas++; //cout<<"Época: "<<epocas<<endl;
 		error /= datos.size();
 		cout<<"E: "<<error<<endl;
+		error_ent.push_back(error);
 		if (error < this->tol){
 			cout<<"Terminó el entrenamiento en "<<epocas<<" épocas.\n";
 			break;
@@ -321,6 +301,12 @@ void Network::entrenar(const char * name) {
 //	cin.get();
 
 	//cout<<"Porcentaje de errores: "<<(contar_errores*100)/2500<<endl;
+
+	//if (this->show_error){
+		crear_dat_vector(error_ent, "error.dat");
+		error_graf("plot \"error.dat\" with lines");
+	//}
+	
 }
 
 
@@ -330,6 +316,40 @@ void Network::val_cross (const char * ruta) {
 }
 
 void Network::probar (const char * name) {
+	vector<vector<double> > vec_dif;
+	
+	//Abro el archivo de datos;
+	vector<double> salidas_escalares;
+	this->datos.clear();
+	this->datos = leer_csv(name, salidas_escalares);
+	
+	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
+	
+	//mapeo las salidas deseadas a las neuronas de salida
+	this->salidas_deseadas = mapear(salidas_escalares);
+	
+	int aciertos=0;//para contar la cantidad de aciertos
+	//vector<double> e; //para los errores por cada dato 
+	double e=0.0; //E_av, error promedio para un set completa
+	int ic; //índice de capa para llenar el vector de salida de cada capa
+	vector<vector<double> > result_c; //resultado de la clasificacion de los datos vector<vector<>> xq tengo un vector de salida por cada dato (por el mapear)
+	for(int i=0;i<this->datos.size();i++) {  
+		//cout<<"dimension de datos "<<datos[i][0]<<"   "<<datos[i][1]<<"   "<<datos[i][2]<<endl;
+		result_c.push_back(clasificar(this->datos[i])); //guardo el resultado de la clasificacion de cada dato
+		vec_dif.push_back(dif(this->salidas_deseadas[i],result_c.back()));
+		if(this->salidas_deseadas.back().size()==1){//si pasa por aca quiere decir que las salidas son solo 1 o -1 (no hay mapeo a vector)
+			if(abs(vec_dif[i][0])<0.7) {aciertos++; cout<<"entro"<<endl;}
+		}
+		else{//tengo que ver que neurona se activo busco el maximo valor 
+			
+		}
+	}
+
+	cout<<"numero de aciertos "<<aciertos<<endl;
+	this->porcentaje.push_back(aciertos*100/this->datos.size());
+	cout<<"% de aciertos "<<this->porcentaje.back()<<endl;
+	//generar un archivo .txt para graficar los puntos con la clasificacion obtenida
+	
 	
 }
 
@@ -391,6 +411,37 @@ void Network::set_max_epocas(int m)
 
 
 /**
+ * @brief Fija la tasa de aprendizaje de la red.
+ * @param n Tasa de aprendizaje nueva.
+ */
+void Network::set_tasa(double n)
+{
+	this->eta = n;
+}
+
+
+/**
+ * @brief Fija la constante para el término de momento.
+ * @param a Constante de momento. 0 <= |a| < 1.
+ */
+void Network::set_momento(double a)
+{
+	this->alfa = a;
+}
+
+
+/**
+ * @brief Setea el parámetro a de la función sigmoide.
+ * @param a Constante.
+ */
+void Network::set_a_sigmoide(double a)
+{
+	///\todo ver cómo usar esto
+	this->sig_a = a;
+}
+
+
+/**
  * @brief Define la tolerancia del error.
  *
  * A medida que va entrenando la red, se calcula una medida del error
@@ -414,7 +465,7 @@ void Network::mostrar_salida(vector<double> v){
 
 
 vector<double> Network::clasificar(vector<double> Datos){
-	Datos.insert(Datos.begin(), -1);
+	//Datos.insert(Datos.begin(), -1);
 	int ic;
 	vector<double> *entradas = &(Datos);
 	//Calcula la salida para los Datos (esto una vez que ya esta entrenado)
@@ -427,6 +478,7 @@ vector<double> Network::clasificar(vector<double> Datos){
 		//meter las entradas por los perceptrones de la capa
 		vector<double> *salida_capa = this->salidas_capas[k];
 		for (size_t j = ic; j<capa.size()+ic; ++j){ //for por cada neurona de la capa k
+		//	cout<<"dimension de las entradas"<<(*entradas).size()<<endl;
 			salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
 		}
 		
