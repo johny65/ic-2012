@@ -18,11 +18,8 @@ long_line_behaviour=1
 long_line_column=79
 
 [files]
-current_page=3
-FILE_NAME_0=248;C++;0;16;1;1;0;/home/johny/Documentos/ic/Multicapa/Multilayer/Network.cpp;0;4
-FILE_NAME_1=3243;C++;0;16;1;1;0;/home/johny/Documentos/ic/Multicapa/Multilayer/main.cpp;0;4
-FILE_NAME_2=2307;C++;0;16;1;1;0;/home/johny/Documentos/ic/Multicapa/Multilayer/Perceptron.h;0;4
-FILE_NAME_3=10479;C++;0;16;1;1;0;/home/johny/Documentos/ic/Multicapa/Multilayer/Perceptron.cpp;0;4
+current_page=0
+FILE_NAME_0=4491;C++;0;16;1;1;0;/home/johny/Documentos/ic/Multicapa/Multilayer/Network.cpp;0;4
 
 [VTE]
 last_dir=/home/johny/Documentos/ic/Multicapa/Multilayer

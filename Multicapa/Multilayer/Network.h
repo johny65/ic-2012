@@ -32,7 +32,6 @@ private:
 
 	bool graficos; ///< Indica si se activan los gráficos o no
 	bool couts; ///< Indica si se deben mostrar salidas por consola
-	bool show_error; ///< Indica si se debe mostrar el gráfico de error
 	GNUplot plotter; ///< Conexión con GNUplot
 	GNUplot error_graf; /// Para graficar error de entrenamiento
 
@@ -57,7 +56,6 @@ public:
 	void entrenar(const char *name);
 	void val_cross(const char *archivo, int k);
 	double probar(const char *name);
-	void mostrar_salida(vector<double>);
 	vector<double> clasificar(vector<double> &Datos);
 	void mostrar_pesos();
 	void guardar_pesos();

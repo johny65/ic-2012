@@ -11,23 +11,6 @@ int main (int argc, char *argv[]) {
 	char *archivo_prueba = NULL;
 	char *archivo_val = NULL;
 
-	string ayudassss = "\
-Perceptrón Multicapa. IC 2012\n\
-Opciones:\n\
- -e archivo:\n\tArchivo de entrada para datos de entrenamiento.\n\
- -p archivo:\n\tArchivo de entradas para las pruebas.\n\
- -n tasa:\n\tTasa de aprendizaje.\n\
- -m alfa:\n\tConstante para el término de momento.\n\
- -t tol:\n\tTolerancia de error para detener entrenamiento.\n\
- -i cant:\n\tNúmero máximo de iteraciones para el entrenamiento.\n\
- -w ms:\n\tTiempo entre cuadros de la animación.\n\
- -g:\n\tNo mostrar ningún gráfico.\n\
- -s:\n\tNo mostrar ninguna salida por consola.\n\
- -z:\n\tMostrar gráfico de error.\n\
- -v ruta+prefijo:\n\tRealiza validación cruzada.\n\
- -h:\n\tMuestra este mensaje de ayuda.\n\
-";
-
 	string ayuda = "\
 Perceptrón Multicapa. IC 2012\n\
 Uso:\n\
@@ -51,7 +34,7 @@ Opciones:\n\
 ";
 	
 	int o, k = 1;
-	while ((o = getopt(argc, argv, "e:p:n:t:i:v:k:mgszh")) != -1){
+	while ((o = getopt(argc, argv, "e:p:n:t:i:v:k:m:gszh")) != -1){
 		switch (o){
 			case 'e': {
 				archivo_entrada = optarg;

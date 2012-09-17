@@ -4,14 +4,14 @@ FLAGS=  -g2 -Wall -O0 -D_DEBUG
 LIBS=  
 OBJS=Debug/main.o Debug/Network.o Debug/func.o Debug/Perceptron.o Debug/utils.o 
 
-all: Debug Debug/Multilayer
+all: Debug bin/Multilayer
 
 clean:
 	rm -rf ${OBJS} Debug/Multilayer
 	rm *.dat
 	rm red.gv; rm red.png
 
-Debug/Multilayer: ${OBJS}
+bin/Multilayer: ${OBJS}
 	${GPP} ${OBJS} ${LIBS} -o $@
 
 Debug:
@@ -33,3 +33,4 @@ Debug/utils.o: utils.cpp GNUplot.h
 	${GPP} ${FLAGS} -c utils.cpp -o $@
 
 .PHONY: clean
+
