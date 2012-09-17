@@ -369,56 +369,11 @@ double Perceptron::get_peso(int peso)
 }
 
 
+
 /**
- * @brief Validación cruzada.
- *
- * Esta rutina entrena el Perceptron con varias particiones, realiza las pruebas,
- * calcula el error de las mismas y escoge los pesos que tuvieron el menor error.
- *
- * @param ruta Ruta (carpeta y prefijo) de los archivos para realizar la
- * validación cruzada.
- *//*
-void Perceptron::val_cross(const char *ruta)
-{	
-	stringstream name_e, name_p;
-	name_e<<ruta<<"_e1.csv";
-	name_p<<ruta<<"_p1.csv";
-	int i=2;
-	while(entrenar((name_e.str()).c_str())==0){
-		//mientras encuentre archivos de entrenamiento-prueba, seguir
-		probar(name_p.str().c_str());
-		cout<<"Terminó partición "<<i-1<<".\n";
-		name_e.str("");
-		name_e<<ruta<<"_e"<<i<<".csv";
-		name_p.str("");
-		name_p<<ruta<<"_p"<<i<<".csv";
-		i++;
-	}
-	
-	
-	//Buscar según el mínimo error y actualizar el vector de pesos
-	double menor = this->error[0];
-	int ind_m = 0;
-	for (size_t i=1; i<this->error.size(); ++i){
-		if(menor>this->error[i]){ menor=this->error[i]; ind_m=i;}
-	}
-	
-	this->pesos = this->weight[ind_m];
-	cout<<"\nPesos ganadores:\n";
-	mostrar_pesos();
-	graficar("Pesos ganadores");
-	
-	
-	//promedio:
-	double sum = 0.0;
-	for (size_t i=0; i<this->error.size(); ++i){
-		sum += this->error[i];
-	}
-	sum /= this->error.size();
-
-	cout<<"Error de la validación cruzada: "<<sum<<endl;
-	
+ * @brief Función que devuelve el vector de Pesos del Perceptrón.
+ */
+vector<double>& Perceptron::get_vector_pesos()
+{
+	return this->pesos;
 }
-*/
-
-

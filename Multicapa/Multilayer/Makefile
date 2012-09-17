@@ -8,6 +8,8 @@ all: Debug Debug/Multilayer
 
 clean:
 	rm -rf ${OBJS} Debug/Multilayer
+	rm *.dat
+	rm red.gv; rm red.png
 
 Debug/Multilayer: ${OBJS}
 	${GPP} ${OBJS} ${LIBS} -o $@
@@ -30,3 +32,4 @@ Debug/Perceptron.o: Perceptron.cpp Perceptron.h GNUplot.h utils.h func.h wait.h
 Debug/utils.o: utils.cpp GNUplot.h
 	${GPP} ${FLAGS} -c utils.cpp -o $@
 
+.PHONY: clean

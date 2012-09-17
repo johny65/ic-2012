@@ -31,6 +31,9 @@ using namespace std;
 */
 vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd);
 
+//no separa salidas deseada
+vector< vector<double> > leer_csv(const char *archivo);
+
 
 /**
  * @brief Recibe una matriz de datos y genera un archivo que puede ser usado
@@ -57,5 +60,21 @@ void crear_dat_vector(vector<double> &v, const char *name);
  */
 void guardar_csv(const char *file, vector< vector<double> > &datos);
 
+
+/**
+* @brief Recibe un vector de datos y genera un archivo con todos los pesos por 
+* por perceptrón.
+* @param pesos Vector de pesos a grabar.
+*/
+void pesos_a_archivo(vector< vector<double> > pesos); 
+
 void mostrar_sdcapa(vector<vector<double> > x);
+
+/**
+* @brief Recibe el nombre de un archivo y crea un vector con los pesos de una red.
+* @param v Vector de datos a grabar.
+* @param archivo Es el nombre del archivo del que se van a extraer los datos.
+*/
+vector< vector<double> > pesos_desde_archivo(const char * archivo);
+
 #endif

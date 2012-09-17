@@ -28,7 +28,6 @@ private:
 	vector< vector<double> > datos;
 	
 	vector< vector<double>* > salidas_capas; ///<es necesario guardar cada una de las salidas de las capas para hacer el paso hacia atras
-	vector<double> porcentaje; ///< guarda el porcentaje de aciertos para un leave-k-out
 	
 
 	bool graficos; ///< Indica si se activan los gráficos o no
@@ -56,13 +55,13 @@ public:
 	void set_momento(double a);
 	void set_a_sigmoide(double a);
 	void entrenar(const char *name);
-	void val_cross(const char *ruta);
-	void probar(const char *name);
+	void val_cross(const char *archivo, int k);
+	double probar(const char *name);
 	void mostrar_salida(vector<double>);
-	vector<double> clasificar(vector<double> Datos);
+	vector<double> clasificar(vector<double> &Datos);
 	void mostrar_pesos();
-	void test();
-
+	void guardar_pesos();
+	int prueba() { return 2; }
 	void dibujar_red();
 };
 

@@ -170,12 +170,15 @@ void Network::entrenar(const char * name) {
 	//Abro el archivo de datos;
 	vector<double> salidas_escalares;
 	this->datos = leer_csv(name, salidas_escalares);
+	cout<<"Cantidad de patrones: "<<this->datos.size()<<endl;
 
 	if (!this->cant_capas()){
 		cout<<"No se configuró ninguna arquitectura para la red.\n";
 		exit(-1);
 	}
 	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
+
+	dibujar_red();
 
 	//mapeo las salidas deseadas a las neuronas de salida
 	this->salidas_deseadas = mapear(salidas_escalares);
@@ -294,35 +297,88 @@ void Network::entrenar(const char * name) {
 		
 	} //termina una época, seguir con otra
 	
-	//cout<<"La cantidad de errores fue: "<<contar_errores<<endl;
-	
-//	graficar_puntos(name,"concent");
-	
-//	cin.get();
-
-	//cout<<"Porcentaje de errores: "<<(contar_errores*100)/2500<<endl;
 
 	//if (this->show_error){
 		crear_dat_vector(error_ent, "error.dat");
 		error_graf("plot \"error.dat\" with lines");
 	//}
-	dibujar_red();
-}
-
-
-
-void Network::val_cross (const char * ruta) {
 	
 }
 
-void Network::probar (const char * name) {
+
+
+	
+/**
+ * @brief Validación cruzada.
+ *
+ * Esta rutina entrena el Perceptron con varias particiones, realiza las pruebas,
+ * calcula el error de las mismas y escoge los pesos que tuvieron el menor error.
+ *
+ * @param ruta Ruta (carpeta y prefijo) de los archivos para realizar la
+ * validación cruzada.
+ */
+void Network::val_cross (const char * archivo, int k)
+{	
+	vector< vector<double> > datos_val = leer_csv(archivo);
+	if (datos_val.size() % k != 0){
+		cout<<"Error, ingrese otro k.\n";
+		exit(-1);
+	}
+
+	int cant = datos_val.size()/k;
+	vector<double> aciertos;
+
+	int ki = 0;
+	for (int i=0; i<cant; ++i){
+		vector< vector<double> > kp(datos_val.begin()+ki, datos_val.begin()+ki+k);
+		cout<<"tamaño prueba: "<<kp.size()<<endl;
+		vector< vector<double> > ke(datos_val.begin(), datos_val.begin()+ki);
+		ke.insert(ke.end(), datos_val.begin()+ki+k, datos_val.end());
+		cout<<"tamaño entrenamiento: "<<ke.size()<<endl;
+		
+		guardar_csv("prueba_k.csv", kp);
+		guardar_csv("entrenamiento_k.csv", ke);
+
+		this->datos.clear();
+		entrenar("entrenamiento_k.csv");
+		
+		double porc = probar("prueba_k.csv");
+		aciertos.push_back(porc);
+		
+		ki += k;
+	}
+
+	vector<double>::iterator m = max_element(aciertos.begin(), aciertos.end());
+
+	double error_clas = 0.0; //promedio de error de clasificación
+	vector<double> desaciertos(aciertos.size());
+	for (int i=0; i<aciertos.size(); ++i){
+		desaciertos[i] = 100 - aciertos[i];
+		error_clas += desaciertos[i];
+	}
+	error_clas /= desaciertos.size();
+
+	vector<double> eee = dif(desaciertos, vector<double>(desaciertos.size(), error_clas));
+	double eeee = sqrt(energia(eee) / (desaciertos.size()-1));
+
+	cout<<"Desvío estándar: "<<eeee<<endl;
+
+	cout<<"Mayor porcentaje de acierto logrado: "<<*m<<endl;
+
+	crear_dat_vector(aciertos, "aciertos.dat");
+	plotter("plot \"aciertos.dat\" with boxes");
+	
+}
+
+
+double Network::probar (const char * name) {
 	vector<vector<double> > vec_dif;
 	
 	//Abro el archivo de datos;
 	vector<double> salidas_escalares;
 	this->datos.clear();
 	this->datos = leer_csv(name, salidas_escalares);
-	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo de prueba."<<endl; return;}
+	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo de prueba."<<endl; return -1;}
 	
 	//mapeo las salidas deseadas a las neuronas de salida
 	this->salidas_deseadas = mapear(salidas_escalares);
@@ -336,12 +392,13 @@ void Network::probar (const char * name) {
 		result_c.push_back(clasificar(this->datos[i])); //guardo el resultado de la clasificacion de cada dato
 		vec_dif.push_back(dif(this->salidas_deseadas[i],result_c.back()));
 		if(this->salidas_deseadas.back().size()==1){//si pasa por aca quiere decir que las salidas son solo 1 o -1 (no hay mapeo a vector)
-			if(abs(vec_dif[i][0])<0.7) {aciertos++;} ///<\todo acá capaz convenga poner signo
+			if(abs(vec_dif[i][0])<0.07) {aciertos++;} ///<\todo acá capaz convenga poner signo
 			this->datos[i].push_back(signo(vec_dif[i][0])); //agrego mi salida para ya dibujar
 		}
 		else{//tengo que ver que neurona se activo busco el maximo valor
-			vector<double>::iterator m = max_element(vec_dif[i].begin(), vec_dif[i].end());
-			int ind = distance(vec_dif[i].begin(), m);
+			vector<double>::iterator m = max_element(result_c[i].begin(), result_c[i].end());
+			int ind = distance(result_c[i].begin(), m);
+			cout<<"neurona activada: "<<ind<<endl;
 			if (this->salidas_deseadas[i][ind] == 1)
 				aciertos++;
 			this->datos[i].push_back(ind); //agrego mi salida para ya dibujar
@@ -349,14 +406,14 @@ void Network::probar (const char * name) {
 	}
 
 	cout<<"numero de aciertos "<<aciertos<<endl;
-	this->porcentaje.push_back(aciertos*100/this->datos.size());
-	cout<<"% de aciertos "<<this->porcentaje.back()<<endl;
+	double porc = aciertos*100.0/this->datos.size();
+	cout<<"% de aciertos "<<porc<<endl;
 	
 	//generar un archivo .txt para graficar los puntos con la clasificacion obtenida
 	guardar_csv("resultados.csv", this->datos);
 	graficar_puntos("resultados.csv", "resultados");
 	
-
+	return porc;
 }
 
 void Network::graficar_puntos(const char *archivo, const char *titulo)
@@ -470,7 +527,7 @@ void Network::mostrar_salida(vector<double> v){
 }
 
 
-vector<double> Network::clasificar(vector<double> Datos){
+vector<double> Network::clasificar(vector<double> &Datos){
 	//Datos.insert(Datos.begin(), -1);
 	int ic;
 	vector<double> *entradas = &(Datos);
@@ -557,4 +614,18 @@ void Network::dibujar_red()
 	f.close();
 	system("dot -Tpng -ored.png red.gv");
 	system("display red.png");
+}
+
+
+/**
+ * @brief Función para guardar los pesos de la red en un Archivo.
+ */
+void Network::guardar_pesos(){
+	for (size_t i=0; i<this->capas.size(); ++i){
+		vector< vector<double> > pesos_capa;
+		for (size_t j=0; j<capas[i].size(); ++j){
+			pesos_capa.push_back(capas[i][j].get_vector_pesos());
+		}
+		pesos_a_archivo(pesos_capa);
+	}
 }

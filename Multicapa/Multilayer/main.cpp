@@ -9,7 +9,7 @@ int main (int argc, char *argv[]) {
 	
 	char *archivo_entrada = NULL;
 	char *archivo_prueba = NULL;
-	//char *ruta_cross_val = NULL;
+	char *archivo_val = NULL;
 
 	string ayudassss = "\
 Perceptrón Multicapa. IC 2012\n\
@@ -37,6 +37,8 @@ donde p1 es la cantidad de neuronas en la capa 1, p2 es la cantidad de neuronas\
 Opciones:\n\
  -e archivo:\n\tArchivo de entrada para datos de entrenamiento.\n\
  -p archivo:\n\tArchivo de entradas para las pruebas.\n\
+ -v archivo\n\tArchivo para realizar la validación cruzada.\n\
+ -k valor\n\tK para el leave-k-out.\n\
  -n tasa:\n\tTasa de aprendizaje.\n\
  -t tol:\n\tTolerancia de error para detener entrenamiento.\n\
  -m alfa:\n\tConstante para el término de momento.\n\
@@ -48,8 +50,8 @@ Opciones:\n\
  -h:\n\tMuestra este mensaje de ayuda.\n\
 ";
 	
-	int o;
-	while ((o = getopt(argc, argv, "e:p:n:t:i:m:gszh")) != -1){
+	int o, k = 1;
+	while ((o = getopt(argc, argv, "e:p:n:t:i:v:k:mgszh")) != -1){
 		switch (o){
 			case 'e': {
 				archivo_entrada = optarg;
@@ -57,6 +59,14 @@ Opciones:\n\
 			}
 			case 'p': {
 				archivo_prueba = optarg;
+				break;
+			}
+			case 'v': {
+				archivo_val = optarg;
+				break;
+			}
+			case 'k': {
+				stringstream ss; ss<<optarg; ss>>k;
 				break;
 			}
 			//case 'z': {
@@ -119,13 +129,23 @@ Opciones:\n\
 	if (red.size())
 		NN.setear_arquitectura(red);
 
-	if (archivo_entrada != NULL)
+
+	if (archivo_val != NULL)
+		NN.val_cross(archivo_val, k);
+		
+	if (archivo_entrada != NULL){
 		NN.entrenar(archivo_entrada);
+		NN.guardar_pesos();
+	}
 	if (archivo_prueba != NULL)
-		NN.probar(archivo_prueba);
+		cout<<"Porcentaje de aciertos: "<<NN.probar(archivo_prueba)<<endl;
+
+
+
 	//if (ruta_cross_val != NULL)
 		//P.val_cross(ruta_cross_val);
 
+	//NN.val_cross("xorvar.csv", 1000);
 	cout<<"\nPresionar una tecla para cerrar.\n"; cin.get();
 	return 0;
 	

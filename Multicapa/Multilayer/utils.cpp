@@ -37,6 +37,28 @@ vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
 	return todo;
 }
 
+vector< vector<double> > leer_csv(const char *archivo)
+{
+	vector< vector<double> > todo;
+	
+	vector<double> aux;
+	ifstream in(archivo);
+	string linea, temp;
+	double val;
+	while (getline(in, linea)){
+		aux.push_back(-1);
+		stringstream ss(linea);
+		while(getline(ss, temp, ',')){
+			stringstream ss2(temp);
+			ss2>>val;
+			aux.push_back(val);
+		}
+		todo.push_back(aux);
+		aux.clear();
+	}
+	return todo;
+}
+
 void crear_dat(vector<vector<double> > &v, const char *name)
 {
 	std::ostringstream ss;
@@ -93,4 +115,39 @@ void mostrar_sdcapa(vector<vector<double> > x){
 		cout<<endl;
 		q++;
 	}
+}
+
+void pesos_a_archivo(vector< vector<double> > pesos){
+	ofstream out("pesos.txt", ios::app);
+	std::ostringstream aux;
+	for (int i=0; i<pesos.size(); i++){
+		for (int j=0; j< pesos[i].size(); j++){
+				aux<<pesos[i][j]<<" ";
+		}
+		aux<<endl;
+	}
+	aux<<endl;
+	out<<aux.str();
+	out.close();
+}
+
+// Cargar los pesos de un Archivo a una red
+
+vector< vector<double> > pesos_desde_archivo(const char * archivo){
+	vector< vector<double> > pesos;
+	vector<double> aux;
+	ifstream in(archivo);
+	string linea, temp;
+	double val;
+	while (getline(in, linea)){
+		stringstream ss(linea);
+		while(getline(ss, temp, ' ')){
+			stringstream ss2(temp);
+			ss2>>val;
+			aux.push_back(val);
+		}
+		pesos.push_back(aux);
+		aux.clear();
+	}
+	return pesos;
 }

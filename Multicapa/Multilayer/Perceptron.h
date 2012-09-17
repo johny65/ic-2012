@@ -62,8 +62,7 @@ public:
 	void calcular_delta(Layer&, int);
 	void actualizar_pesos(vector<double>&, double eta, double alfa = 0.0);
 	void mostrar_pesos();
-
-	//vector<double>& get_pesos(){ return pesos; }
+	vector<double>& get_vector_pesos();
 
 	
 };
