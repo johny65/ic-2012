@@ -4,14 +4,14 @@ FLAGS=  -g2 -Wall -O0 -D_DEBUG
 LIBS=  
 OBJS=Debug/main.o Debug/Network.o Debug/func.o Debug/Perceptron.o Debug/utils.o 
 
-all: Debug bin/Multilayer
+all: Debug bin/rbfnn
 
 clean:
-	rm -rf ${OBJS} Debug/Multilayer
+	rm -rf ${OBJS} Debug/rbfnn
 	rm *.dat
 	rm red.gv; rm red.png
 
-bin/Multilayer: ${OBJS}
+bin/rbfnn: ${OBJS}
 	${GPP} ${OBJS} ${LIBS} -o $@
 
 Debug:

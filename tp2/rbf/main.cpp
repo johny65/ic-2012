@@ -1,10 +1,13 @@
 #include<iostream>
 
 #include "Network.h"
+#include "func.h"
+
+
 using namespace std;
 
 int main (int argc, char *argv[]) {
-
+/*
 	Network NN;
 	
 	char *archivo_entrada = NULL;
@@ -131,29 +134,10 @@ Opciones:\n\
 	//NN.val_cross("xorvar.csv", 1000);
 	cout<<"\nPresionar una tecla para cerrar.\n"; cin.get();
 	return 0;
-	
-/*
-	
-	vector<double> p;
-	//p.push_back(4);
-	p.push_back(2);
-	p.push_back(10);
-	//p.push_back(10);
-	p.push_back(1);
-	Network A(p);
-	//cout<<A.cant_capas()<<endl;
-	//A.entrenar("tabla_XOR.csv");
-	A.entrenar("xorvar.csv");
-	//A.entrenar("test.csv");
-	//A.entrenar("concent.csv");
-	//A.mostrar_pesos();
-	//pruebo con un dato 
-	vector<double> x,s;
-	x.push_back(1); 	x.push_back(-1);
-	s=A.clasificar(x);
-	cout<<"Resultado "<<endl;
-	for(size_t i=0;i<s.size();i++) { cout<<s[i]<<endl; }
-	//cin.get();
+*/
+	srand(time(NULL));
+	vector<double> sd;
+	vector< vector<double> > datos = leer_csv("kkk", sd);
+	k_means(datos, 4);
 	return 0;
-	*/
 }
