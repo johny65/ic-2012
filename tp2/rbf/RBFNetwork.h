@@ -3,15 +3,27 @@
 
 #include <vector>
 #include "Perceptron.h"
+#include "rbf.h"
 #include "utils.h"
 
 using namespace std;
 
 
 /**
-	@class Network Clase principal de la red neuronal.
-*/
-class Network {
+ * @brief Clase Red Neuronal con Funciones de Base Radial (RBF-NN).
+ *
+ * Una Red Neuronal con Funciones de Base Radial (RBF-NN, Radial Basis Function
+ * Neural Network) sólo contiene 2 capas de neuronas: una capa oculta donde
+ * las neuronas poseen una función de base radial como función de activación,
+ * y una capa de salidad con neuronas perceptrones simples (con una salida
+ * lineal).
+ * Esta red se entrena en 2 etapas: primero se entrenan las neuronas de la capa
+ * oculta (se buscan los centros para las funciones de base radial) de una forma
+ * no supervisada (mediante el algoritmo k-means). Después se entrenan las
+ * neuronas de salida (sus pesos) mediante un método supervisado.
+ * 
+ */
+class RBFNetwork {
 private:
 
 	double eta; ///< Tasa de aprendizaje
@@ -21,8 +33,11 @@ private:
 
 	double sig_a; ///< Constante a para la sigmoidea
 
+
+	vector<Perceptron> capa_salida;
+	vector<RBF> capa_oculta;
 	
-	vector<Layer> capas; /** R (capas) es el vector de capas, es decir la longitud del vector R determina la cantidad de capas en la red, siendo R[R.size()-1] la capa de salida*/
+	
 	vector< vector<double> > salidas_deseadas; ///< Vector con las salidas esperadas (en forma de vectores)
 	
 	vector< vector<double> > datos;
@@ -39,15 +54,14 @@ private:
 	vector< vector<double> > mapear(vector<double>&);
 	void inicializar_pesos();
 	void graficar_puntos(const char *archivo, const char *titulo);
-	bool is_hidden(Layer x);
+	void verificar_inicializada();
 	
 public:
 
-	void setear_arquitectura(vector<int> perceptrones_por_capa);
-	Network();
-	~Network();
+	void setear_arquitectura(int unidades_ocultas, int unidades_salida);
+	RBFNetwork();
+	~RBFNetwork();
 	
-	int cant_capas();
 	void set_max_epocas(int m);
 	void set_tolerancia(double t);
 	void set_tasa(double n);
@@ -57,7 +71,6 @@ public:
 	void val_cross(const char *archivo, int k);
 	double probar(const char *name);
 	vector<double> clasificar(vector<double> &Datos);
-	void mostrar_pesos();
 	void guardar_pesos();
 	int prueba() { return 2; }
 	void dibujar_red();

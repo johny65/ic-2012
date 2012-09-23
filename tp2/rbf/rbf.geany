@@ -18,10 +18,14 @@ long_line_behaviour=1
 long_line_column=79
 
 [files]
-current_page=0
+current_page=3
+FILE_NAME_0=3309;C++;0;16;1;1;0;/home/johny/Documentos/ic/tp2/rbf/func.cpp;0;4
+FILE_NAME_1=1759;C++;0;16;1;1;0;/home/johny/Documentos/ic/tp2/rbf/func.h;0;4
+FILE_NAME_2=2228;C++;0;16;1;1;0;/home/johny/Documentos/ic/tp2/rbf/main.cpp;0;4
+FILE_NAME_3=4211;C++;0;16;1;1;0;/home/johny/Documentos/ic/tp2/rbf/Network.cpp;0;4
 
 [VTE]
-last_dir=/home/johny
+last_dir=/home/johny/Documentos/ic/tp2/rbf/bin
 
 [gproject]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;

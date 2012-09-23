@@ -39,7 +39,7 @@ vector<Punto> k_means(vector<Punto> datos, int k)
 	//centroides iniciales)
 
 	set<Punto> s;
-	while ((int)s.size() != k){
+	while ((int)s.size() != k){ //me garantizo de tomar k puntos distintos
 		int p = rand()%datos.size();
 		s.insert(datos.at(p));
 	}
@@ -52,7 +52,6 @@ vector<Punto> k_means(vector<Punto> datos, int k)
 	int D = datos[0].size(); //dimensión de los datos
 	int it = 0;
 
-	cout<<"Empieza k-means...\n";
 	while (hay_cambios){ //mientras algún punto se mueva de partición
 
 		//limpieza
@@ -94,12 +93,11 @@ vector<Punto> k_means(vector<Punto> datos, int k)
 
 		it++;
 
-
+		
+	}
+	/*
 		crear_dat(centroides, "c.dat");
 		plot("plot \"c.dat\"");
-		cin.get();
-		
-
 
 		for (int i=0; i<k; ++i){
 			if (particiones[i].size() != 0){
@@ -110,13 +108,10 @@ vector<Punto> k_means(vector<Punto> datos, int k)
 			}
 		}
 		cin.get();
+	*/
 
-	}
-	cout<<"k-means terminó en "<<it<<" iteraciones.\n";
 	return centroides;
 }
-
-
 
 vector<double> init_weight(int nd)
 {
@@ -205,5 +200,12 @@ double sigmoide(double valor, double a)
 double derivada_sigmoide(double x, double a)
 {
 	double res = 2.0 * a * exp(a*x) / pow((exp(a*x) + 1), 2.0);
+	return res;
+}
+
+
+double gaussiana(Punto &x, Punto &media, double sigma2)
+{
+	double res = exp(-dist(x, media) / (2*sigma2));
 	return res;
 }

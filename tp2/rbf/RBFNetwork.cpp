@@ -1,12 +1,12 @@
 #include <stdexcept>
-#include "Network.h"
+#include "RBFNetwork.h"
 #include "func.h"
 
 /**
  * @brief Constructor, fija los parámetros por defecto.
  */
-Network::Network() :
-	eta(0.01), alfa(0.0), max_epocas(1000000), tol(0.01), sig_a(1.0), couts(true)
+RBFNetwork::RBFNetwork() :
+	eta(0.1), alfa(0.0), max_epocas(1000), tol(0.01), sig_a(1.0), couts(true)
 {
 	srand(time(NULL) + getpid());
 }
@@ -19,75 +19,38 @@ Network::Network() :
  * de perceptrones que va a haber en esa capa (la cantidad de capas la establece
  * la longitud del vector).
  */
-void Network::setear_arquitectura(vector<int> perceptrones_por_capa)
+void RBFNetwork::setear_arquitectura(int unidades_ocultas, int unidades_salida)
 {
 	
-	//capas ocultas (la capa de entrada es considerada capa oculta)
-	int t = perceptrones_por_capa.size() - 1;
-	for (int i=0; i<t; ++i){
-		Layer nueva(perceptrones_por_capa[i], true);
-		this->capas.push_back(nueva);
-	}
-
-	//capa de salida (pongo a los perceptrones como hidden = false)
-	Layer nueva(perceptrones_por_capa[t], false);
-	this->capas.push_back(nueva);
-
-	//ya aloco el espacio para los vectores de salida de las capas;
+	this->capa_oculta = vector<RBF>(unidades_ocultas);
+	this->capa_salida = vector<Perceptron>(unidades_salida);
 	
-	this->salidas_capas = vector< vector<double>* >(cant_capas());
-	for (int i=0; i<cant_capas()-1; ++i){
-		//si la capa es oculta, su salida será la entrada para otra capa,
-		//entonces hay que agregar el -1 del sesgo
-		this->salidas_capas[i] = new vector<double>(this->capas[i].size() + 1, -1);
-	}
-	//a la capa de salida no
-	this->salidas_capas.back() = new vector<double>(this->capas.back().size());
+	//ya aloco el espacio para los vectores de salida de las capas:
+	//(la capa de salida tiene como entrada la salida de la capa oculta más el sesgo)
+	
+	this->salidas_capas = vector< vector<double>* >(2);
+	this->salidas_capas[0] = new vector<double>(this->capa_oculta.size() + 1, -1);
+	this->salidas_capas[1] = new vector<double>(this->capa_salida.size());
 		
-}
-
-	
-/**
- * @brief Devuelve la cantidad de capas de la red.
- */
-int Network::cant_capas()
-{
-	return this->capas.size();
-}
-
-
-/**
- * @brief Para inicializar todos los pesos de la red (los pesos de todas las
- * neuronas que tiene).
- */
-void Network::inicializar_pesos()
-{
-	//recorro todos los perceptrones diciéndoles que inicializen sus pesos
-
-	//para los que están en la capa de entrada, la cantidad de pesos que tienen
-	//es igual al número de entradas)
-	for (size_t j=0; j<this->capas[0].size(); ++j){
-		this->capas[0][j].inicializar_pesos(this->datos[0].size());
-	}
-
-	//para los demás la cantidad de pesos es igual a la cantidad de perceptrones
-	//en la capa anterior más el peso correspondiente al sesgo
-	for (size_t i=1; i<this->capas.size(); ++i){
-		for (size_t j=0; j<this->capas[i].size(); ++j){
-			this->capas[i][j].inicializar_pesos(capas[i-1].size()+1);
-		}
-	}
-	
 }
 
 
 /**
  * @brief Destructor.
  */
-Network::~Network()
+RBFNetwork::~RBFNetwork()
 {
 	for (size_t i=0; i<this->salidas_capas.size(); ++i){
 		delete this->salidas_capas[i];
+	}
+}
+
+
+void RBFNetwork::verificar_inicializada()
+{
+	if (this->capa_oculta.size() == 0 && this->capa_salida.size() == 0){
+		cout<<"No se configuró ninguna arquitectura para la red.\n";
+		exit(-1);
 	}
 }
 
@@ -106,11 +69,11 @@ Network::~Network()
  *
  * @param x vector de salidas deseadas escalares.
  */
-vector< vector<double> > Network::mapear(vector<double> &x)
+vector< vector<double> > RBFNetwork::mapear(vector<double> &x)
 {
 	///\todo ver eso del epsilon
 	
-	int c = this->capas.back().size(); //si la función es de la clase no hace falta pasar esto como parámetro
+	int c = this->capa_salida.size(); //si la función es de la clase no hace falta pasar esto como parámetro
 
 	vector< vector<double> > sal_m;
 	if(c==1){
@@ -153,28 +116,16 @@ de neuronas establecidas para la capa de salida ("<<ex.what()<<")\n";
 
 
 /**
- * @brief Devuelve si una capa es oculta o no.
- * @param x Capa a evaluar.
- */
-bool Network::is_hidden(Layer x){
-	return x[0].get_hidden();
-}
-
-
-/**
  * @brief Entrena la red neuronal.
  * @param name Nombre del archivo que contiene los datos.
  */
-void Network::entrenar(const char * name) {
+void RBFNetwork::entrenar(const char * name) {
 	
 	//Abro el archivo de datos;
 	vector<double> salidas_escalares;
 	this->datos = leer_csv(name, salidas_escalares);
 
-	if (!this->cant_capas()){
-		cout<<"No se configuró ninguna arquitectura para la red.\n";
-		exit(-1);
-	}
+	verificar_inicializada();
 	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
 
 	//mapeo las salidas deseadas a las neuronas de salida
@@ -182,9 +133,24 @@ void Network::entrenar(const char * name) {
 
 	if (this->couts)
 		dibujar_red();
-	
-	//inicializo los pesos de la red
-	inicializar_pesos();
+
+
+	/* Etapa 1: "entreno" las medias de las gaussianas mediante k-means */
+
+	vector<Punto> medias = k_means(this->datos, this->capa_oculta.size());
+	for (size_t i=0; i<this->capa_oculta.size(); ++i){
+		this->capa_oculta[i].set_centro(medias[i]);
+	}
+	///\todo ver lo de entrenar los sigmas
+
+
+	/* Etapa 2: entreno los pesos de los perceptrones en la capa de salida */
+
+
+	//inicializo los pesos de los perceptrones
+	for (size_t i=0; i<this->capa_salida.size(); ++i){
+		this->capa_salida[i].inicializar_pesos(this->salidas_capas[0]->size());
+	}
 
 	//vector con índices para aleatorizar entradas
 	int cant_patrones_entrada = datos.size();
@@ -196,87 +162,31 @@ void Network::entrenar(const char * name) {
 	//empiezo el entrenamiento
 	int epocas = 0;
 	vector<double> error_ent;
+	vector<double> e(this->capa_salida.size()); //errores de salida (salida_obtenida - salida_deseada)
 	while (epocas < this->max_epocas){ //Epoca=conjunto de datos entero es decir el archivo completo
-		//contar_errores=0;
+	
 		double error = 0.0; //E_av, error promedio para un set completo
-		int ic; //índice de capa para llenar el vector de salida de cada capa
+		
 		for (int i=0; i<cant_patrones_entrada; ++i){ //recorro todo el set de datos
 
 			vector<double> *entradas = &datos[indices[i]]; //un patrón de entrada (no todas)
-			
 
-			/*----------- paso hacia adelante: --------------*/
-			
-			for (size_t k=0; k<this->capas.size(); ++k){
-
-				Layer &capa = this->capas[k]; //parado en la capa k
-				if (is_hidden(capa))
-					ic = 1; //empezar a llenar salida_capa desde el índice 1 (el 0 es el -1 del sesgo)
-				else
-					ic = 0; //empezar a llenar salida_capa desde el índice 0
-
-				//cout<<"Capa "<<k+1<<" - Tamano de la entrada: "<<entradas->size()<<endl;
-
-				//meter las entradas por los perceptrones de la capa
-				vector<double> *salida_capa = this->salidas_capas[k];
-				for (size_t j = ic; j<capa.size()+ic; ++j){ //for por cada neurona de la capa k
-					salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
-				}
-				
-				//cout<<"Tamaño salida: "<<salida_capa->size()<<endl;
-
-				entradas = salida_capa;
-				//cout<<"Pesos para este dato"<<endl; mostrar_pesos(); 
-			} //termina feed-forward
-			
-			vector<double> &salidas = *entradas; //salida de la última capa (salida de la red)
-			//cout<<"longitud de la capa de salida"<<salidas.size()<<endl;
-			//if(signo(salidas.back(),1.0)-this->salidas_deseadas[i][0]==(-2) or signo(salidas.back(),1.0)-this->salidas_deseadas[i][0]==(1)) {cout<<salidas.back()<<"  "<<this->salidas_deseadas[i][0]<<endl;contar_errores++;}
-
-			
-
-			/*------------- paso hacia atrás: --------------*/
-			
-			vector<double> e = dif(this->salidas_deseadas[indices[i]], salidas); //errores en la salida de cada neurona
-
-			/* primero última capa:
-			 * me paro en la última capa y recorro las neuronas calculando el gradiente
-			 * local en cada una con el error en sus salidas (e)
-			 */
-			Layer &ultima_capa = this->capas.back();
-			for (size_t j=0; j<ultima_capa.size(); ++j){
-				ultima_capa[j].calcular_delta(e.at(j));
+			//pasada por la capa oculta
+			for (size_t j=0; j<this->capa_oculta.size(); ++j){
+				RBF &neurona = this->capa_oculta[j];
+				this->salidas_capas[0]->at(j+1) = neurona.clasificar(*entradas); //el +1 por el sesgo
 			}
 
-			/* ahora las otras:
-			 * recorro las demás capas; me paro en la capa k y recorro sus neuronas
-			 * calculando el gradiente local en cada una mediante los calculados en
-			 * la capa k+1
-			 */
-			for (int k = this->capas.size()-2; k>=0; --k){
-				
-				Layer &capa = this->capas[k];
-				Layer &capa_posterior = this->capas[k+1];
-				
-				for (size_t j=0; j<capa.size(); ++j){
-					capa[j].calcular_delta(capa_posterior, j);
-				}
-
-				/* actualizar pesos de la capa k+1:
-				 * una vez calculados los gradientes locales en la capa k, puedo
-				 * actualizar los pesos en la capa k+1
-				 */
-				for (size_t j=0; j<capa_posterior.size(); ++j){
-					capa_posterior[j].actualizar_pesos(*this->salidas_capas[k], this->eta, this->alfa);
-				}
-
+			//pasada por la capa de salida
+			entradas = this->salidas_capas[0];
+			for (size_t j=0; j<this->capa_salida.size(); ++j){
+				Perceptron &neurona = this->capa_salida[j];
+				double s = neurona.clasificar(*entradas);
+				this->salidas_capas[1]->at(j) = s;
+				e[j] = s - this->salidas_deseadas[indices[i]][j];
+				neurona.actualizar_pesos(*entradas, e[j], this->eta);
 			}
 
-			//en este punto me falta actualizar los pesos de la primera capa
-			for (size_t j=0; j<this->capas.front().size(); ++j){
-				this->capas.front()[j].actualizar_pesos(datos[indices[i]], this->eta, this->alfa);
-			}
-			
 			
 			double E = energia(e)/2.0; //E(n), suma del error cuadrático instantáneo
 			error += E;
@@ -312,8 +222,8 @@ void Network::entrenar(const char * name) {
  *
  * @param archivo Archivo con el set completo de datos.
  * @param k Deja k patrones para prueba.
- */
-void Network::val_cross (const char * archivo, int k)
+ *//*
+void RBFNetwork::val_cross (const char * archivo, int k)
 {
 	if (!this->cant_capas()){
 		cout<<"No se configuró ninguna arquitectura para la red.\n";
@@ -373,9 +283,10 @@ void Network::val_cross (const char * archivo, int k)
 	plotter("plot \"aciertos.dat\" with boxes");
 	
 }
+*/
 
 
-double Network::probar (const char * name) {
+double RBFNetwork::probar (const char * name) {
 	vector<vector<double> > vec_dif;
 	
 	//Abro el archivo de datos;
@@ -426,7 +337,9 @@ double Network::probar (const char * name) {
 	return porc;
 }
 
-void Network::graficar_puntos(const char *archivo, const char *titulo)
+
+
+void RBFNetwork::graficar_puntos(const char *archivo, const char *titulo)
 {
 	vector< vector<double> > datos;
 	vector<double> salidas;
@@ -445,7 +358,7 @@ void Network::graficar_puntos(const char *archivo, const char *titulo)
 		sprintf(nombre, "clase %d.dat",  (int)salidas[j]);
 		ofstream out(nombre, ios::app);
 		int n=(*q).size();
-		for(int i=1;i<n;++i){
+		for(int i=0;i<n;++i){
 			if(i!=n-1) ss << ((*q)[i]) << " ";
 			else ss << ((*q)[i]) << endl;
 		}
@@ -473,11 +386,11 @@ void Network::graficar_puntos(const char *archivo, const char *titulo)
 	for( int j=0;j<100000000;j++){
 		
 	}
-	for (size_t k=0; k<clases.size();k++){
-		char  nomb[15];
-		sprintf(nomb, "clase %d.dat",(int)clases[k]);
-		remove(nomb);
-	}
+	//for (size_t k=0; k<clases.size();k++){
+		//char  nomb[15];
+		//sprintf(nomb, "clase %d.dat",(int)clases[k]);
+		//remove(nomb);
+	//}
 	
 }
 
@@ -488,7 +401,7 @@ void Network::graficar_puntos(const char *archivo, const char *titulo)
  * @param m Cantidad máxima de épocas (presentación completa de todos los patrones
  * de entrada).
  */
-void Network::set_max_epocas(int m)
+void RBFNetwork::set_max_epocas(int m)
 {
 	this->max_epocas = m;
 }
@@ -498,7 +411,7 @@ void Network::set_max_epocas(int m)
  * @brief Fija la tasa de aprendizaje de la red.
  * @param n Tasa de aprendizaje nueva.
  */
-void Network::set_tasa(double n)
+void RBFNetwork::set_tasa(double n)
 {
 	this->eta = n;
 }
@@ -508,7 +421,7 @@ void Network::set_tasa(double n)
  * @brief Fija la constante para el término de momento.
  * @param a Constante de momento. 0 <= |a| < 1.
  */
-void Network::set_momento(double a)
+void RBFNetwork::set_momento(double a)
 {
 	this->alfa = a;
 }
@@ -518,7 +431,7 @@ void Network::set_momento(double a)
  * @brief Setea el parámetro a de la función sigmoide.
  * @param a Constante.
  */
-void Network::set_a_sigmoide(double a)
+void RBFNetwork::set_a_sigmoide(double a)
 {
 	///\todo ver cómo usar esto
 	this->sig_a = a;
@@ -534,52 +447,32 @@ void Network::set_a_sigmoide(double a)
  *
  * @param t Nueva tolerancia.
  */
-void Network::set_tolerancia(double t)
+void RBFNetwork::set_tolerancia(double t)
 {
 	this->tol = t;
 }
 
 
-vector<double> Network::clasificar(vector<double> &Datos)
+/**
+ * @brief Mete un dato de entrada en la red y obtiene la respuesta de salida.
+ */
+vector<double> RBFNetwork::clasificar(vector<double> &Datos)
 {
-	//Datos.insert(Datos.begin(), -1);
-	int ic;
-	vector<double> *entradas = &(Datos);
-	//Calcula la salida para los Datos (esto una vez que ya esta entrenado)
-	for (size_t k=0; k<this->capas.size(); ++k){
-		Layer &capa = this->capas[k]; //parado en la capa k
-		if (is_hidden(capa))
-			ic = 1; //empezar a llenar salida_capa desde el índice 1 (el 0 es el -1 del sesgo)
-		else
-			ic = 0; //empezar a llenar salida_capa desde el índice 0
-		//meter las entradas por los perceptrones de la capa
-		vector<double> *salida_capa = this->salidas_capas[k];
-		for (size_t j = ic; j<capa.size()+ic; ++j){ //for por cada neurona de la capa k
-		//	cout<<"dimension de las entradas"<<(*entradas).size()<<endl;
-			salida_capa->at(j) = capa[j-ic].clasificar(*entradas);
-		}
-		
-		
-		entradas=salida_capa;
-		
+	//primero lo paso por la capa oculta
+	for (size_t i=0; i<this->capa_oculta.size(); ++i){
+		RBF &neurona = this->capa_oculta[i];
+		this->salidas_capas[0]->at(i+1) = neurona.clasificar(Datos); //el +1 por el sesgo
 	}
-	return *entradas;
-}
 
-void Network::mostrar_pesos(){
-	vector<Layer>::iterator q=this->capas.begin();
-	int i=0;
-	while(q!=capas.end()){
-		cout<<"Capa "<<i<<endl<<" --------------------------------"<<endl;
-		vector<Perceptron>::iterator u=(*q).begin();
-		while(u!=(*q).end()) { 
-			(*u).mostrar_pesos();
-			u++;
-		}
-		q++;
-		i++;
-		cout<<endl;
+	//después lo paso por la capa de salida
+	vector<double> &entradas = *this->salidas_capas[0];
+	for (size_t i=0; i<this->capa_salida.size(); ++i){
+		Perceptron &neurona = this->capa_salida[i];
+		this->salidas_capas[1]->at(i) = neurona.clasificar(entradas);
 	}
+
+	vector<double> *salidas = this->salidas_capas[1];
+	return *salidas;
 }
 
 
@@ -590,40 +483,37 @@ void Network::mostrar_pesos(){
  * configuró. Requiere tener `graphviz` instalado (el programa `dot`) e
  * `ImageMagick` para mostrar la imagen (el programa `display`).
  */
-void Network::dibujar_red()
+void RBFNetwork::dibujar_red()
 {
+	///\todo tratar de ponerle dibujitos a las neuronas
+	
 	ofstream f("red.gv");
 	f<<"digraph {\nrankdir=LR\n";
-	for (size_t i=0; i<this->datos[0].size()-1; ++i){
+	for (size_t i=0; i<this->datos[0].size(); ++i){
 		f<<"x"<<i<<" [shape=point, label=\"\"]\n";
 	}
-	for (size_t i=0; i<this->capas.size(); ++i){
-		for (size_t j=0; j<this->capas[i].size(); ++j){
-			f<<"c"<<i<<"p"<<j<<" [shape=circle, label=\"\"]\n";
-		}
+	for (size_t i=0; i<this->capa_oculta.size(); ++i){
+		f<<"c1p"<<i<<" [shape=circle, label=\"\"]\n";
 	}
-	//cout<<"ultima cap: "<<this->capas.back().size()<<endl;
-	//cout<<"ultima cap: "<<this->capas[this->capas.size()-1].size()<<endl;
-	for (size_t i=0; i<this->capas.back().size(); ++i){
+	for (size_t i=0; i<this->capa_salida.size(); ++i){
+		f<<"c2p"<<i<<" [shape=circle, label=\"\"]\n";
 		f<<"s"<<i<<" [style=invisible, shape=point, label=\"\"]\n";
 	}
-	
-	for (size_t i=0; i<this->datos[0].size()-1; ++i){
-		for (size_t j=0; j<this->capas[0].size(); ++j){
-			f<<"x"<<i<<" -> "<<"c0p"<<j<<endl;
-		}
-	}
-	
-	for (size_t i=0; i<this->capas.size()-1; ++i){
-		for (size_t j=0; j<this->capas[i].size(); ++j){
-			for (size_t k=0; k<this->capas[i+1].size(); ++k){
-				f<<"c"<<i<<"p"<<j<<" -> "<<"c"<<i+1<<"p"<<k<<endl;
-			}
-		}
-	}
 
-	for (size_t i=0; i<this->capas.back().size(); ++i){
-		f<<"c"<<this->capas.size()-1<<"p"<<i<<" -> s"<<i<<endl;
+	for (size_t i=0; i<this->datos[0].size(); ++i){
+		for (size_t j=0; j<this->capa_oculta.size(); ++j){
+			f<<"x"<<i<<" -> c1p"<<j<<endl;
+		}
+	}
+	
+	for (size_t i=0; i<this->capa_oculta.size(); ++i){
+		for (size_t j=0; j<this->capa_salida.size(); ++j){
+			f<<"c1p"<<i<<" -> c2p"<<j<<endl;
+		}
+	}
+	
+	for (size_t i=0; i<this->capa_salida.size(); ++i){
+		f<<"c2p"<<i<<" -> s"<<i<<endl;
 	}
 	
 	f<<"\n}";
@@ -635,8 +525,8 @@ void Network::dibujar_red()
 
 /**
  * @brief Función para guardar los pesos de la red en un Archivo.
- */
-void Network::guardar_pesos(){
+ *//*
+void RBFNetwork::guardar_pesos(){
 	for (size_t i=0; i<this->capas.size(); ++i){
 		vector< vector<double> > pesos_capa;
 		for (size_t j=0; j<capas[i].size(); ++j){
@@ -645,3 +535,4 @@ void Network::guardar_pesos(){
 		pesos_a_archivo(pesos_capa);
 	}
 }
+*/

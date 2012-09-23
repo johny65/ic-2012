@@ -19,10 +19,7 @@ using namespace std;
  * Por defecto el perceptrón es establecido como perteneciente a una capa
  * oculta.
  */
-Perceptron::Perceptron() : hidden(true)
-{
-	//srand(time(NULL));
-}
+Perceptron::Perceptron() : hidden(true) {}
 
 
 /**
@@ -34,7 +31,6 @@ Perceptron::Perceptron() : hidden(true)
 Perceptron::Perceptron(bool h)
 {
 	this->hidden = h;
-	//srand(time(NULL));
 }
 
 
@@ -154,15 +150,12 @@ double Perceptron::get_delta()
  * @param eta Tasa de aprendizaje.
  * @param alfa Coeficiente de momento (0 <= |alfa| < 1).
  */
-void Perceptron::actualizar_pesos(vector<double> &ys, double eta, double alfa)
+void Perceptron::actualizar_pesos(vector<double> &ys, double e, double eta)
 {
 	assert(ys.size() == this->pesos.size());
 
-	double dw;
 	for (size_t i=0; i<this->pesos.size(); ++i){
-		dw = eta * this->delta * ys[i] + alfa * this->dw_anteriores[i];
-		this->pesos[i] += dw;
-		this->dw_anteriores[i] = dw;
+		this->pesos[i] -= eta * e * ys[i];
 	}
 	
 }
@@ -354,7 +347,8 @@ void Perceptron::mostrar_pesos(){
  */
 double Perceptron::clasificar(const vector<double> &D){
 	this->v = dot(D, this->pesos);
-	return sigmoide(this->v, 1.0);
+	//return sigmoide(this->v, 1.0);
+	return this->v;
 }
 
 

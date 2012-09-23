@@ -20,7 +20,7 @@ vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
 	string linea, temp;
 	double val;
 	while (getline(in, linea)){
-		aux.push_back(-1);
+		//aux.push_back(-1); //para las redes RBF no hay que poner el -1 en la entrada
 		stringstream ss(linea);
 		while(getline(ss, temp, ',')){
 			stringstream ss2(temp);
@@ -46,7 +46,7 @@ vector< vector<double> > leer_csv(const char *archivo)
 	string linea, temp;
 	double val;
 	while (getline(in, linea)){
-		aux.push_back(-1);
+		//aux.push_back(-1);
 		stringstream ss(linea);
 		while(getline(ss, temp, ',')){
 			stringstream ss2(temp);
@@ -66,7 +66,7 @@ void crear_dat(vector<vector<double> > &v, const char *name)
 	vector<vector<double> >::iterator q=v.begin();
 	while(q!=v.end()){
 		int n=(*q).size();
-		for(int i=1;i<n;++i){
+		for(int i=0;i<n;++i){
 			if(i!=n-1) ss << ((*q)[i]) << " ";
 			else ss << ((*q)[i]) << endl;
 		}
@@ -120,8 +120,8 @@ void mostrar_sdcapa(vector<vector<double> > x){
 void pesos_a_archivo(vector< vector<double> > pesos){
 	ofstream out("pesos.txt", ios::app);
 	std::ostringstream aux;
-	for (int i=0; i<pesos.size(); i++){
-		for (int j=0; j< pesos[i].size(); j++){
+	for (size_t i=0; i<pesos.size(); i++){
+		for (size_t j=0; j< pesos[i].size(); j++){
 				aux<<pesos[i][j]<<" ";
 		}
 		aux<<endl;

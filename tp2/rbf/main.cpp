@@ -1,6 +1,5 @@
-#include<iostream>
-
-#include "Network.h"
+#include <iostream>
+#include "RBFNetwork.h"
 #include "func.h"
 
 
@@ -135,9 +134,10 @@ Opciones:\n\
 	cout<<"\nPresionar una tecla para cerrar.\n"; cin.get();
 	return 0;
 */
-	srand(time(NULL));
-	vector<double> sd;
-	vector< vector<double> > datos = leer_csv("kkk", sd);
-	k_means(datos, 4);
+	RBFNetwork red;
+	red.setear_arquitectura(2, 1);
+	red.entrenar("concent.csv");
+	red.probar("concent.csv");
+	cin.get();
 	return 0;
 }

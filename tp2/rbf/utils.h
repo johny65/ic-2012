@@ -22,8 +22,8 @@ using namespace std;
 /**
  * @brief Rutina para leer un archivo csv.
  *
- * Lee todas las entradas más la salida deseada. La entrada del sesgo la agrega
- * al principio. Las salidas deseadas las mete en un vector aparte.
+ * Lee todas las entradas más la salida deseada. No agrega la entrada del sesgo.
+ * Las salidas deseadas las mete en un vector aparte.
  *
  * @param archivo Nombre del archivo que se va a leer.
  * @param sd Vector donde se guardarán las salidas deseadas.
