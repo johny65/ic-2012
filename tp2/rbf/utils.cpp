@@ -6,7 +6,7 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
-#include "GNUplot.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -75,7 +75,6 @@ void crear_dat(vector<vector<double> > &v, const char *name)
 	out<<"# archivo temporal usado para graficar los puntos de entrada en gnuplot\n";
 	out<<ss.str();
 	out.close();
-	
 }
 
 void crear_dat_vector(vector<double> &v, const char *name)
@@ -103,18 +102,6 @@ void guardar_csv(const char *file, vector< vector<double> > &datos)
 		out<<datos[i].back()<<endl;
 	}
 	out.close();
-}
-
-void mostrar_sdcapa(vector<vector<double> > x){
-	vector<vector<double> >::iterator q=x.begin();
-	
-	while(q!=x.end()){
-		for(size_t i=0;i<(*q).size();i++) { 
-			cout<<(*q)[i]<<" ";
-		}
-		cout<<endl;
-		q++;
-	}
 }
 
 void pesos_a_archivo(vector< vector<double> > pesos){

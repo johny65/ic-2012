@@ -9,10 +9,8 @@
  */
 class RBF {
 private:
-
 	Punto mu; ///< Media (centro de la gaussiana)
 	double sigma2; ///< Sigma cuadrado (varianza)
-	
 
 public:
 	RBF();

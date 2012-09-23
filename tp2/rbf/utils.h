@@ -31,7 +31,10 @@ using namespace std;
 */
 vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd);
 
-//no separa salidas deseada
+
+/**
+ * @brief Lee un archivo csv pero no separa las salidas deseadas.
+ */
 vector< vector<double> > leer_csv(const char *archivo);
 
 
@@ -68,7 +71,6 @@ void guardar_csv(const char *file, vector< vector<double> > &datos);
 */
 void pesos_a_archivo(vector< vector<double> > pesos); 
 
-void mostrar_sdcapa(vector<vector<double> > x);
 
 /**
 * @brief Recibe el nombre de un archivo y crea un vector con los pesos de una red.

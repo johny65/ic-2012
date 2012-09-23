@@ -6,7 +6,6 @@
 #include <cassert>
 #include <set>
 #include "func.h"
-
 #include "GNUplot.h"
 #include "utils.h"
 
@@ -119,7 +118,6 @@ vector<double> init_weight(int nd)
 	vector<double> pesos;
 	for(int i=0; i<nd; ++i){ //hasta nd xq el sesgo tambien tiene peso aletorio
 		w=(rand()*1.0/RAND_MAX) - 0.5;
-		//w = (rand()%1000) / 1000.0 - 0.5;
 		pesos.push_back(w);
 	}
 	return pesos;
@@ -127,6 +125,7 @@ vector<double> init_weight(int nd)
 
 vector<double> sum(const vector<double> &y, const vector<double> &x)
 {
+	assert(y.size() == x.size());
 	vector<double> r;
 	int n=y.size();
 	for(int i=0;i<n;++i){
@@ -160,7 +159,6 @@ double dot(const vector<double> &x, const vector<double> &y)
 {
 	assert(y.size() == x.size());
 	double p=0;
-	//vector de pesos sin sesgo
 	int n=x.size();
 	for(int i=0; i<n; ++i){
 		p+=x[i]*y[i];
@@ -176,33 +174,11 @@ double energia(const vector<double> &s){
 	return e;
 }
 
-
-/* Funciones de activación: */
-
-/*
- * Tiene que aceptar parámetros (double, double) para que haya compatibilidad
- * con la sigmoide.
- */
-
-double signo(double valor, double a)
+double signo(double valor)
 {
 	if(valor>=0) return 1;
 	else return -1;	
 }
-
-double sigmoide(double valor, double a)
-{
-	//double res = (1.0 - exp(-a*valor)) / (1.0 + exp(-a*valor));
-	double res = (2.0/(1.0 + exp(-a*valor)))-1;
-	return res;
-}
-
-double derivada_sigmoide(double x, double a)
-{
-	double res = 2.0 * a * exp(a*x) / pow((exp(a*x) + 1), 2.0);
-	return res;
-}
-
 
 double gaussiana(Punto &x, Punto &media, double sigma2)
 {

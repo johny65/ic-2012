@@ -70,11 +70,18 @@ double dot(const vector<double> &x, const vector<double> &y);
 double energia(const vector<double> &s);
 
 
-double signo(double valor, double a = 1.0);
-double sigmoide(double valor, double a = 1.0);
-double derivada_sigmoide(double valor, double a = 1.0);
+/**
+ * @brief Función signo.
+ */
+double signo(double valor);
 
 
+/**
+ * @brief Función de base radial gaussiana.
+ * @param x Punto a evaluar.
+ * @param media Media para la gaussiana (mu).
+ * @param sigma2 Varianza para la gaussiana (sigma cuadrado).
+ */
 double gaussiana(Punto &x, Punto &media, double sigma2);
 
 #endif

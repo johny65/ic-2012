@@ -6,7 +6,7 @@
  * @brief Constructor, fija los parámetros por defecto.
  */
 RBFNetwork::RBFNetwork() :
-	eta(0.1), alfa(0.0), max_epocas(1000), tol(0.01), sig_a(1.0), couts(true)
+	eta(0.1), max_epocas(1000), tol(0.01), couts(true)
 {
 	srand(time(NULL) + getpid());
 }
@@ -15,9 +15,10 @@ RBFNetwork::RBFNetwork() :
 /**
  * @brief Inicializa la arquitectura de la red con las capas y neuronas fijadas.
  *
- * @param perceptrones_por_capa Vector donde cada elemento indica la cantidad
- * de perceptrones que va a haber en esa capa (la cantidad de capas la establece
- * la longitud del vector).
+ * @param unidades_ocultas Cantidad de neuronas en la capa oculta (neuronas con
+ * las funciones de base radial).
+ * @param unidades_salida Cantidad de neuronas en la capa de salida (perceptrones
+ * con salida lineal).
  */
 void RBFNetwork::setear_arquitectura(int unidades_ocultas, int unidades_salida)
 {
@@ -46,6 +47,10 @@ RBFNetwork::~RBFNetwork()
 }
 
 
+/**
+ * @brief Comprueba que se haya seteado una arquitectura y aborta la ejecución
+ * en caso contrario.
+ */
 void RBFNetwork::verificar_inicializada()
 {
 	if (this->capa_oculta.size() == 0 && this->capa_salida.size() == 0){
@@ -71,8 +76,6 @@ void RBFNetwork::verificar_inicializada()
  */
 vector< vector<double> > RBFNetwork::mapear(vector<double> &x)
 {
-	///\todo ver eso del epsilon
-	
 	int c = this->capa_salida.size(); //si la función es de la clase no hace falta pasar esto como parámetro
 
 	vector< vector<double> > sal_m;
@@ -119,13 +122,14 @@ de neuronas establecidas para la capa de salida ("<<ex.what()<<")\n";
  * @brief Entrena la red neuronal.
  * @param name Nombre del archivo que contiene los datos.
  */
-void RBFNetwork::entrenar(const char * name) {
+void RBFNetwork::entrenar(const char *name)
+{
+	verificar_inicializada();
 	
 	//Abro el archivo de datos;
 	vector<double> salidas_escalares;
 	this->datos = leer_csv(name, salidas_escalares);
 
-	verificar_inicializada();
 	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
 
 	//mapeo las salidas deseadas a las neuronas de salida
@@ -383,11 +387,9 @@ void RBFNetwork::graficar_puntos(const char *archivo, const char *titulo)
 	//wait(this->tiempo_espera);
 
 	//Borramos los archivos creados para dibujar
-	for( int j=0;j<100000000;j++){
-		
-	}
+	for( int j=0;j<100000000;j++){}
 	for (size_t k=0; k<clases.size();k++){
-		char  nomb[15];
+		char nomb[15];
 		sprintf(nomb, "clase %d.dat",(int)clases[k]);
 		remove(nomb);
 	}
@@ -418,27 +420,6 @@ void RBFNetwork::set_tasa(double n)
 
 
 /**
- * @brief Fija la constante para el término de momento.
- * @param a Constante de momento. 0 <= |a| < 1.
- */
-void RBFNetwork::set_momento(double a)
-{
-	this->alfa = a;
-}
-
-
-/**
- * @brief Setea el parámetro a de la función sigmoide.
- * @param a Constante.
- */
-void RBFNetwork::set_a_sigmoide(double a)
-{
-	///\todo ver cómo usar esto
-	this->sig_a = a;
-}
-
-
-/**
  * @brief Define la tolerancia del error.
  *
  * A medida que va entrenando la red, se calcula una medida del error
@@ -455,6 +436,7 @@ void RBFNetwork::set_tolerancia(double t)
 
 /**
  * @brief Mete un dato de entrada en la red y obtiene la respuesta de salida.
+ * @param Datos Entrada a evaluar.
  */
 vector<double> RBFNetwork::clasificar(vector<double> &Datos)
 {
@@ -519,7 +501,11 @@ void RBFNetwork::dibujar_red()
 	f<<"\n}";
 	f.close();
 	system("dot -Tpng -ored.png red.gv");
-	system("display red.png");
+	//system("display red.png");
+	if (fork() == 0){ //de esta forma no espera a que el programa termine
+		execlp("display", "display", "red.png", NULL);
+		exit(1);
+	}
 }
 
 

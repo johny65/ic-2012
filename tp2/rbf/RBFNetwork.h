@@ -27,54 +27,39 @@ class RBFNetwork {
 private:
 
 	double eta; ///< Tasa de aprendizaje
-	double alfa; ///< Coeficiente para el término de momento
 	int max_epocas; ///< Cantidad máxima de épocas
 	double tol; ///< Tolerancia del error para detener el entrenamiento
-
-	double sig_a; ///< Constante a para la sigmoidea
-
 
 	vector<Perceptron> capa_salida;
 	vector<RBF> capa_oculta;
 	
-	
 	vector< vector<double> > salidas_deseadas; ///< Vector con las salidas esperadas (en forma de vectores)
-	
 	vector< vector<double> > datos;
-	
 	vector< vector<double>* > salidas_capas; ///<es necesario guardar cada una de las salidas de las capas para hacer el paso hacia atras
 	
-
 	bool graficos; ///< Indica si se activan los gráficos o no
 	bool couts; ///< Indica si se deben mostrar salidas por consola
 	GNUplot plotter; ///< Conexión con GNUplot
 	GNUplot error_graf; /// Para graficar error de entrenamiento
 
-
 	vector< vector<double> > mapear(vector<double>&);
-	void inicializar_pesos();
 	void graficar_puntos(const char *archivo, const char *titulo);
 	void verificar_inicializada();
 	
 public:
 
-	void setear_arquitectura(int unidades_ocultas, int unidades_salida);
 	RBFNetwork();
 	~RBFNetwork();
-	
+	void setear_arquitectura(int unidades_ocultas, int unidades_salida);
 	void set_max_epocas(int m);
 	void set_tolerancia(double t);
 	void set_tasa(double n);
-	void set_momento(double a);
-	void set_a_sigmoide(double a);
 	void entrenar(const char *name);
 	void val_cross(const char *archivo, int k);
 	double probar(const char *name);
 	vector<double> clasificar(vector<double> &Datos);
 	void guardar_pesos();
-	int prueba() { return 2; }
 	void dibujar_red();
 };
 
 #endif
-
