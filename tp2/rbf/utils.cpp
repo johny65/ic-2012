@@ -97,7 +97,7 @@ void guardar_csv(const char *file, vector< vector<double> > &datos)
 {
 	ofstream out(file, ios::trunc);
 	for (size_t i=0; i<datos.size(); ++i){
-		for (size_t j=1; j<datos[i].size()-1; ++j){
+		for (size_t j=0; j<datos[i].size()-1; ++j){
 			out<<datos[i][j]<<", ";
 		}
 		out<<datos[i].back()<<endl;

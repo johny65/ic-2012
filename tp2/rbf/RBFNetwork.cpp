@@ -286,7 +286,7 @@ void RBFNetwork::val_cross (const char * archivo, int k)
 */
 
 
-double RBFNetwork::probar (const char * name) {
+double RBFNetwork::probar (const char *name) {
 	vector<vector<double> > vec_dif;
 	
 	//Abro el archivo de datos;
@@ -386,11 +386,11 @@ void RBFNetwork::graficar_puntos(const char *archivo, const char *titulo)
 	for( int j=0;j<100000000;j++){
 		
 	}
-	//for (size_t k=0; k<clases.size();k++){
-		//char  nomb[15];
-		//sprintf(nomb, "clase %d.dat",(int)clases[k]);
-		//remove(nomb);
-	//}
+	for (size_t k=0; k<clases.size();k++){
+		char  nomb[15];
+		sprintf(nomb, "clase %d.dat",(int)clases[k]);
+		remove(nomb);
+	}
 	
 }
 

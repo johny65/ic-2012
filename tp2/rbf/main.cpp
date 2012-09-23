@@ -135,9 +135,9 @@ Opciones:\n\
 	return 0;
 */
 	RBFNetwork red;
-	red.setear_arquitectura(2, 1);
-	red.entrenar("concent.csv");
-	red.probar("concent.csv");
+	red.setear_arquitectura(4, 1);
+	red.entrenar("xorvar.csv");
+	red.probar("xorvar.csv");
 	cin.get();
 	return 0;
 }

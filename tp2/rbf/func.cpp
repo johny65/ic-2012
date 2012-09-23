@@ -95,7 +95,7 @@ vector<Punto> k_means(vector<Punto> datos, int k)
 
 		
 	}
-	/*
+	
 		crear_dat(centroides, "c.dat");
 		plot("plot \"c.dat\"");
 
@@ -108,7 +108,7 @@ vector<Punto> k_means(vector<Punto> datos, int k)
 			}
 		}
 		cin.get();
-	*/
+	
 
 	return centroides;
 }
