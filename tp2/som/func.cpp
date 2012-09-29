@@ -115,3 +115,8 @@ double funcion_vecindad(int n,double &distancia, double sigma_inicial, double t)
 	if(distancia>=4*s) return 0;
 	else return exp(-1*distancia/(2*pow(s,2)));
 }
+
+double eta_variable(int n, double eta_inicial, double t)
+{
+	return eta_inicial * exp(-n/t);
+}

@@ -111,5 +111,12 @@ double sigma(int n, double sigma_inicial, double tiempo);
 double funcion_vecindad(int n,double &distancia, double sigma_inicial, double t);
 
 
+/**
+ * @brief Función para actualizar la tasa de aprendizaje a lo largo del tiempo.
+ * @param n Instante de tiempo actual.
+ * @param eta_inicial Valor inicial.
+ * @param t Constante de tiempo.
+ */
+double eta_variable(int n, double eta_inicial, double t);
 
 #endif

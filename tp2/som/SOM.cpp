@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <iomanip>
+#include <sstream>
 #include "SOM.h"
 #include "utils.h"
 #include "func.h"
@@ -8,8 +9,10 @@
 
 /**
  * @brief Constructor.
+ * Inicializa la tasa de aprendizaje en los valores recomendados por Haykin
+ * (pág. 452).
  */
-SOM::SOM() : eta(0.01)
+SOM::SOM() : eta(0.1), t2(1000)
 {
 	srand(time(NULL) + getpid());
 }
@@ -22,21 +25,32 @@ SOM::~SOM() {}
 
 
 /**
- * @brief Fija la tasa de aprendizaje de la red.
- * @param n Tasa de aprendizaje nueva.
+ * @brief Fija la tasa de aprendizaje inicial de la red.
+ * La misma es usada para ir actualizando la tasa de aprendizaje a lo largo
+ * del tiempo.
  */
-void SOM::set_tasa(double n)
+void SOM::set_tasa_inicial(double n)
 {
 	this->eta = n;
 }
 
 
 /**
- * @brief Fija el valor de sigma inicial.
+ * @brief Fija el valor t usado para calcular la tasa de aprendizaje variable
+ * con el tiempo.
+ */
+void SOM::set_t2(double t)
+{
+	this->t2 = t;
+}
+
+
+/**
+ * @brief Fija el valor de sigma inicial (ancho de la vecindad).
  * El mismo es usado para calcular el valor de sigma variable con el tiempo
  * para la función de vecindad.
  */
-void SOM::set_sigma(double s)
+void SOM::set_sigma_inicial(double s)
 {
 	this->sigma = s;
 }
@@ -141,22 +155,20 @@ void SOM::competir(vector<double> &x, int &i, int &j)
  */
 void SOM::actualizar_pesos(int iganadora, int jganadora, vector<double> &x, int n)
 {
-	//cout<<"Neurona ganadora: "<<iganadora<<" "<<jganadora<<endl;
-	double r, h;
+	double r, h, e;
 	for (int i=0; i<this->M; ++i){
 		for (int j=0; j<this->N; ++j){
 			r = dist(iganadora, jganadora, i, j);
 			h = funcion_vecindad(n, r, this->sigma, this->t);
 			//cout<<setw(9)<<h<<" | ";
 
-			this->grilla[i][j].actualizar_pesos(x, this->eta, h);
+			e = eta_variable(n, this->eta, this->t2);
+			this->grilla[i][j].actualizar_pesos(x, e, h);
 		}
 		//cout<<endl;
 	}
 }
 
-	
-		
 
 /**
  * @brief Entrena la red neuronal.
@@ -168,7 +180,7 @@ void SOM::entrenar(const char *name)
 	
 	//Abro el archivo de datos:
 	vector<double> salidas_escalares;
-	this->datos = leer_csv(name, salidas_escalares);
+	this->datos = leer_csv(name, salidas_escalares); ///<\todo ver si hay que meter el -1
 
 	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
 
@@ -185,7 +197,7 @@ void SOM::entrenar(const char *name)
 
 	//empiezo el entrenamiento
 	int it = 0; //iteraciones
-	while (it < 5000){ ///<\todo detener cuando nos se observen cambios
+	while (it < cant_patrones_entrada*10){ ///<\todo detener cuando no se observen cambios
 		
 		for (int i=0; i<cant_patrones_entrada; ++i){ //recorro todo el set de datos
 		
@@ -201,6 +213,69 @@ void SOM::entrenar(const char *name)
 
 			it++;
 		}
-	}
 
+		//aleatorizar la presentación de patrones en la siguiente época
+		random_shuffle(indices.begin(), indices.end());
+	}
+	visualizar_resultados();
+
+}
+
+
+/**
+ * @brief Guarda los pesos de las neuronas entrenadas y muestra el mapa
+ * topológico aprendido.
+ */
+void SOM::visualizar_resultados()
+{
+	///\todo ver bien cómo vamos a graficar
+
+	plotter("set key off");
+	bool b = true;
+	int k=0;
+	for (int i=0; i<this->M; ++i){
+		for (int j=0; j<this->N; ++j){
+			stringstream arriba; arriba<<"arriba"<<k<<".dat";
+			stringstream abajo; abajo<<"abajo"<<k<<".dat";
+			stringstream izq; izq<<"izquierda"<<k<<".dat";
+			stringstream der; der<<"derecha"<<k<<".dat";
+			
+			vector< vector<double> > a(2);
+			if (i-1 >= 0){
+				a.push_back(this->grilla[i][j].get_pesos());
+				a.push_back(this->grilla[i-1][j].get_pesos());
+			}
+			crear_dat(a, arriba.str().c_str());
+			a.clear();
+			if (i+1 < this->M){
+				a.push_back(this->grilla[i][j].get_pesos());
+				a.push_back(this->grilla[i+1][j].get_pesos());
+			}
+			crear_dat(a, abajo.str().c_str());
+			a.clear();
+			if (j-1 >= 0){
+				a.push_back(this->grilla[i][j].get_pesos());
+				a.push_back(this->grilla[i][j-1].get_pesos());
+			}
+			crear_dat(a, izq.str().c_str());
+			a.clear();
+			if (j+1 < this->N){
+				a.push_back(this->grilla[i][j].get_pesos());
+				a.push_back(this->grilla[i][j+1].get_pesos());
+			}
+			crear_dat(a, der.str().c_str());
+			stringstream ss;
+			if (b){
+				ss<<"plot \""<<arriba.str()<<"\" with linespoints, \""<<abajo.str()<<"\" with linespoints, \""<<izq.str()<<"\" with linespoints, \""<<der.str()<<"\" with linespoints lt 1";
+				b=false;
+			}
+			else
+				ss<<"replot \""<<arriba.str()<<"\" with linespoints, \""<<abajo.str()<<"\" with linespoints, \""<<izq.str()<<"\" with linespoints, \""<<der.str()<<"\" with linespoints lt 1";
+
+			plotter(ss.str().c_str());
+			k++;
+			//cin.get();
+		}
+	}
+	cin.get();
 }

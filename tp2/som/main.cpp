@@ -135,7 +135,7 @@ Opciones:\n\
 */
 
 	SOM som;
-	som.inicializar(10, 10);
-	som.entrenar("kkk");
+	som.inicializar(5, 5);
+	som.entrenar("concent.csv");
 	return 0;
 }

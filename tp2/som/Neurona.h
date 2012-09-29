@@ -15,7 +15,7 @@ public:
 	void inicializar_pesos(int);
 	double evaluar(vector<double> &x);
 	void actualizar_pesos(vector<double> &x, double eta, double h);
-	
+	vector<double> get_pesos() { return this->pesos; }
 };
 
 #endif
