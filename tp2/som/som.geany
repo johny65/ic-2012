@@ -8,8 +8,8 @@ detect_indent_width=false
 indent_mode=2
 
 [project]
-name=rbfnn
-base_path=/home/johny/Documentos/ic/tp2/
+name=SOM
+base_path=/home/johny/Documentos/ic/tp2/som
 description=
 file_patterns=*.cpp;*.h;
 
@@ -18,10 +18,7 @@ long_line_behaviour=1
 long_line_column=79
 
 [files]
-current_page=1
-FILE_NAME_0=2972;C++;0;16;1;1;0;/home/johny/Documentos/ic/tp2/rbf/main.cpp;0;4
-FILE_NAME_1=1896;C++;0;16;1;1;0;/home/johny/Documentos/ic/tp2/rbf/RBFNetwork.h;0;4
-FILE_NAME_2=14656;C++;0;16;1;1;0;/home/johny/Documentos/ic/tp2/rbf/RBFNetwork.cpp;0;4
+current_page=-1
 
 [VTE]
 last_dir=/home/johny/Documentos/ic/tp2/rbf/bin
