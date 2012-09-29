@@ -21,6 +21,14 @@ double dist(Punto a, Punto b);
 
 
 /**
+ * @brief Calcula la distancia euclídea entre 2 puntos de una grilla bidimensional
+ * (sin calcular la raíz cuadrada).
+ * Los puntos son (x1,y1) y (x2,y2).
+ */
+double dist(int x1, int y1, int x2, int y2);
+
+
+/**
  * @brief Algoritmo de k-means.
  * @param datos Vector con los puntos de datos de entrada.
  * @param k Cantidad de clústers.

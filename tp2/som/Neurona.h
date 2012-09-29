@@ -14,6 +14,7 @@ public:
 	~Neurona();
 	void inicializar_pesos(int);
 	double evaluar(vector<double> &x);
+	void actualizar_pesos(vector<double> &x, double eta, double h);
 	
 };
 

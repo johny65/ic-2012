@@ -135,7 +135,7 @@ Opciones:\n\
 */
 
 	SOM som;
-	som.inicializar(3, 3);
+	som.inicializar(10, 10);
 	som.entrenar("kkk");
 	return 0;
 }
