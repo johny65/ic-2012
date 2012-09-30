@@ -15,7 +15,7 @@
  * Inicializa la tasa de aprendizaje en los valores recomendados por Haykin
  * (pág. 452).
  */
-SOM::SOM() : eta(0.1), t2(1000)
+SOM::SOM() : eta(0.5), t2(1000), tol(1e-2)
 {
 	srand(time(NULL) + getpid());
 }
@@ -203,25 +203,34 @@ void SOM::entrenar(const char *name)
 	//empiezo el entrenamiento
 	int it = 0; //iteraciones
 	int epocas = 0;
+	double error=0;
 	while (epocas < 50){ ///<\todo detener cuando no se observen cambios
 		
 		for (int i=0; i<cant_patrones_entrada; ++i){ //recorro todo el set de datos
 		
 			vector<double> &entrada = datos[indices[i]]; //un patrón de entrada (no todas)
-
+			
 			//busco la ganadora para este patrón de entrada
 			int iwin, jwin;
 			competir(entrada, iwin, jwin);
 
+			//calculo el error
+			error+=dist(entrada,grilla[iwin][jwin].get_pesos());
+			
 			//actualizar los pesos
 			actualizar_pesos(iwin, jwin, entrada, it);
 
 			visualizar_resultados();
 			//wait(500);
 			
+			
 			it++;
+			
 		}
+		if((error/cant_patrones_entrada)<this->tol){ cout<<"corto por error"<<endl; break;}
+		cout<<"Epoca numero "<<epocas<<" error para la epoca: "<<error/cant_patrones_entrada<<endl;
 		epocas++;
+		error=0;
 		//if (!(epocas%10))
 
 		
@@ -317,6 +326,47 @@ void SOM::visualizar_resultados()
 	//remove("*.dat");
 }
 
+
+
+
+void SOM::visualizar_datoslabel(int cant_clases){
+	//inicializo el vector de colores
+	vector<vector<float> > color;
+	inicializar_color(color,cant_clases);
+	
+	glClear(GL_COLOR_BUFFER_BIT);
+	
+	double x, y, xv, yv;
+	vector<double> p;
+	
+	for (int i=0; i<this->M; ++i){
+		for (int j=0; j<this->N; ++j){
+			
+			//this->grilla[i][j].get_pesos();
+			mapeo(i, j, x, y);
+			
+			int clase=this->grilla[i][j].get_clase();
+			glColor3f(color[clase][0],color[clase][1],color[clase][2]);
+			glBegin(GL_POINTS);
+			glVertex2d(x, y);
+			glEnd();
+			
+			//el de la derecha:
+			if (i+1 < this->M){
+				mapeo(i+1,j, xv, yv);
+				unir(x, y, xv, yv);
+			}
+			
+			//de la abajo:
+			if (j+1 < this->N){
+				mapeo(i,j+1, xv, yv);
+				unir(x, y, xv, yv);
+			}
+			
+		}
+	}
+	glutSwapBuffers();
+}
 
 
 

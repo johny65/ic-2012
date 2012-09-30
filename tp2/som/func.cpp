@@ -127,3 +127,18 @@ double eta_variable(int n, double eta_inicial, double t)
 	double d = eta_inicial * exp(-n/t);
 	return d < 0.001 ? 0.001 : d;
 }
+
+void inicializar_color(vector<vector<float> > &color, int cant_clases){
+	vector<float> rgb;
+	
+	for(int i=0;i<cant_clases;i++) { 
+		for(int i=0;i<<3;i++) {  
+		rgb.push_back((1+rand()%100)/100.0);
+		rgb.push_back((1+rand()%100)/100.0);
+		rgb.push_back((1+rand()%100)/100.0);
+		}
+	color.push_back(rgb);
+	rgb.clear();
+	}
+	
+}

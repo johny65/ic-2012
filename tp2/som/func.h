@@ -122,4 +122,8 @@ double eta_variable(int n, double eta_inicial, double t);
 
 
 double dist(pair<int,int> G, pair<int,int> N);
+
+void inicializar_color(vector<vector<float> > &,int);
+
+
 #endif

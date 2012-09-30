@@ -14,7 +14,7 @@ private:
 	double t2; ///< Variable de tiempo para el cálculo de eta dinámico
 	double sigma; ///< Sigma inicial para la función de vecindad
 	double t; ///< Variable de tiempo para el cálculo de sigma dinámico
-
+	double tol;
 	Matriz grilla; ///< Grilla de neuronas
 	int M, N; ///< Tamaño de la grilla
 	vector< vector<double> > datos; ///< Entradas
@@ -26,6 +26,7 @@ private:
 	void competir(vector<double> &x, int &i, int &j);
 	void actualizar_pesos(int iganadora, int jganadora, vector<double> &x, int n);
 	void visualizar_resultados();
+	void visualizar_datoslabel(int);
 
 void display_cb();
 	
