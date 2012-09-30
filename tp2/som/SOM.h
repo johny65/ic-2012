@@ -26,6 +26,8 @@ private:
 	void competir(vector<double> &x, int &i, int &j);
 	void actualizar_pesos(int iganadora, int jganadora, vector<double> &x, int n);
 	void visualizar_resultados();
+
+void display_cb();
 	
 public:
 	SOM();

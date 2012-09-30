@@ -3,9 +3,11 @@
 #include <iomanip>
 #include <sstream>
 #include <limits>
+#include <GL/glut.h>
 #include "SOM.h"
 #include "utils.h"
 #include "func.h"
+#include "wait.h"
 
 
 /**
@@ -214,15 +216,20 @@ void SOM::entrenar(const char *name)
 			//actualizar los pesos
 			actualizar_pesos(iwin, jwin, entrada, it);
 
-
+			visualizar_resultados();
+			//wait(500);
+			
 			it++;
 		}
 		epocas++;
+		//if (!(epocas%10))
+
 		
 		//aleatorizar la presentación de patrones en la siguiente época
 		random_shuffle(indices.begin(), indices.end());
 	}
-	visualizar_resultados();
+	//visualizar_resultados();
+
 
 }
 
@@ -240,61 +247,104 @@ vector<vector<peso_act> > SOM::generar_datos_grafico(){
 }
 
 
+
+
+void mapeo(double x, double y, double &xsalida, double &ysalida)
+{
+	int w = 800, h = 600;
+	double xmin = -1, xmax = 1;
+	double ymin = -1, ymax = 1;
+	double nn = fabs(xmax-xmin);
+
+	xsalida = (x - xmin)/nn; xsalida *= w;
+	ysalida = (y - ymin)/nn; ysalida *= h;
+
+}
+
+void unir(double x, double y, double xv, double yv)
+{
+	glColor3f(1.0,0.0,0.0);
+	glLineWidth(2.0);
+	glBegin(GL_LINES);
+		glVertex2d(x, y);
+		glVertex2d(xv, yv);
+	glEnd();
+}
+
 /**
  * @brief Guarda los pesos de las neuronas entrenadas y muestra el mapa
  * topológico aprendido.
  */
 void SOM::visualizar_resultados()
 {
-	///\todo ver bien cómo vamos a graficar
+	glClear(GL_COLOR_BUFFER_BIT);
 
-	plotter("set key off");
-	bool b = true;
-	int k=0;
+	double x, y, xv, yv;
+	//plotter("set key off");
+	//bool b = true;
+	//int k=0;
+	vector<double> p;
+	
 	for (int i=0; i<this->M; ++i){
 		for (int j=0; j<this->N; ++j){
-			stringstream arriba; arriba<<"arriba"<<k<<".dat";
-			stringstream abajo; abajo<<"abajo"<<k<<".dat";
-			stringstream izq; izq<<"izquierda"<<k<<".dat";
-			stringstream der; der<<"derecha"<<k<<".dat";
-			
-			vector< vector<double> > a(2);
-			if (i-1 >= 0){
-				a.push_back(this->grilla[i][j].get_pesos());
-				a.push_back(this->grilla[i-1][j].get_pesos());
-			}
-			crear_dat(a, arriba.str().c_str());
-			a.clear();
-			if (i+1 < this->M){
-				a.push_back(this->grilla[i][j].get_pesos());
-				a.push_back(this->grilla[i+1][j].get_pesos());
-			}
-			crear_dat(a, abajo.str().c_str());
-			a.clear();
-			if (j-1 >= 0){
-				a.push_back(this->grilla[i][j].get_pesos());
-				a.push_back(this->grilla[i][j-1].get_pesos());
-			}
-			crear_dat(a, izq.str().c_str());
-			a.clear();
-			if (j+1 < this->N){
-				a.push_back(this->grilla[i][j].get_pesos());
-				a.push_back(this->grilla[i][j+1].get_pesos());
-			}
-			crear_dat(a, der.str().c_str());
-			stringstream ss;
-			if (b){
-				ss<<"plot \""<<arriba.str()<<"\" with linespoints, \""<<abajo.str()<<"\" with linespoints, \""<<izq.str()<<"\" with linespoints, \""<<der.str()<<"\" with linespoints lt 1";
-				b=false;
-			}
-			else
-				ss<<"replot \""<<arriba.str()<<"\" with linespoints, \""<<abajo.str()<<"\" with linespoints, \""<<izq.str()<<"\" with linespoints, \""<<der.str()<<"\" with linespoints lt 1";
 
-			plotter(ss.str().c_str());
-			k++;
-			//cin.get();
+			p = this->grilla[i][j].get_pesos();
+			mapeo(p[0], p[1], x, y);
+
+			glColor3f(0,0,0); glPointSize(5);
+			glBegin(GL_POINTS);
+				glVertex2d(x, y);
+			glEnd();
+
+			//el de la derecha:
+			if (i+1 < this->M){
+				mapeo(this->grilla[i+1][j].get_pesos()[0],
+					this->grilla[i+1][j].get_pesos()[1], xv, yv);
+				unir(x, y, xv, yv);
+			}
+
+			//de la abajo:
+			if (j+1 < this->N){
+				mapeo(this->grilla[i][j+1].get_pesos()[0],
+					this->grilla[i][j+1].get_pesos()[1], xv, yv);
+				unir(x, y, xv, yv);
+			}
+
 		}
 	}
-	cin.get();
-	remove("*.dat");
+	glutSwapBuffers();
+	//cin.get();
+	//remove("*.dat");
+}
+
+
+
+
+
+void SOM::display_cb() {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glColor3f(0,0,0); glPointSize(5);
+	vector<vector<peso_act> > grafico = generar_datos_grafico();
+	vector<vector<peso_act> >::iterator q=grafico.begin();
+	while(q!=grafico.end()){
+		for(size_t i=0;i<(*q).size();i++) { 
+			peso_act *act=&(*q)[i];
+			if(act->weight.size()==2){
+				//setear_colores(act->cant_act);
+				glBegin(GL_POINTS);
+					glVertex2d(800*(act->weight[0]),600*(act->weight[1])); 
+				glEnd();
+				}
+			
+			
+			else{
+				//aca ver como hacer cuando tengo 3D, 4D, etc.
+			}
+		}
+		
+		q++;
+	}
+
+	
+	glutSwapBuffers();
 }

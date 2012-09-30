@@ -118,10 +118,12 @@ double sigma(int n, double sigma_inicial, double tiempo){
 double funcion_vecindad(int n,double &distancia, double sigma_inicial, double t){
 	double s=sigma(n,sigma_inicial,t);
 	if(distancia>=4*s) return 0;
-	else return exp(-1*distancia/(2*pow(s,2)));
+	double d = exp(-1*distancia/(2*pow(s,2)));
+	return d < 1e-5 ? 0.0 : d;
 }
 
 double eta_variable(int n, double eta_inicial, double t)
 {
-	return eta_inicial * exp(-n/t);
+	double d = eta_inicial * exp(-n/t);
+	return d < 0.001 ? 0.001 : d;
 }
