@@ -4,7 +4,7 @@
 /**
  * @brief Constructor.
  */
-Neurona::Neurona() { this->cant_activaciones=0;}
+Neurona::Neurona() {}
 
 
 /**
@@ -29,8 +29,7 @@ void Neurona::inicializar_pesos(int n)
  */
 double Neurona::evaluar(vector<double> &x)
 {
-	//vector<double> d=dif(x, this->pesos);
-	return dot(x,this->pesos);
+	return dist(x, this->pesos);
 }
 
 

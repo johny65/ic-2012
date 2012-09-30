@@ -1,7 +1,7 @@
 GPP=g++
 GCC=gcc
 FLAGS=  -g2 -Wall -O0 -D_DEBUG 
-LIBS=  
+LIBS= -lGL -lGLU -lglut
 OBJS=Debug/main.o Debug/SOM.o Debug/func.o Debug/Neurona.o Debug/utils.o
 
 all: Debug bin/som

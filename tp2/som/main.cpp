@@ -71,7 +71,7 @@ int main (int argc, char *argv[]) {
 	SOM som;
 	som.inicializar(10, 10);
 
-	som.entrenar("concent.csv");
+	som.entrenar("rectangulo.csv");
 	grafico=som.generar_datos_grafico();
 	glutInit (&argc, argv);
 	initialize();

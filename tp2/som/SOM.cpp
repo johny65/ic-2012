@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <sstream>
+#include <limits>
 #include "SOM.h"
 #include "utils.h"
 #include "func.h"
@@ -121,7 +122,7 @@ void SOM::inicializar_pesos()
  */
 void SOM::competir(vector<double> &x, int &i, int &j)
 {
-	double win = 0.0;
+	double win = numeric_limits<double>::max();
 	int wini = -1, winj = -1;
 	double aux;
 
@@ -129,7 +130,7 @@ void SOM::competir(vector<double> &x, int &i, int &j)
 	for (int f=0; f<this->M; ++f){
 		for (int c=0; c<this->N; ++c){
 			aux = this->grilla[f][c].evaluar(x);
-			if (aux > win){
+			if (aux < win){
 				win = aux;
 				wini = f;
 				winj = c;
@@ -156,14 +157,15 @@ void SOM::competir(vector<double> &x, int &i, int &j)
  */
 void SOM::actualizar_pesos(int iganadora, int jganadora, vector<double> &x, int n)
 {
-	double r, h, e;
+	double r, h;
+	double e = eta_variable(n, this->eta, this->t2);
 	for (int i=0; i<this->M; ++i){
 		for (int j=0; j<this->N; ++j){
-			r = dist(grilla[iganadora][jganadora].position(), grilla[i][j].position());
+			r = dist(iganadora, jganadora, i, j);
+			//r = dist(grilla[iganadora][jganadora].position(), grilla[i][j].position());
 			h = funcion_vecindad(n, r, this->sigma, this->t);
 			//cout<<setw(9)<<h<<" | ";
 
-			e = eta_variable(n, this->eta, this->t2);
 			this->grilla[i][j].actualizar_pesos(x, e, h);
 		}
 		//cout<<endl;
@@ -194,11 +196,12 @@ void SOM::entrenar(const char *name)
 	for (size_t i=0; i<indices.size(); ++i){
 		indices[i] = i;
 	}
-	//random_shuffle(indices.begin(), indices.end());
+	random_shuffle(indices.begin(), indices.end());
 
 	//empiezo el entrenamiento
 	int it = 0; //iteraciones
-	while (it < 10*cant_patrones_entrada){ ///<\todo detener cuando no se observen cambios
+	int epocas = 0;
+	while (epocas < 50){ ///<\todo detener cuando no se observen cambios
 		
 		for (int i=0; i<cant_patrones_entrada; ++i){ //recorro todo el set de datos
 		
@@ -213,14 +216,13 @@ void SOM::entrenar(const char *name)
 
 
 			it++;
-			
-			//cout<<"Termina iteracion "<<it<<endl<<"--------------------"<<endl;
 		}
-
+		epocas++;
+		
 		//aleatorizar la presentación de patrones en la siguiente época
-		//random_shuffle(indices.begin(), indices.end());
+		random_shuffle(indices.begin(), indices.end());
 	}
-	//visualizar_resultados();
+	visualizar_resultados();
 
 }
 
@@ -294,4 +296,5 @@ void SOM::visualizar_resultados()
 		}
 	}
 	cin.get();
+	remove("*.dat");
 }

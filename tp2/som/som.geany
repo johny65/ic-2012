@@ -9,7 +9,7 @@ indent_mode=2
 
 [project]
 name=SOM
-base_path=/home/johny/Documentos/ic/tp2/som
+base_path=/home/johny/Documentos/r58/tp2/som
 description=
 file_patterns=*.cpp;*.h;
 
@@ -18,8 +18,10 @@ long_line_behaviour=1
 long_line_column=79
 
 [files]
-current_page=0
-FILE_NAME_0=2515;C++;0;16;1;1;0;/home/johny/Documentos/ic/tp2/som/SOM.cpp;0;4
+current_page=2
+FILE_NAME_0=513;C++;0;16;1;1;0;/home/johny/Documentos/r58/tp2/som/Neurona.cpp;0;4
+FILE_NAME_1=4403;C++;0;16;1;1;0;/home/johny/Documentos/r58/tp2/som/SOM.cpp;0;4
+FILE_NAME_2=2948;C++;0;16;1;1;0;/home/johny/Documentos/r58/tp2/som/main.cpp;0;4
 
 [VTE]
 last_dir=/home/johny/Documentos/ic/tp2/som/bin
