@@ -1,141 +1,80 @@
 #include <iostream>
+#include <GL/glut.h>
 #include "SOM.h"
 
 
 using namespace std;
 
-int main (int argc, char *argv[]) {
-/*
-	Network NN;
-	
-	char *archivo_entrada = NULL;
-	char *archivo_prueba = NULL;
-	char *archivo_val = NULL;
 
-	string ayuda = "\
-Perceptrón Multicapa. IC 2012\n\
-Uso:\n\
-\tmulticapa [opciones] p1 p2 ... pn\n\n\
-donde p1 es la cantidad de neuronas en la capa 1, p2 es la cantidad de neuronas\
- en la capa 2, y pn es la cantidad de neuronas en la capa n.\n\
-Opciones:\n\
- -e archivo:\n\tArchivo de entrada para datos de entrenamiento.\n\
- -p archivo:\n\tArchivo de entradas para las pruebas.\n\
- -v archivo\n\tArchivo para realizar la validación cruzada.\n\
- -k valor\n\tK para el leave-k-out.\n\
- -n tasa:\n\tTasa de aprendizaje.\n\
- -t tol:\n\tTolerancia de error para detener entrenamiento.\n\
- -m alfa:\n\tConstante para el término de momento.\n\
- -a valor:\n\tConstante a para la sigmoidea.\n\
- -i cant:\n\tNúmero máximo de iteraciones (épocas) para el entrenamiento.\n\
- -g:\n\tNo mostrar ningún gráfico.\n\
- -s:\n\tNo mostrar ninguna salida por consola.\n\
- -z:\n\tMostrar gráfico de error.\n\
- -h:\n\tMuestra este mensaje de ayuda.\n\
-";
+vector<vector<peso_act> > grafico;
+
+void reshape_cb (int w, int h) {
+	if (w==0||h==0) return;
+	glViewport(0,0,w,h);
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	gluOrtho2D(0,w,0,h);
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+}
+
+void setear_colores(int &act){
+	float r,g,b;
+	r=(30*act)/100.0;
+	g=0.1;
+	b=0.1;
+	glColor3f(r,g,b);
+	glPointSize(5.00);
+}
+
+void display_cb() {
+	glClear(GL_COLOR_BUFFER_BIT);
+	//glColor3f(0,0,0); glPointSize(5);
 	
-	int o, k = 1;
-	while ((o = getopt(argc, argv, "e:p:n:t:i:v:k:m:gszh")) != -1){
-		switch (o){
-			case 'e': {
-				archivo_entrada = optarg;
-				break;
-			}
-			case 'p': {
-				archivo_prueba = optarg;
-				break;
-			}
-			case 'v': {
-				archivo_val = optarg;
-				break;
-			}
-			case 'k': {
-				stringstream ss; ss<<optarg; ss>>k;
-				break;
-			}
-			//case 'z': {
-				//P.set_show_error(true);
-				//break;
-			//}
-			case 'n': {
-				double tasa;
-				stringstream ss; ss<<optarg; ss>>tasa;
-				NN.set_tasa(tasa);
-				break;
-			}
-			case 't': {
-				double tol;
-				stringstream ss; ss<<optarg; ss>>tol;
-				NN.set_tolerancia(tol);
-				break;
-			}
-			case 'i': {
-				int it;
-				stringstream ss; ss<<optarg; ss>>it;
-				NN.set_max_epocas(it);
-				break;
-			}
-			case 'm': {
-				double alfa;
-				stringstream ss; ss<<optarg; ss>>alfa;
-				NN.set_momento(alfa);
-				break;
-			}
-			//case 'a': {
-				//double a;
-				//ss<<optarg; ss>>a;
-				//NN.set_momento(alfa);
-				//break;
-			//}
-			//case 'g': {
-				//P.set_graficos(false);
-				//break;
-			//}
-			//case 's': {
-				//P.set_salidas(false);
-				//break;
-			//}
-			case 'h':
-			case '?': {
-				cout<<ayuda<<endl;
-				return -1;
+	vector<vector<peso_act> >::iterator q=grafico.begin();
+	while(q!=grafico.end()){
+		for(size_t i=0;i<(*q).size();i++) { 
+			peso_act *act=&(*q)[i];
+			if(act->weight.size()==2){
+				setear_colores(act->cant_act);
+				glBegin(GL_POINTS);
+					glVertex2d(800*(act->weight[0]),600*(act->weight[1])); 
+				glEnd();
+				}
+			
+			
+			else{
+				//aca ver como hacer cuando tengo 3D, 4D, etc.
 			}
 		}
-	}
-
-	//arquitectura:
-	vector<int> red;
-	for (int i=optind; i<argc; ++i){
-		int p;
-		stringstream ss; ss<<argv[i]; ss>>p;
-		red.push_back(p);
-	}
-	if (red.size())
-		NN.setear_arquitectura(red);
-
-
-	if (archivo_val != NULL)
-		NN.val_cross(archivo_val, k);
 		
-	if (archivo_entrada != NULL){
-		NN.entrenar(archivo_entrada);
-		NN.guardar_pesos();
+		q++;
 	}
-	if (archivo_prueba != NULL)
-		cout<<"Porcentaje de aciertos: "<<NN.probar(archivo_prueba)<<endl;
+
+	
+	glutSwapBuffers();
+}
+
+void initialize() {
+	glutInitDisplayMode (GLUT_RGBA|GLUT_DOUBLE);
+	glutInitWindowSize (800,600);
+	glutInitWindowPosition (100,100);
+	glutCreateWindow ("Neuronas ganadoras");
+	glutDisplayFunc (display_cb);
+	glutReshapeFunc (reshape_cb);
+	glClearColor(1.f,1.f,1.f,1.f);
+}
 
 
 
-	//if (ruta_cross_val != NULL)
-		//P.val_cross(ruta_cross_val);
-
-	//NN.val_cross("xorvar.csv", 1000);
-	cout<<"\nPresionar una tecla para cerrar.\n"; cin.get();
-	return 0;
-*/
-
+int main (int argc, char *argv[]) {
 	SOM som;
-	som.inicializar(5, 5);
+	som.inicializar(10, 10);
+
 	som.entrenar("concent.csv");
+	grafico=som.generar_datos_grafico();
+	glutInit (&argc, argv);
+	initialize();
+	glutMainLoop();
 	return 0;
 }

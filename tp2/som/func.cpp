@@ -31,6 +31,11 @@ double dist(int x1, int y1, int x2, int y2)
 	return d; //no saco raíz cuadrada
 }
 
+double dist(pair<int,int> G, pair<int,int> N){
+	double d=pow(N.first-G.first,2)+pow(N.second-G.second,2);
+	return d;
+}
+
 vector<double> init_weight(int nd)
 {
 	double w;

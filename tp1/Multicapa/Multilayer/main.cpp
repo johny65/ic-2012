@@ -37,7 +37,7 @@ Opciones:\n\
 	while ((o = getopt(argc, argv, "e:p:n:t:i:v:k:m:gszh")) != -1){
 		switch (o){
 			case 'e': {
-				archivo_entrada = optarg;
+				archivo_entrada = "concent.csv"; //optarg;
 				break;
 			}
 			case 'p': {

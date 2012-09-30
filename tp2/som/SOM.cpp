@@ -107,6 +107,7 @@ void SOM::inicializar_pesos()
 	for (int i=0; i<this->M; ++i){
 		for (int j=0; j<this->N; ++j){
 			this->grilla[i][j].inicializar_pesos(this->datos[0].size());
+			this->grilla[i][j].set_position(pair<int,int> (i,j));
 		}
 	}
 }
@@ -158,7 +159,7 @@ void SOM::actualizar_pesos(int iganadora, int jganadora, vector<double> &x, int 
 	double r, h, e;
 	for (int i=0; i<this->M; ++i){
 		for (int j=0; j<this->N; ++j){
-			r = dist(iganadora, jganadora, i, j);
+			r = dist(grilla[iganadora][jganadora].position(), grilla[i][j].position());
 			h = funcion_vecindad(n, r, this->sigma, this->t);
 			//cout<<setw(9)<<h<<" | ";
 
@@ -193,11 +194,11 @@ void SOM::entrenar(const char *name)
 	for (size_t i=0; i<indices.size(); ++i){
 		indices[i] = i;
 	}
-	random_shuffle(indices.begin(), indices.end());
+	//random_shuffle(indices.begin(), indices.end());
 
 	//empiezo el entrenamiento
 	int it = 0; //iteraciones
-	while (it < cant_patrones_entrada*10){ ///<\todo detener cuando no se observen cambios
+	while (it < 10*cant_patrones_entrada){ ///<\todo detener cuando no se observen cambios
 		
 		for (int i=0; i<cant_patrones_entrada; ++i){ //recorro todo el set de datos
 		
@@ -212,13 +213,28 @@ void SOM::entrenar(const char *name)
 
 
 			it++;
+			
+			//cout<<"Termina iteracion "<<it<<endl<<"--------------------"<<endl;
 		}
 
 		//aleatorizar la presentación de patrones en la siguiente época
-		random_shuffle(indices.begin(), indices.end());
+		//random_shuffle(indices.begin(), indices.end());
 	}
-	visualizar_resultados();
+	//visualizar_resultados();
 
+}
+
+vector<vector<peso_act> > SOM::generar_datos_grafico(){
+	vector<vector<peso_act> > Graf;
+	vector<peso_act> aux;
+	for(size_t i=0;i<grilla.size();i++) { 
+		for(size_t j=0;j<grilla[i].size();j++) { 
+			aux.push_back(grilla[i][j].devolver_peso_act());
+		}
+		Graf.push_back(aux);
+		aux.clear();
+	}
+	return Graf;
 }
 
 

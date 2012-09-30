@@ -36,6 +36,7 @@ public:
 	void set_t(double t);
 	void inicializar(int, int);
 	void entrenar(const char*);
+	vector<vector<peso_act> > generar_datos_grafico();
 	
 };
 

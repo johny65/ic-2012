@@ -119,4 +119,7 @@ double funcion_vecindad(int n,double &distancia, double sigma_inicial, double t)
  */
 double eta_variable(int n, double eta_inicial, double t);
 
+
+
+double dist(pair<int,int> G, pair<int,int> N);
 #endif

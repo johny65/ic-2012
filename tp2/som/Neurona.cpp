@@ -4,7 +4,7 @@
 /**
  * @brief Constructor.
  */
-Neurona::Neurona() {}
+Neurona::Neurona() { this->cant_activaciones=0;}
 
 
 /**
@@ -29,7 +29,8 @@ void Neurona::inicializar_pesos(int n)
  */
 double Neurona::evaluar(vector<double> &x)
 {
-	return dot(x, this->pesos);
+	//vector<double> d=dif(x, this->pesos);
+	return dot(x,this->pesos);
 }
 
 
@@ -57,4 +58,29 @@ void Neurona::actualizar_pesos(vector<double> &x, double eta, double h)
 	for (size_t i=0; i<this->pesos.size(); ++i){
 		this->pesos[i] += eta * h * (x[i] - this->pesos[i]);
 	}
+	this->cant_activaciones++;
+}
+
+void Neurona::set_position(pair<int,int> P){
+	this->Pos=P;
+}
+pair<int, int> Neurona::position(){
+	return this->Pos;
+}
+
+peso_act Neurona::devolver_peso_act(){
+	peso_act N;
+	
+	N.weight=this->pesos;
+	N.cant_act=this->cant_activaciones;
+	return N;
+	
+}
+
+bool Neurona::es_vecino(pair<int, int> N){
+	if(abs(N.first-this->Pos.first)==1 || abs(N.second-this->Pos.second)==1)
+		return true;
+	else 
+		return false;
+	
 }
