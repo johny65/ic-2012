@@ -1,5 +1,7 @@
+#include <algorithm>
 #include "Neurona.h"
 #include "func.h"
+#include <limits>
 
 /**
  * @brief Constructor.
@@ -54,32 +56,41 @@ double Neurona::evaluar(vector<double> &x)
  */
 void Neurona::actualizar_pesos(vector<double> &x, double eta, double h)
 {
+	double resta;
 	for (size_t i=0; i<this->pesos.size(); ++i){
-		this->pesos[i] += eta * h * (x[i] - this->pesos[i]);
+		resta = x[i] - this->pesos[i];
+		//if (resta < numeric_limits<double>::min()) resta = 0.0;
+		this->pesos[i] += eta * h * (resta);
 	}
-	this->cant_activaciones++;
 }
 
-void Neurona::set_position(pair<int,int> P){
-	this->Pos=P;
-}
-pair<int, int> Neurona::position(){
-	return this->Pos;
+
+/**
+ * @brief Inicializa el vector de activaciones para ir sumando la cantidad de
+ * veces que se activa para una clase determinada.
+ * @param n Cantidad de clases.
+ */
+void Neurona::init_activaciones(int n)
+{
+	this->activaciones = vector<int>(n, -1);
 }
 
-peso_act Neurona::devolver_peso_act(){
-	peso_act N;
-	
-	N.weight=this->pesos;
-	N.cant_act=this->cant_activaciones;
-	return N;
-	
+
+/**
+ * @brief Contar una activación para la clase k.
+ */
+void Neurona::sumar_clase(int k)
+{
+	this->activaciones[k]++;
 }
 
-bool Neurona::es_vecino(pair<int, int> N){
-	if(abs(N.first-this->Pos.first)==1 || abs(N.second-this->Pos.second)==1)
-		return true;
-	else 
-		return false;
-	
+
+void Neurona::set_clase()
+{
+	vector<int>::iterator m = max_element(this->activaciones.begin(),
+		this->activaciones.end());
+	if (*m == -1)
+		this->clase = -1;
+	else
+		this->clase = distance(this->activaciones.begin(), m);
 }

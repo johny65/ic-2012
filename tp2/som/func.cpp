@@ -11,17 +11,20 @@
 
 using namespace std;
 
+extern bool eee;
 
 double dist(Punto a, Punto b)
 {
-	assert(a.size() == b.size()); //puntos de la misma dimensión
 	int D = a.size();
-	
+
+
 	double d = 0.0;
 	for (int i=0; i<D; ++i){
+		
 		d += (a[i] - b[i])*(a[i] - b[i]);
 	}
-
+	
+	//d=sqrt(d);
 	return d; //no hace falta sacar raíz cuadrada
 }
 
@@ -29,11 +32,6 @@ double dist(int x1, int y1, int x2, int y2)
 {
 	double d = pow((x1-x2), 2) + pow((y1-y2), 2);
 	return d; //no saco raíz cuadrada
-}
-
-double dist(pair<int,int> G, pair<int,int> N){
-	double d=pow(N.first-G.first,2)+pow(N.second-G.second,2);
-	return d;
 }
 
 vector<double> init_weight(int nd)
@@ -104,13 +102,6 @@ double signo(double valor)
 	else return -1;	
 }
 
-double gaussiana(Punto &x, Punto &media, double sigma2)
-{
-	double res = exp(-dist(x, media) / (2*sigma2));
-	return res;
-}
-
-
 double sigma(int n, double sigma_inicial, double tiempo){
 	return sigma_inicial*exp(-1*n/tiempo);
 }
@@ -132,10 +123,10 @@ void inicializar_color(vector<vector<float> > &color, int cant_clases){
 	vector<float> rgb;
 	
 	for(int i=0;i<cant_clases;i++) { 
-		for(int i=0;i<<3;i++) {  
-		rgb.push_back((1+rand()%100)/100.0);
-		rgb.push_back((1+rand()%100)/100.0);
-		rgb.push_back((1+rand()%100)/100.0);
+		for(int i=0;i<3;i++) {  
+			rgb.push_back((1+rand()%100)/100.0);
+			rgb.push_back((1+rand()%100)/100.0);
+			rgb.push_back((1+rand()%100)/100.0);
 		}
 	color.push_back(rgb);
 	rgb.clear();

@@ -28,7 +28,7 @@ void initialize() {
 	glutInitDisplayMode (GLUT_RGBA|GLUT_DOUBLE);
 	glutInitWindowSize (800,600);
 	glutInitWindowPosition (100,100);
-	glutCreateWindow ("SOM");
+	glutCreateWindow ("Mapa Autoorganizativo - Entrenamiento");
 	glutReshapeFunc (reshape_cb);
 	reshape_cb(800,600);
 	glClearColor(1.f,1.f,1.f,1.f);
@@ -43,12 +43,10 @@ int main (int argc, char *argv[]) {
 
 	SOM som;
 	som.inicializar(10, 10);
-	som.entrenar("rectangulo.csv");
-	
-	//grafico=som.generar_datos_grafico();
-	//display_cb();
-	//glutPostRedisplay();
+	som.entrenar("phoneme.csv");
+	som.etiquetar("phoneme.csv");
+	som.clasificar("phoneme.csv");
+
 	cin.get();
-	//glutMainLoop();
 	return 0;
 }

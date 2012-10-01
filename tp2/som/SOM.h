@@ -28,8 +28,6 @@ private:
 	void visualizar_resultados();
 	void visualizar_datoslabel(int);
 
-void display_cb();
-	
 public:
 	SOM();
 	~SOM();
@@ -39,7 +37,8 @@ public:
 	void set_t(double t);
 	void inicializar(int, int);
 	void entrenar(const char*);
-	vector<vector<peso_act> > generar_datos_grafico();
+	void etiquetar(const char*);
+	void clasificar(const char*);
 	
 };
 

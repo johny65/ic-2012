@@ -9,13 +9,14 @@
 #include "func.h"
 #include "wait.h"
 
+bool eee = false;
 
 /**
  * @brief Constructor.
  * Inicializa la tasa de aprendizaje en los valores recomendados por Haykin
  * (pág. 452).
  */
-SOM::SOM() : eta(0.5), t2(1000), tol(1e-2)
+SOM::SOM() : eta(0.5), t2(1000), tol(1e-1)
 {
 	srand(time(NULL) + getpid());
 }
@@ -110,7 +111,6 @@ void SOM::inicializar_pesos()
 	for (int i=0; i<this->M; ++i){
 		for (int j=0; j<this->N; ++j){
 			this->grilla[i][j].inicializar_pesos(this->datos[0].size());
-			this->grilla[i][j].set_position(pair<int,int> (i,j));
 		}
 	}
 }
@@ -124,7 +124,7 @@ void SOM::inicializar_pesos()
  */
 void SOM::competir(vector<double> &x, int &i, int &j)
 {
-	double win = numeric_limits<double>::max();
+	double win = 100000 /*numeric_limits<double>::max()*/;
 	int wini = -1, winj = -1;
 	double aux;
 
@@ -132,7 +132,9 @@ void SOM::competir(vector<double> &x, int &i, int &j)
 	for (int f=0; f<this->M; ++f){
 		for (int c=0; c<this->N; ++c){
 			aux = this->grilla[f][c].evaluar(x);
+			if (eee) cout<<"distancia aux: "<<aux<<endl;
 			if (aux < win){
+				if (eee) cout<<"ganó alguien\n";
 				win = aux;
 				wini = f;
 				winj = c;
@@ -164,7 +166,6 @@ void SOM::actualizar_pesos(int iganadora, int jganadora, vector<double> &x, int 
 	for (int i=0; i<this->M; ++i){
 		for (int j=0; j<this->N; ++j){
 			r = dist(iganadora, jganadora, i, j);
-			//r = dist(grilla[iganadora][jganadora].position(), grilla[i][j].position());
 			h = funcion_vecindad(n, r, this->sigma, this->t);
 			//cout<<setw(9)<<h<<" | ";
 
@@ -204,29 +205,29 @@ void SOM::entrenar(const char *name)
 	int it = 0; //iteraciones
 	int epocas = 0;
 	double error=0;
-	while (epocas < 50){ ///<\todo detener cuando no se observen cambios
+	while (epocas < 20){ ///<\todo detener cuando no se observen cambios
 		
 		for (int i=0; i<cant_patrones_entrada; ++i){ //recorro todo el set de datos
 		
 			vector<double> &entrada = datos[indices[i]]; //un patrón de entrada (no todas)
-			
+
 			//busco la ganadora para este patrón de entrada
 			int iwin, jwin;
+			
 			competir(entrada, iwin, jwin);
 
 			//calculo el error
-			error+=dist(entrada,grilla[iwin][jwin].get_pesos());
+			
+			error+=dist(entrada,grilla.at(iwin).at(jwin).get_pesos());
 			
 			//actualizar los pesos
 			actualizar_pesos(iwin, jwin, entrada, it);
 
-			visualizar_resultados();
-			//wait(500);
-			
+			//visualizar_resultados();
 			
 			it++;
-			
 		}
+		//visualizar_resultados();
 		if((error/cant_patrones_entrada)<this->tol){ cout<<"corto por error"<<endl; break;}
 		cout<<"Epoca numero "<<epocas<<" error para la epoca: "<<error/cant_patrones_entrada<<endl;
 		epocas++;
@@ -242,33 +243,31 @@ void SOM::entrenar(const char *name)
 
 }
 
-vector<vector<peso_act> > SOM::generar_datos_grafico(){
-	vector<vector<peso_act> > Graf;
-	vector<peso_act> aux;
-	for(size_t i=0;i<grilla.size();i++) { 
-		for(size_t j=0;j<grilla[i].size();j++) { 
-			aux.push_back(grilla[i][j].devolver_peso_act());
-		}
-		Graf.push_back(aux);
-		aux.clear();
-	}
-	return Graf;
-}
-
-
-
-
 void mapeo(double x, double y, double &xsalida, double &ysalida)
 {
 	int w = 800, h = 600;
-	double xmin = -1, xmax = 1;
-	double ymin = -1, ymax = 1;
-	double nn = fabs(xmax-xmin);
+	double xmin = -2, xmax = 2;
+	double ymin = -2, ymax = 2;
+	double nnx = fabs(xmax-xmin);
+	double nny = fabs(ymax-ymin);
 
-	xsalida = (x - xmin)/nn; xsalida *= w;
-	ysalida = (y - ymin)/nn; ysalida *= h;
-
+	xsalida = (x - xmin)/nnx; xsalida *= w;
+	ysalida = (y - ymin)/nny; ysalida *= h;
 }
+
+void mapeo(double x, double y, double &xsalida, double &ysalida, int M, int N)
+{
+	int w = 800, h = 600;
+	double xmin = -1, xmax = N;
+	double ymin = -1, ymax = M;
+	double nnx = fabs(xmax-xmin);
+	double nny = fabs(ymax-ymin);
+
+	xsalida = (x - xmin)/nnx; xsalida *= w;
+	ysalida = (y - ymin)/nny; ysalida *= h;
+}
+
+
 
 void unir(double x, double y, double xv, double yv)
 {
@@ -281,17 +280,13 @@ void unir(double x, double y, double xv, double yv)
 }
 
 /**
- * @brief Guarda los pesos de las neuronas entrenadas y muestra el mapa
- * topológico aprendido.
+ * @brief Muestra el mapa topológico que se va aprendiendo.
  */
 void SOM::visualizar_resultados()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	double x, y, xv, yv;
-	//plotter("set key off");
-	//bool b = true;
-	//int k=0;
 	vector<double> p;
 	
 	for (int i=0; i<this->M; ++i){
@@ -322,17 +317,15 @@ void SOM::visualizar_resultados()
 		}
 	}
 	glutSwapBuffers();
-	//cin.get();
-	//remove("*.dat");
 }
 
 
-
-
 void SOM::visualizar_datoslabel(int cant_clases){
+	cout<<"entró a visualizar\n";
 	//inicializo el vector de colores
 	vector<vector<float> > color;
 	inicializar_color(color,cant_clases);
+	cout<<"color iniciado\n";
 	
 	glClear(GL_COLOR_BUFFER_BIT);
 	
@@ -343,14 +336,19 @@ void SOM::visualizar_datoslabel(int cant_clases){
 		for (int j=0; j<this->N; ++j){
 			
 			//this->grilla[i][j].get_pesos();
-			mapeo(i, j, x, y);
+			mapeo(i, j, x, y, this->M, this->N);
 			
 			int clase=this->grilla[i][j].get_clase();
-			glColor3f(color[clase][0],color[clase][1],color[clase][2]);
+			if (clase == -1)
+				glColor3f(1,1,1);
+			else
+				glColor3f(color.at(clase).at(0),color.at(clase).at(1),color.at(clase).at(2));
+
+			glPointSize(25);
 			glBegin(GL_POINTS);
 			glVertex2d(x, y);
 			glEnd();
-			
+			/*
 			//el de la derecha:
 			if (i+1 < this->M){
 				mapeo(i+1,j, xv, yv);
@@ -362,7 +360,7 @@ void SOM::visualizar_datoslabel(int cant_clases){
 				mapeo(i,j+1, xv, yv);
 				unir(x, y, xv, yv);
 			}
-			
+			*/
 		}
 	}
 	glutSwapBuffers();
@@ -370,31 +368,78 @@ void SOM::visualizar_datoslabel(int cant_clases){
 
 
 
+void SOM::etiquetar(const char *name)
+{
+	verificar_inicializada();
+	
+	//Abro el archivo de datos:
+	vector<double> salidas;
+	this->datos = leer_csv(name, salidas);
 
-void SOM::display_cb() {
-	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0,0,0); glPointSize(5);
-	vector<vector<peso_act> > grafico = generar_datos_grafico();
-	vector<vector<peso_act> >::iterator q=grafico.begin();
-	while(q!=grafico.end()){
-		for(size_t i=0;i<(*q).size();i++) { 
-			peso_act *act=&(*q)[i];
-			if(act->weight.size()==2){
-				//setear_colores(act->cant_act);
-				glBegin(GL_POINTS);
-					glVertex2d(800*(act->weight[0]),600*(act->weight[1])); 
-				glEnd();
-				}
-			
-			
-			else{
-				//aca ver como hacer cuando tengo 3D, 4D, etc.
-			}
+	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
+
+	int cant_clases = *max_element(salidas.begin(), salidas.end()) + 1;
+	cout<<"Clases: "<<cant_clases<<endl;
+
+	//inicializar:
+	for (int i=0; i<this->M; ++i){
+		for (int j=0; j<this->N; ++j){
+			this->grilla[i][j].init_activaciones(cant_clases);
 		}
+	}
+	
+	cout<<"se inicializó\n";
+	
+	for (size_t i=0; i<this->datos.size(); ++i){
 		
-		q++;
+		//busco la ganadora para este patrón de entrada
+		vector<double> &entrada = datos[i];
+		int iwin, jwin;
+		competir(entrada, iwin, jwin);
+
+		this->grilla[iwin][jwin].sumar_clase((int)salidas[i]);
+	}
+	cout<<"se compitieron\n";
+	//
+	for (int i=0; i<this->M; ++i){
+		for (int j=0; j<this->N; ++j){
+			this->grilla[i][j].set_clase();
+		}
 	}
 
+
+	visualizar_datoslabel(cant_clases);
 	
-	glutSwapBuffers();
+}
+
+
+
+void SOM::clasificar(const char* name)
+{
+	verificar_inicializada();
+	
+	//Abro el archivo de datos:
+	vector<double> salidas;
+	this->datos = leer_csv(name, salidas);
+
+	if(datos.empty()) {cout<<"Error: no se pudo leer el archivo."<<endl; return;}
+
+	int aciertos=0;
+	for (size_t i=0; i<this->datos.size(); ++i){
+		
+		//busco la ganadora para este patrón de entrada
+		vector<double> &entrada = datos[i];
+		int iwin, jwin;
+		competir(entrada, iwin, jwin);
+
+		if (this->grilla[iwin][jwin].get_clase() == (int)salidas[i]){
+			aciertos++;
+		}
+
+	}
+
+	cout<<"Número de aciertos: "<<aciertos<<"/"<<this->datos.size()<<endl;
+	double porc = aciertos*100.0/this->datos.size();
+	cout<<"% de aciertos: "<<porc<<"%"<<endl;
+
 }

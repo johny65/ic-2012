@@ -29,15 +29,6 @@ double dist(int x1, int y1, int x2, int y2);
 
 
 /**
- * @brief Algoritmo de k-means.
- * @param datos Vector con los puntos de datos de entrada.
- * @param k Cantidad de clústers.
- * @return Un vector con los k centroides (medias) calculados.
- */ 
-vector<Punto> k_means(vector<Punto> datos, int k);
-
-
-/**
  * @brief Rutina que inicializa el vector de pesos aletoriamente (valores
  * entre [-0.5, 0.5]).
  * @param nd Es la longitud del vector a retornar (cantidad total de entradas
@@ -85,14 +76,6 @@ double signo(double valor);
 
 
 /**
- * @brief Función de base radial gaussiana.
- * @param x Punto a evaluar.
- * @param media Media para la gaussiana (mu).
- * @param sigma2 Varianza para la gaussiana (sigma cuadrado).
- */
-double gaussiana(Punto &x, Punto &media, double sigma2);
-
-/**
 @brief Funcion sigma variante con el tiempo
 @param n iteracion en la que estoy parado
 @param sigma_inicial valor inicial de desvio
@@ -119,9 +102,6 @@ double funcion_vecindad(int n,double &distancia, double sigma_inicial, double t)
  */
 double eta_variable(int n, double eta_inicial, double t);
 
-
-
-double dist(pair<int,int> G, pair<int,int> N);
 
 void inicializar_color(vector<vector<float> > &,int);
 
