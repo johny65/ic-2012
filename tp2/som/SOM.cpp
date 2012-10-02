@@ -16,7 +16,7 @@ bool eee = false;
  * Inicializa la tasa de aprendizaje en los valores recomendados por Haykin
  * (pág. 452).
  */
-SOM::SOM() : eta(0.5), t2(1000), tol(1e-1)
+SOM::SOM() : eta(0.9), t2(3800), tol(1e-3)
 {
 	srand(time(NULL) + getpid());
 }
@@ -59,7 +59,9 @@ void SOM::set_sigma_inicial(double s)
 	this->sigma = s;
 }
 
-
+void SOM::set_view(bool t){
+	this->view_training=t;
+}
 /**
  * @brief Fija el valor t usado para calcular el valor de sigma variable con
  * el tiempo para la función de vecindad.
@@ -98,7 +100,7 @@ void SOM::inicializar(int M, int N)
 	 * sigma: igual al "radio" de la grilla
 	 * t: 1000/log(sigma)
 	 */
-	this->sigma = min(M, N)/2.0;
+	this->sigma = max(M, N)/2.0;
 	this->t = 1000/log(this->sigma);
 }
 
@@ -132,15 +134,16 @@ void SOM::competir(vector<double> &x, int &i, int &j)
 	for (int f=0; f<this->M; ++f){
 		for (int c=0; c<this->N; ++c){
 			aux = this->grilla[f][c].evaluar(x);
-			if (eee) cout<<"distancia aux: "<<aux<<endl;
+			//if (eee) cout<<"distancia aux: "<<aux<<endl;
 			if (aux < win){
-				if (eee) cout<<"ganó alguien\n";
+				//if (eee) cout<<"ganó alguien\n";
 				win = aux;
 				wini = f;
 				winj = c;
 			}
 		}
 	}
+	
 	//resultados
 	i = wini; j = winj;
 	
@@ -155,22 +158,22 @@ void SOM::competir(vector<double> &x, int &i, int &j)
  * hacia las demás.
  * 
  * @param iganadora Fila de la neurona ganadora.
- * @param jganadora Columna de la neurona ganadora.
- * @param x Patrón de entrada actual.
- * @param n Instante actual de tiempo discreto.
- */
+ * @param jganadora Columna de la neurona 			//cout<<setw(9)<<h<<" | ";
+*/
 void SOM::actualizar_pesos(int iganadora, int jganadora, vector<double> &x, int n)
 {
-	double r, h;
-	double e = eta_variable(n, this->eta, this->t2);
+	double r, h,e;
+	e=eta_variable(n,this->eta,this->t2);
+
 	for (int i=0; i<this->M; ++i){
 		for (int j=0; j<this->N; ++j){
 			r = dist(iganadora, jganadora, i, j);
 			h = funcion_vecindad(n, r, this->sigma, this->t);
 			//cout<<setw(9)<<h<<" | ";
-
+			
 			this->grilla[i][j].actualizar_pesos(x, e, h);
 		}
+		
 		//cout<<endl;
 	}
 }
@@ -205,8 +208,9 @@ void SOM::entrenar(const char *name)
 	int it = 0; //iteraciones
 	int epocas = 0;
 	double error=0;
-	while (epocas < 20){ ///<\todo detener cuando no se observen cambios
-		
+	
+	while (epocas < 5000){ ///<\todo detener cuando no se observen cambios
+
 		for (int i=0; i<cant_patrones_entrada; ++i){ //recorro todo el set de datos
 		
 			vector<double> &entrada = datos[indices[i]]; //un patrón de entrada (no todas)
@@ -221,13 +225,14 @@ void SOM::entrenar(const char *name)
 			error+=dist(entrada,grilla.at(iwin).at(jwin).get_pesos());
 			
 			//actualizar los pesos
-			actualizar_pesos(iwin, jwin, entrada, it);
-
-			//visualizar_resultados();
+			actualizar_pesos(iwin, jwin, entrada, epocas);
+			
+			
+			//if(this->view_training) {visualizar_resultados();}
 			
 			it++;
 		}
-		//visualizar_resultados();
+		visualizar_resultados();
 		if((error/cant_patrones_entrada)<this->tol){ cout<<"corto por error"<<endl; break;}
 		cout<<"Epoca numero "<<epocas<<" error para la epoca: "<<error/cant_patrones_entrada<<endl;
 		epocas++;

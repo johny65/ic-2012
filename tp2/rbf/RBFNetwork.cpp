@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include "RBFNetwork.h"
 #include "func.h"
+#include "utils.h"
 
 /**
  * @brief Constructor, fija los parámetros por defecto.

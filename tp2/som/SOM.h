@@ -15,6 +15,7 @@ private:
 	double sigma; ///< Sigma inicial para la función de vecindad
 	double t; ///< Variable de tiempo para el cálculo de sigma dinámico
 	double tol;
+	bool view_training; ///<visualizacion durante entrenamiento
 	Matriz grilla; ///< Grilla de neuronas
 	int M, N; ///< Tamaño de la grilla
 	vector< vector<double> > datos; ///< Entradas
@@ -35,6 +36,7 @@ public:
 	void set_t2(double t);
 	void set_sigma_inicial(double s);
 	void set_t(double t);
+	void set_view(bool);
 	void inicializar(int, int);
 	void entrenar(const char*);
 	void etiquetar(const char*);

@@ -4,6 +4,18 @@
 
 
 using namespace std;
+string name;
+int pantalla(){
+	int op;
+	cout<< "Que desea Hacer? "<<endl;
+	cout<< "1- Entrenar un SOM (problema de entrenamiento sin clasificacion)"<<endl;
+	cout<< "2- Utilizar un SOM como clasificador"<<endl;
+	cin>> op;
+	cout<<"Por favor introduzca el nombre del archivo .csv"<<endl;
+	cin>> name;
+	return op;
+}
+
 
 void reshape_cb (int w, int h) {
 	if (w==0||h==0) return;
@@ -43,9 +55,19 @@ int main (int argc, char *argv[]) {
 
 	SOM som;
 	som.inicializar(10, 10);
-	som.entrenar("phoneme.csv");
-	som.etiquetar("phoneme.csv");
-	som.clasificar("phoneme.csv");
+	int opcion=pantalla();
+	if(opcion==1){
+		som.set_view(true);
+		som.entrenar(name.c_str()); 
+		cin.get();}
+	if(opcion==2){
+		som.set_view(false); //para clasificacion no muestro como se ajusta el som en el entrenamiento
+		som.entrenar(name.c_str());
+		som.etiquetar(name.c_str());
+		som.clasificar(name.c_str());
+		cin.get();
+	}
+	
 
 	cin.get();
 	return 0;

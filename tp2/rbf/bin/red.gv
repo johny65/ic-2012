@@ -1,0 +1,17 @@
+digraph {
+rankdir=LR
+x0 [shape=point, label=""]
+x1 [shape=point, label=""]
+c1p0 [shape=circle, label=""]
+c1p1 [shape=circle, label=""]
+c2p0 [shape=circle, label=""]
+s0 [style=invisible, shape=point, label=""]
+x0 -> c1p0
+x0 -> c1p1
+x1 -> c1p0
+x1 -> c1p1
+c1p0 -> c2p0
+c1p1 -> c2p0
+c2p0 -> s0
+
+}

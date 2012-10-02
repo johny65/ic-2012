@@ -2,6 +2,8 @@
 #include "Neurona.h"
 #include "func.h"
 #include <limits>
+#include <iostream>
+#include <cmath>
 
 /**
  * @brief Constructor.
@@ -59,8 +61,10 @@ void Neurona::actualizar_pesos(vector<double> &x, double eta, double h)
 	double resta;
 	for (size_t i=0; i<this->pesos.size(); ++i){
 		resta = x[i] - this->pesos[i];
-		//if (resta < numeric_limits<double>::min()) resta = 0.0;
+		if(isnan(resta)) resta=0;
+		//if(isnan(h)) h=0; //if (resta < numeric_limits<double>::min()) resta = 0.0;
 		this->pesos[i] += eta * h * (resta);
+		
 	}
 }
 
