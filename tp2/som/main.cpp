@@ -27,14 +27,6 @@ void reshape_cb (int w, int h) {
 	glLoadIdentity ();
 }
 
-void setear_colores(int &act){
-	float r,g,b;
-	r=(30*act)/100.0;
-	g=0.1;
-	b=0.1;
-	glColor3f(r,g,b);
-	glPointSize(5.00);
-}
 
 void initialize() {
 	glutInitDisplayMode (GLUT_RGBA|GLUT_DOUBLE);

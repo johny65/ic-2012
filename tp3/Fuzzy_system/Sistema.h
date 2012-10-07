@@ -21,6 +21,8 @@ public:
 	~Sistema();
 	void graficar_conjuntos();
 	void Simular();
+	void Fuzzification(); ///< convertir el universo de discurso X en el conjunto difuso A;
+	void Defuzzification(); ///< convertir el conjunto difuso B al universo de discurso Y;
 };
 
 #endif
