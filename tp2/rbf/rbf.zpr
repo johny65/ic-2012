@@ -12,7 +12,7 @@ custom_tabs=0
 tab_use_spaces=0
 use_wxfb=0
 explorer_path=
-current_source=main.cpp
+current_source=RBFNetwork.cpp
 path_char=/
 [source]
 path=func.cpp
@@ -32,7 +32,7 @@ cursor=287
 open=true
 [source]
 path=RBFNetwork.cpp
-cursor=14977
+cursor=12025
 open=true
 [source]
 path=rbf.cpp
@@ -56,7 +56,7 @@ cursor=145
 open=true
 [header]
 path=RBFNetwork.h
-cursor=1949
+cursor=1373
 open=true
 [header]
 path=wait.h

@@ -2,25 +2,27 @@
 #include <GL/glut.h>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
+#include <map>
 using namespace std;
 Sistema::Sistema(int cant_conj,vector<double> intervalos) { 
 	/**
 	@param cant_conj: cantidad de conjuntos difusos.
 	@param intervalos de los conjuntos difusos (el tamanio del vector debe ser 2*cant conjuntos contiene los valores left y right de los triangulos)
 	*/
+	//cargo los triangulos
 	triangulo aux;
-	for(int i=0;i<cant_conj;i+=2) { 
-		aux.left=intervalos[i];
-		aux.right=intervalos[i+1];
+	for(int i=0;i<cant_conj;i++) { 
+		aux.left=intervalos[2*i];
+		aux.right=intervalos[2*i+1];
+		aux.calcular_centro();
 		this->conjuntos.push_back(aux);
 	}
 	
-	//inicializo la temperatura exterior en forma aletoria doy valores entre -10 y 50 grados. cada valor representa 10 segundos
-	for(int i=0;i<12;i++) { 
-		double aux=-10+rand()%60;
-		for(int j=0;j<30;j++) {  //mantengo por 5 minutos el mismo valor de temperatura exterior
-			this->temp_ext.push_back(aux);
-		}
+	//inicializo la temperatura exterior segun alguna funcion la hago exponencial. cada valor representa 10 segundos
+	for(int i=0;i<360;i++) { 
+		double te=0.5*i+2; ///< todo ver como hacer una exponencial;
+		this->temp_ext.push_back(te);
 		cout<<this->temp_ext.back()<<setw(5);
 	}
 	cout<<endl;
@@ -32,23 +34,63 @@ Sistema::Sistema(int cant_conj,vector<double> intervalos) {
 		}
 		cout<<this->temp_ref.back()<<setw(5);
 	}
+	
+	//elijo un numero aletorio entre 0 y 359 instante en el cual se habre la puerta;
+	this->puerta_abierta=0+rand()%360;
+	
+	graficar_conjuntos();
 }
 
 Sistema::~Sistema() {
 	
 }
 
-void Sistema::graficar_conjuntos(){
-	glClear(GL_COLOR_BUFFER_BIT);
-	//Grafico los conjuntos
-	glColor3f(1.0,0.0,0.0); glPointSize(80);
-	for(size_t i=0;i<this->conjuntos.size();i++) { 
-		triangulo *aux=&(this->conjuntos[i]);
-		glBegin(GL_LINES);
-			glVertex2d(100*aux->left,0.0); glVertex2d(100*aux->center,100.0);
-			glVertex2d(100*aux->center,100.0); glVertex2d(100*aux->right,0.0);
-		glEnd();	
+void Sistema::Simular_sincontrol(){
+	this->temp_int_sc.push_back(20); ///<declaro la temperatura del interior inicial en 20 grados (solo para simular)
+	for(size_t i=1;i<this->temp_ref.size();i++) {  
+		if(i==puerta_abierta)
+			this->temp_int_sc.push_back(0.169*this->temp_int_sc[i-1]+0.831*this->temp_ext[i]);
+		else
+			this->temp_int_sc.push_back(0.912*this->temp_int_sc[i-1]+0.088*this->temp_ext[i]);
 	}
-	glutSwapBuffers();
+	graficar(this->temp_int_sc);
 }
 
+void Sistema::graficar_conjuntos(){
+	crear_dat_conjuntos(this->conjuntos,"conjuntos.dat");
+	std::ostringstream sp;
+	sp<<"plot conjuntos.dat";
+	this->plotter(sp.str());
+}
+
+void Sistema::graficar(vector<double> &T){
+	crear_dat_vector(T,"sin_control.dat");
+	std::ostringstream sp;
+	sp<<"plot sin_control.dat";
+	this->plotter(sp.str());
+}
+
+void Sistema::Simular_concontrol(){
+	map<int,double> conj_memb; ///< la llave sera el indice del conjunto al que pertenece y el double el grado de membresia de ese conjunto
+	double memb;
+	///<Rutina Principal
+	///<calcular conjunto y grado de membresia de los conjuntos de entrada (guardo num_conjunto, grado_membresia);
+	
+	///
+	for(size_t i=0;i<this->temp_ext.size();i++) {
+		double *T=&(this->temp_ext[i]); ///< valor de la temperatura exterior
+		///<calculo los conjuntos a los cuales pertenece y la membresia de los mismos
+		for(size_t j=0;j<this->conjuntos.size();j++) { 
+			memb=this->conjuntos[j].calcular_degree(*T);
+			if(memb!=-1){
+				///<guardo el indice del conjunto(j) y la membresia
+				conj_memb[j]=memb;
+			}
+		}
+		///En este punto tengo en conj_memb (conj,grado_memb) correspondiente a la Temperatura T.
+		
+		///Aqui van los mapeos al conjunto de salida.
+		
+	}
+	
+}
