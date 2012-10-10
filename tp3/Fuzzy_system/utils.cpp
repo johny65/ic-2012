@@ -52,14 +52,15 @@ bool triangulo::pertenece(double x){
 void triangulo::calcular_bc(double degree){
 	double m1=1/(this->center-this->left);
 	double m2=1/(this->center-this->right);
+	this->A.a=this->left;
 	this->A.b=(degree+this->left*m1)/m1;
 	this->A.c=(degree+this->right*m2)/m2;
+	this->A.d=this->right;
 	this->A.degree=degree;
 	
 }
 
 double triangulo::calcular_degree(double &x){
-	if(pertenece(x)){
 		double m;//pendiente
 		if(x>this->center){
 			m=1/(this->center-this->left);
@@ -69,8 +70,7 @@ double triangulo::calcular_degree(double &x){
 			m=1/(this->center-this->right);
 			return m*(x-this->right);			
 		}
-	}
-	else return -1;
+
 }
 
 
@@ -189,4 +189,12 @@ void crear_dat_conjuntos(vector<triangulo> &v, const char *name)
 	}
 	out<<ss.str();
 	out.close();
+}
+
+
+double calcular_centroide(trapezoide A,trapezoide B){
+	double centro_A=A.b+(A.c-A.b)/2;
+	double centro_B=B.b+(B.c-B.b)/2;
+	double c=(A.degree*(A.c-A.a)*centro_A+B.degree*(B.c-B.a)*centro_B)/(A.degree*(A.c-A.a)+B.degree*(B.c-B.a));
+	return c;
 }

@@ -34,7 +34,7 @@ vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd);
 
 
 struct trapezoide{
-	double b,c; // b y c cortes que produce el grado de activacion del conjunto difuso
+	double a,b,c,d; // b y c cortes que produce el grado de activacion del conjunto difuso
 	double degree; //valor que toman los puntos b y c en el eje y.
 };	
 struct triangulo{
@@ -100,5 +100,10 @@ vector< vector<double> > pesos_desde_archivo(const char * archivo);
 * @brief Guarga los triangulos para graficarlos con GNUplot
 */
 void crear_dat_conjuntos(vector<triangulo> &v, const char *name);
+
+
+/**
+*/
+double calcular_centroide(trapezoide A,trapezoide B);
 
 #endif
