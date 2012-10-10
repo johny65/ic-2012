@@ -19,13 +19,14 @@ Sistema::Sistema(int cant_conj,vector<double> intervalos) {
 		this->conjuntos.push_back(aux);
 	}
 	
-	//inicializo la temperatura exterior segun alguna funcion la hago exponencial. cada valor representa 10 segundos
-	for(int i=0;i<360;i++) { 
-		double te=0.5*i+2; ///< todo ver como hacer una exponencial;
-		this->temp_ext.push_back(te);
-		cout<<this->temp_ext.back()<<setw(5);
+	//inicializo la temperatura exterior segun la figura que esta en la guia cada 10 minuto cambia cada valor representa 10 segundos
+	for(int i=0;i<6;i++) { 
+		double t_ext=10+rand()%30;
+		for(int j=0;j<60;j++) { //constante durante 10 minutos;
+			this->temp_ext.push_back(t_ext);
+		}
 	}
-	cout<<endl;
+	
 	
 	//inicializo la temperatura de referencia
 	for(int i=0;i<6;i++) { 
@@ -68,6 +69,7 @@ void Sistema::graficar(vector<double> &T){
 	std::ostringstream sp;
 	sp<<"plot sin_control.dat";
 	this->plotter(sp.str());
+	crear_dat_vector(this->temp_ext,"temp_ext.dat");
 }
 
 void Sistema::Simular_concontrol(){
