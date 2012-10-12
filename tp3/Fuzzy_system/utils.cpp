@@ -63,12 +63,15 @@ void triangulo::calcular_bc(double degree){
 double triangulo::calcular_degree(double &x){
 		double m;//pendiente
 		if(x>this->center){
-			m=1/(this->center-this->left);
-			return m*(x-this->left);
+			m=(this->right-this->center);
+	
+			return (1+(this->center-x)/m);
 		}
 		else{
-			m=1/(this->center-this->right);
-			return m*(x-this->right);			
+			
+			m=(this->center-this->left);
+	
+			return ((x-this->left)/m);			
 		}
 
 }
@@ -208,4 +211,8 @@ double calcular_centroide(trapezoide A,trapezoide B){
 	double centro_B=B.b+(B.c-B.b)/2;
 	double c=(A.degree*(A.c-A.a)*centro_A+B.degree*(B.c-B.a)*centro_B)/(A.degree*(A.c-A.a)+B.degree*(B.c-B.a));
 	return c;
+}
+
+double calcular_centroide_unico(triangulo A){
+	return ((A.left+A.center+A.right)/3);
 }

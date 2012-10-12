@@ -13,8 +13,8 @@ private:
 	vector<triangulo> conjuntos_v; ///< conjuntos pertenecientes al voltaje v
 	
 	//map para reglas de inferencia para el caso de temp de referencia a 18 grados
-	map<int,int> Temp_i; ///<mapeo de temperatura a corriente
-	map<int,int> Temp_v; ///<mapeo de temperatura a voltaje
+//	map<int,int> Temp_i; ///<mapeo de temperatura a corriente
+//	map<int,int> Temp_v; ///<mapeo de temperatura a voltaje
 	
 	//Variables y datos para la simulacion
 	vector<double> temp_int_sc; ///< temperatura interna simulada sin control: variable de salida
@@ -30,6 +30,8 @@ private:
 	//funciones privadas
 	void graficar_conjuntos();
 	void graficar(vector<double> &T);
+	void graficar_controlado();
+	pair<int,int> conjuntos_activados(double n);
 
 public:
 	Sistema(vector<double>,vector<double>,vector<double> ); ///< cant_conjuntos: cant de triangulos borrosos, min: rango de temp minimo, max:rango de tem maximo
