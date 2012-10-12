@@ -42,6 +42,7 @@ struct triangulo{
 	double center;
 	double right;
 	trapezoide A;
+	//bool medio_triangulo; //solo es verdadero en los extremos 
 	void calcular_bc(double degree);
 	void calcular_centro();
 	bool pertenece(double);

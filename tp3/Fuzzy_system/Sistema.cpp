@@ -5,22 +5,34 @@
 #include <sstream>
 #include <map>
 using namespace std;
-Sistema::Sistema(int cant_conj,vector<double> intervalos_t,vector<double> intervalos_i,vector<double> intervalos_v) { 
+Sistema::Sistema(vector<double> intervalos_t,vector<double> intervalos_i,vector<double> intervalos_v) { 
 	/**
 	@param cant_conj: cantidad de conjuntos difusos.
 	@param intervalos de los conjuntos difusos (el tamanio del vector debe ser 2*cant conjuntos contiene los valores left y right de los triangulos)
 	*/
 	//cargo los triangulos de entrada
 	triangulo aux;
-	for(int i=0;i<cant_conj;i++) { 
+	
+	 
+	//cargo los triangulos:
+	for(int i=0;i<(intervalos_t.size()/2);i++) { 
 		aux.left=intervalos_t[2*i];
 		aux.right=intervalos_t[2*i+1];
 		aux.calcular_centro();
 		this->conjuntos_temp.push_back(aux);
 	}
 	
+	//cargo un ultimo medio triangulo
+	aux=this->conjuntos_temp.back();
+	double l=aux.center; //el left del medio triangulo debe ser igual al center de ultimo cargado
+	aux.left=l; aux.center=aux.right;
+	this->conjuntos_temp.push_back(aux); //meto el ultimo medio triangulo, el right no me preocupa pues solo uso left y center;
+	
+	
 	//genero conjuntos de salida de la corriente
-	for(int i=0;i<cant_conj;i++){
+	
+	//cargo los triangulos:
+	for(int i=0;i<(intervalos_i.size()/2);i++) { 
 		aux.left=intervalos_i[2*i];
 		aux.right=intervalos_i[2*i+1];
 		aux.calcular_centro();
@@ -28,12 +40,16 @@ Sistema::Sistema(int cant_conj,vector<double> intervalos_t,vector<double> interv
 	}
 	
 	//genero conjuntos de salida del voltaje.
-	for(int i=0;i<cant_conj;i++){
+	
+	
+	//cargo los triangulos:
+	for(int i=0;i<(intervalos_v.size()/2);i++) { 
 		aux.left=intervalos_v[2*i];
 		aux.right=intervalos_v[2*i+1];
 		aux.calcular_centro();
 		this->conjuntos_v.push_back(aux);
 	}
+	
 	
 	//inicializo la temperatura exterior segun la figura que esta en la guia cada 10 minuto cambia cada valor representa 10 segundos
 	for(int i=0;i<6;i++) { 
@@ -80,10 +96,10 @@ void Sistema::Simular_sincontrol(){
 }
 
 void Sistema::graficar_conjuntos(){
-	crear_dat_conjuntos(this->conjuntos_temp,"conjuntos.dat");
-	ostringstream sp;
-	sp<<"plot \"conjuntos.dat\" with lines";
-	plotter(sp.str());
+	crear_dat_conjuntos(this->conjuntos_temp,"conjunto_t.dat");
+	crear_dat_conjuntos(this->conjuntos_i,"conjunto_i.dat");
+	crear_dat_conjuntos(this->conjuntos_v,"conjunto_v.dat");
+	///<to do Graficar con GNUPLOT
 }
 
 void Sistema::graficar(vector<double> &T){
@@ -97,71 +113,10 @@ void Sistema::graficar(vector<double> &T){
 }
 
 void Sistema::Simular_concontrol(){
-	vector<int> indice_conj;
-	double memb,ti;
-	double c;///< aqui guardare el valor del centroide
-
-	///<Rutina Principal
-	///<calcular conjunto y grado de membresia de los conjuntos de entrada (guardo num_conjunto, grado_membresia);
+	///< Para la simulacion hacemos lo siguiente:
+	///< tomamos la temperatura de refencia y la restamos de la temperatura exterior(entrada) Text-Tr=n
+	///< Si n<0 tengo que prender la calefaccion (i:corriente)
+	///< Si n>0 tengo que prender la refrigeracion (v: voltaje);
 	
-	this->temp_int_cc.push_back(20); ///< to do provisorio. 
-	///
-	bool regla_i=false; ///< indica si tengo que usar la regla de inferencia de la corriente caso contrario uso la del voltaje
-	for(int i=1;i<this->temp_ext.size();i++) {
-		double *T=&(this->temp_int_cc[i-1]); ///< valor de la temperatura anterior
-		///<calculo los conjuntos a los cuales pertenece y la membresia de los mismos
-		for(int j=0;j<this->conjuntos_temp.size();j++) { 
-			if(this->conjuntos_temp[j].pertenece(*T)){ ///< si pertenece al conjunto j calculo el grado de membresia
-				memb=this->conjuntos_temp[j].calcular_degree(*T);
-				if(j==1 || j==2) regla_i=true; ///<las inferencias se hacen sobre la tabla de corriente
-				if(regla_i){
-					//cout<<"entre en la corriente"<<endl;
-					indice_conj.push_back(this->Temp_i.at(j));///<guardo el indice del conjunto de la corriente 
-					//cout<<indice_conj.back()<<endl;
-					conjuntos_i[indice_conj.back()].calcular_bc(memb); ///<calculo el trapezoide correspondiente con el mismo grado de membresia
-				}
-				else{
-					indice_conj.push_back(this->Temp_v[j]);
-					conjuntos_v[indice_conj.back()].calcular_bc(memb); ///<calculo el trapezoide correspondiente con el mismo grado de membresia
-				}
-			}
-		}
-		
-		cout<<"temperatura de entrada "<<*T<<" indices"<<endl;
-		for(size_t i=0;i<indice_conj.size();i++) { 
-			cout<<indice_conj[i]<<endl;
-		}
-		//cout<<"LLego"<<endl;
-		if(regla_i){ cout<<"llego"<<endl;
-			c=calcular_centroide(conjuntos_i[indice_conj.at(0)].A,conjuntos_i[indice_conj.at(1)].A); cout<<c;
-			if(this->puerta_abierta==i){
-				ti=0.169*this->temp_int_cc.at(i-1)+0.831*this->temp_ext.at(i)+0.112*pow(c,2);
-				this->temp_int_cc.push_back(ti);
-				cout<<ti;
-			}
-			else{
-				ti=0.912*this->temp_int_cc.at(i-1)+0.088*this->temp_ext.at(i)+0.604*pow(c,2);
-				this->temp_int_cc.push_back(ti);
-			}
-		}
-		else{
-			c=calcular_centroide(conjuntos_v[indice_conj[0]].A,conjuntos_v[indice_conj[1]].A);
-			if(this->puerta_abierta==i){
-				ti=0.169*this->temp_int_cc.at(i-1)+0.831*this->temp_ext.at(i)-0.002*c;
-				this->temp_int_cc.push_back(ti);
-			}
-			else{
-				ti=0.912*this->temp_int_cc.at(i-1)+0.088*this->temp_ext.at(i)-0.1021*c;
-				this->temp_int_cc.push_back(ti);
-			}
-		}
-		//cout<<"LLego"<<endl;
-		///termina una iteracion 
-		regla_i=false; ///< la vuelvo a falso
-		indice_conj.clear(); ///<borro los indices viejos
-		
-		
-		
 	
-	}
 }

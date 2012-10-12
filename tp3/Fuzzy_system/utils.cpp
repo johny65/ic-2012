@@ -181,12 +181,23 @@ void crear_dat_conjuntos(vector<triangulo> &v, const char *name)
 	std::ostringstream ss;
 	ofstream out(name, ios::trunc);
 	vector<triangulo>::iterator q=v.begin();
+	
+	
+	//guardo los triangulos interiores completos
 	while(q!=v.end()){
-		ss << (*q).left << " " << 0.0<< "\n";
-		ss << (*q).center << " " << 1.0 << "\n";
-		ss << (*q).right << " " << 0.0 << "\n";
+		if(q+1==v.end()){
+			ss << (*q).left << " " << 0.0<< "\n";
+			ss << (*q).center << " " << 1.0 << "\n";
+		}
+		else{
+			ss << (*q).left << " " << 0.0<< "\n";
+			ss << (*q).center << " " << 1.0 << "\n";
+			ss << (*q).right << " " << 0.0 << "\n";
+		}
 		q++;
 	}
+
+	
 	out<<ss.str();
 	out.close();
 }

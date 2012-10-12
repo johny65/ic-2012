@@ -32,7 +32,7 @@ private:
 	void graficar(vector<double> &T);
 
 public:
-	Sistema(int, vector<double>,vector<double>,vector<double> ); ///< cant_conjuntos: cant de triangulos borrosos, min: rango de temp minimo, max:rango de tem maximo
+	Sistema(vector<double>,vector<double>,vector<double> ); ///< cant_conjuntos: cant de triangulos borrosos, min: rango de temp minimo, max:rango de tem maximo
 	~Sistema();
 	
 	void Simular_sincontrol();
