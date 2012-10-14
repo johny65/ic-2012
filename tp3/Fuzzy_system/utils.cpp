@@ -10,6 +10,57 @@
 
 using namespace std;
 
+
+/**
+ * @brief Calcula el punto centro del triángulo (en el eje x).
+ */
+void triangulo::calcular_centro(){
+	double r=(this->right-this->left)/2;
+	this->center=this->left+r;
+}
+
+
+/**
+ * @brief Devuelve si un punto `x` está dentro del triángulo (en el eje x).
+ */
+bool triangulo::pertenece(double x){
+	if(x<this->right && x>this->left)
+		return true;
+	else return false;
+}
+
+
+/**
+ * @brief Trunca el triángulo a una altura `degree` (queda un trapecio).
+ */
+void triangulo::calcular_bc(double degree){
+	double m1=1/(this->center-this->left);
+	double m2=1/(this->center-this->right);
+	this->A.a=this->left;
+	this->A.b=(degree+this->left*m1)/m1;
+	this->A.c=(degree+this->right*m2)/m2;
+	this->A.d=this->right;
+	this->A.degree=degree;
+}
+
+/**
+ * @brief Calcula el grado de activación de un punto `x`.
+ */
+double triangulo::calcular_degree(double &x){
+	if (!pertenece(x))
+		return 0.0;
+	double m;//pendiente
+	if(x>this->center){
+		m=(this->right-this->center);
+		return (1+(this->center-x)/m);
+	}
+	else{
+		m=(this->center-this->left);
+		return ((x-this->left)/m);			
+	}
+
+}
+
 vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
 {
 	vector< vector<double> > todo;
@@ -36,46 +87,6 @@ vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
 	}
 	return todo;
 }
-
-
-void triangulo::calcular_centro(){
-	double r=(this->right-this->left)/2;
-	this->center=this->left+r;
-}
-
-bool triangulo::pertenece(double x){
-	if(x<this->right && x>this->left)
-		return true;
-	else return false;
-}
-
-void triangulo::calcular_bc(double degree){
-	double m1=1/(this->center-this->left);
-	double m2=1/(this->center-this->right);
-	this->A.a=this->left;
-	this->A.b=(degree+this->left*m1)/m1;
-	this->A.c=(degree+this->right*m2)/m2;
-	this->A.d=this->right;
-	this->A.degree=degree;
-	
-}
-
-double triangulo::calcular_degree(double &x){
-		double m;//pendiente
-		if(x>this->center){
-			m=(this->right-this->center);
-	
-			return (1+(this->center-x)/m);
-		}
-		else{
-			
-			m=(this->center-this->left);
-	
-			return ((x-this->left)/m);			
-		}
-
-}
-
 
 vector< vector<double> > leer_csv(const char *archivo)
 {
@@ -143,41 +154,6 @@ void guardar_csv(const char *file, vector< vector<double> > &datos)
 	out.close();
 }
 
-void pesos_a_archivo(vector< vector<double> > pesos){
-	ofstream out("pesos.txt", ios::app);
-	std::ostringstream aux;
-	for (size_t i=0; i<pesos.size(); i++){
-		for (size_t j=0; j< pesos[i].size(); j++){
-				aux<<pesos[i][j]<<" ";
-		}
-		aux<<endl;
-	}
-	aux<<endl;
-	out<<aux.str();
-	out.close();
-}
-
-// Cargar los pesos de un Archivo a una red
-
-vector< vector<double> > pesos_desde_archivo(const char * archivo){
-	vector< vector<double> > pesos;
-	vector<double> aux;
-	ifstream in(archivo);
-	string linea, temp;
-	double val;
-	while (getline(in, linea)){
-		stringstream ss(linea);
-		while(getline(ss, temp, ' ')){
-			stringstream ss2(temp);
-			ss2>>val;
-			aux.push_back(val);
-		}
-		pesos.push_back(aux);
-		aux.clear();
-	}
-	return pesos;
-}
-
 
 void crear_dat_conjuntos(vector<triangulo> &v, const char *name)
 {
@@ -210,7 +186,14 @@ double calcular_centroide(trapezoide A,trapezoide B){
 	double centro_A=A.b+(A.c-A.b)/2;
 	double centro_B=B.b+(B.c-B.b)/2;
 	double c=(A.degree*(A.c-A.a)*centro_A+B.degree*(B.c-B.a)*centro_B)/(A.degree*(A.c-A.a)+B.degree*(B.c-B.a));
-	return c;
+
+	double cA = (A.d - A.a)+A.a;
+	double cB = (B.d - B.a)+B.a;
+	double r = cA * A.degree + cB * B.degree;
+	r /= (A.degree + B.degree);
+
+	cout<<"C andrés: "<<c<<" R mío: "<<r<<endl;
+	return r;
 }
 
 double calcular_centroide_unico(triangulo A){
