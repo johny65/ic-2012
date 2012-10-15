@@ -187,13 +187,7 @@ double calcular_centroide(trapezoide A,trapezoide B){
 	double centro_B=B.b+(B.c-B.b)/2;
 	double c=(A.degree*(A.c-A.a)*centro_A+B.degree*(B.c-B.a)*centro_B)/(A.degree*(A.c-A.a)+B.degree*(B.c-B.a));
 
-	double cA = (A.d - A.a)+A.a;
-	double cB = (B.d - B.a)+B.a;
-	double r = cA * A.degree + cB * B.degree;
-	r /= (A.degree + B.degree);
-
-	cout<<"C andrés: "<<c<<" R mío: "<<r<<endl;
-	return r;
+	return c;
 }
 
 double calcular_centroide_unico(triangulo A){
