@@ -21,7 +21,6 @@ using namespace std;
 
 class Sistema {
 private:
-	bool dibujar_conjuntos;
 	vector<triangulo> conjuntos_i; ///< conjuntos pertenecientes a la corriente i
 	vector<triangulo> conjuntos_v; ///< conjuntos pertenecientes al voltaje v
 

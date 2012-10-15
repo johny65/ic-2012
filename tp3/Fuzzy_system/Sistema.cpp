@@ -5,8 +5,8 @@
 #include "Sistema.h"
 
 //para reducir código:
-#define ifthen_corriente(x, y, z) regla_corriente(x, y, z, this->temp_ext[i], n, escalados)
-#define ifthen_voltaje(x, y, z) regla_voltaje(x, y, z, this->temp_ext[i], n, escalados)
+#define ifthen_corriente(x, y, z) regla_corriente(x, y, z, this->temp_ext[i], n, truncados)
+#define ifthen_voltaje(x, y, z) regla_voltaje(x, y, z, this->temp_ext[i], n, truncados)
 
 
 using namespace std;
@@ -17,8 +17,7 @@ using namespace std;
  * 2*cant conjuntos, contiene los valores left y right de los triangulos)
  */
 Sistema::Sistema(vector<double> &intervalos_i, vector<double> &intervalos_v,
-	vector<double> &intervalos_te, vector<double> &intervalos_var) :
-dibujar_conjuntos(false)
+	vector<double> &intervalos_te, vector<double> &intervalos_var)
 {
 	srand(time(NULL));
 
@@ -137,7 +136,7 @@ void Sistema::Simular_concontrol()
 		//}
 		if(n<0){ //debo activar la calefaccion
 			n=fabs(n);
-			vector<trapezoide> escalados;
+			vector<trapezoide> truncados;
 
 			//ifthen_corriente: TEMP.EXTERNA, VARIACIÓN INT-REF -> CORRIENTE
 			
@@ -155,13 +154,13 @@ void Sistema::Simular_concontrol()
 			ifthen_corriente(ALTA, MUCHISIMA, ALTA);
 			
 			//defuzzyficar:
-			corriente = Defuzzification(escalados);
+			corriente = Defuzzification(truncados);
 			volt = 0.0;
 		}
 		else if(n>0){//debo activar la refrigeracion
 		
 			n=fabs(n);
-			vector<trapezoide> escalados;
+			vector<trapezoide> truncados;
 
 			//ifthen_voltaje: TEMP.EXTERNA, VARIACIÓN INT-REF -> VOLTAJE
 			
@@ -179,7 +178,7 @@ void Sistema::Simular_concontrol()
 			ifthen_voltaje(ALTA, MUCHISIMA, ALTA);
 
 			//defuzzyficar:
-			volt = Defuzzification(escalados);
+			volt = Defuzzification(truncados);
 			corriente = 0.0;
 
 		}
