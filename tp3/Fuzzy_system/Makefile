@@ -4,12 +4,12 @@ FLAGS= -g2 -Wall -O0 -D_DEBUG
 LIBS=
 OBJS=obj/main.o obj/Sistema.o obj/utils.o 
 
-all: Debug obj Debug/fuzzy
+all: Debug obj Debug/fuzzy.bin
 
 clean:
 	rm -rf ${OBJS} Debug/Fuzzy_system.bin
 
-Debug/fuzzy: ${OBJS}
+Debug/fuzzy.bin: ${OBJS}
 	${GPP} ${OBJS} ${LIBS} -o $@
 
 Debug:
