@@ -18,6 +18,12 @@ using namespace std;
 #define MEDIA 1
 #define ALTA 2
 
+#define MUYPOCO 0
+#define POCO 1
+#define MEDIO 2
+#define ALTO 3
+#define MUYALTO 4
+
 
 class Sistema {
 private:

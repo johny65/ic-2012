@@ -87,9 +87,10 @@ void guardar_csv(const char *file, vector< vector<double> > &datos);
 */
 void crear_dat_conjuntos(vector<triangulo> &v, const char *name);
 
+void crear_dat_trapecios(vector<trapezoide> &v, const char *name);
 
-/**
-*/
+
+
 double calcular_centroide(trapezoide A,trapezoide B);
 
 double calcular_centroide_unico(triangulo A);

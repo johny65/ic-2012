@@ -140,22 +140,25 @@ void Sistema::Simular_concontrol()
 
 			//ifthen_corriente: TEMP.EXTERNA, VARIACIÓN INT-REF -> CORRIENTE
 			
-			ifthen_corriente(BAJA, POCA, MEDIA);
-			ifthen_corriente(BAJA, MEDIANA, MEDIA);
-			ifthen_corriente(BAJA, MUCHA, ALTA);
-			ifthen_corriente(BAJA, MUCHISIMA, ALTA);
-			ifthen_corriente(MEDIA, POCA, BAJA);
-			ifthen_corriente(MEDIA, MEDIANA, MEDIA);
-			ifthen_corriente(MEDIA, MUCHA, ALTA);
-			ifthen_corriente(MEDIA, MUCHISIMA, ALTA);
-			ifthen_corriente(ALTA, POCA, BAJA);
-			ifthen_corriente(ALTA, MEDIANA, BAJA);
-			ifthen_corriente(ALTA, MUCHA, MEDIA);
-			ifthen_corriente(ALTA, MUCHISIMA, ALTA);
+			ifthen_corriente(BAJA, POCA, MEDIO);
+			ifthen_corriente(BAJA, MEDIANA, MEDIO);
+			ifthen_corriente(BAJA, MUCHA, ALTO);
+			ifthen_corriente(BAJA, MUCHISIMA, MUYALTO);
+			ifthen_corriente(MEDIA, POCA, POCO);
+			ifthen_corriente(MEDIA, MEDIANA, MEDIO);
+			ifthen_corriente(MEDIA, MUCHA, ALTO);
+			ifthen_corriente(MEDIA, MUCHISIMA, MUYALTO);
+			ifthen_corriente(ALTA, POCA, POCO);
+			ifthen_corriente(ALTA, MEDIANA, MEDIO);
+			ifthen_corriente(ALTA, MUCHA, ALTO);
+			ifthen_corriente(ALTA, MUCHISIMA, MUYALTO);
+			
 			
 			//defuzzyficar:
 			corriente = Defuzzification(truncados);
-			volt = 0.0;
+			if (corriente > 1e-7)
+				volt = 0.0;
+		
 		}
 		else if(n>0){//debo activar la refrigeracion
 		
@@ -164,22 +167,24 @@ void Sistema::Simular_concontrol()
 
 			//ifthen_voltaje: TEMP.EXTERNA, VARIACIÓN INT-REF -> VOLTAJE
 			
-			ifthen_voltaje(BAJA, POCA, BAJA);
-			ifthen_voltaje(BAJA, MEDIANA, BAJA);
-			ifthen_voltaje(BAJA, MUCHA, MEDIA);
-			ifthen_voltaje(BAJA, MUCHISIMA, MEDIA);
-			ifthen_voltaje(MEDIA, POCA, MEDIA);
-			ifthen_voltaje(MEDIA, MEDIANA, MEDIA);
-			ifthen_voltaje(MEDIA, MUCHA, ALTA);
-			ifthen_voltaje(MEDIA, MUCHISIMA, ALTA);
-			ifthen_voltaje(ALTA, POCA, ALTA);
-			ifthen_voltaje(ALTA, MEDIANA, ALTA);
-			ifthen_voltaje(ALTA, MUCHA, ALTA);
-			ifthen_voltaje(ALTA, MUCHISIMA, ALTA);
+			ifthen_voltaje(BAJA, POCA, POCO);
+			ifthen_voltaje(BAJA, MEDIANA, MEDIO);
+			ifthen_voltaje(BAJA, MUCHA, ALTO);
+			ifthen_voltaje(BAJA, MUCHISIMA, MUYALTO);
+			ifthen_voltaje(MEDIA, POCA, POCO);
+			ifthen_voltaje(MEDIA, MEDIANA, MEDIO);
+			ifthen_voltaje(MEDIA, MUCHA, ALTO);
+			ifthen_voltaje(MEDIA, MUCHISIMA, MUYALTO);
+			ifthen_voltaje(ALTA, POCA, MUYALTO);
+			ifthen_voltaje(ALTA, MEDIANA, MUYALTO);
+			ifthen_voltaje(ALTA, MUCHA, MUYALTO);
+			ifthen_voltaje(ALTA, MUCHISIMA, MUYALTO);
+			
 
 			//defuzzyficar:
 			volt = Defuzzification(truncados);
-			corriente = 0.0;
+			if (volt > 1e-6)
+				corriente = 0.0;
 
 		}
 		
@@ -242,8 +247,9 @@ trapezoide Sistema::verificar_regla(int A1, int A2, int C, char c, double a1, do
 		conjunto3 = this->conjuntos_v.at(C);
 
 	conjunto3.calcular_bc(comp);
-	//cout<<"Para n="<<a2<<" se activó el conjunto "<<A2<<" con "<<activacion2<<endl;
-	//cout<<"Para TE="<<a1<<" se activó el conjunto "<<A1<<" con "<<activacion1<<endl;
+	cout<<"Para n="<<a2<<" se activó el conjunto "<<A2<<" con "<<activacion2<<endl;
+	cout<<"Para TE="<<a1<<" se activó el conjunto "<<A1<<" con "<<activacion1<<endl;
+	cout<<"El conjunto de salida activado es el "<<C<<(c == 'i' ? "(corriente)" : "(voltaje)")<<endl;
 	
 	return conjunto3.A;
 	
@@ -332,14 +338,20 @@ double Sistema::Defuzzification(vector<trapezoide> &v)
 {
 	double a = 0.0, b = 0.0;
 	for (size_t i=0; i<v.size(); ++i){
-		if (v[i].degree != 0.0){ //regla activada
+		//if (v[i].degree != 0.0){ //regla activada
+			//cout<<"Altura trapecio "<<i<<": "<<v[i].degree<<endl;
 			double centro = (v[i].d - v[i].a)/2.0 + v[i].a;
 			a += centro * v[i].degree;
 			b += v[i].degree;
-		}
+		//}
 	}
 	if (b == 0.0) return 0.0;
-	return a/b;
+	double y = a/b;
+	cout<<"Salida calculada: "<<y<<endl;
+	//crear_dat_trapecios(v, "trapecios.dat");
+	//plotter("plot \"trapecios.dat\" with lines");
+	//cin.get();
+	return y;
 }
 
 

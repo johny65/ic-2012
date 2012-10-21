@@ -181,6 +181,19 @@ void crear_dat_conjuntos(vector<triangulo> &v, const char *name)
 	out.close();
 }
 
+void crear_dat_trapecios(vector<trapezoide> &v, const char *name)
+{
+	std::ostringstream ss;
+	ofstream out(name, ios::trunc);
+	for (size_t i=0; i<v.size(); ++i){
+		ss<<v[i].a<<" 0"<<endl;
+		ss<<v[i].b<<" "<<v[i].degree<<endl;
+		ss<<v[i].c<<" "<<v[i].degree<<endl;
+		ss<<v[i].d<<" 0"<<endl;
+	}
+	out<<ss.str();
+	out.close();
+}
 
 double calcular_centroide(trapezoide A,trapezoide B){
 	double centro_A=A.b+(A.c-A.b)/2;
