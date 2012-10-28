@@ -26,7 +26,7 @@ Poblacion crear(int n, int l)
             s[j] = (r%2 ? '0' : '1');
         }
         s[l] = '\0';
-        res[i] = s;
+        res[i].cromosoma = s;
         delete[] s;
     }
     return res;
@@ -52,4 +52,39 @@ void mutar(Cromosoma &a)
 {
     int r = rand()%a.size();
     a[r] = (a[r] == '0' ? '1' : '0');
+}
+
+Poblacion seleccionar(Poblacion &vieja)
+{
+    const int N = 5;
+
+    int maxfit = 0, maxind = 0;
+    
+    Poblacion nueva(vieja.size());
+    for (size_t i=0; i<nueva.size(); ++i){
+        for (int j=0; j<N; ++j){
+            int r = rand()%vieja.size();
+            Individuo &seleccionado = vieja[r];
+            if (seleccionado.fitness > maxfit){
+                maxfit = seleccionado.fitness;
+                maxind = r;
+            }
+        }
+        nueva[i] = vieja[maxind];
+    }
+
+    return nueva;
+}
+
+int bin2int(Cromosoma &c)
+{
+    int l = c.length() - 2;
+    int res = 0;
+    while (l >= 0){
+        if (c.at(c.length() - 1 - l) == '1')
+            res += pow(2, l);
+        l--;
+    }
+    if (c[0] == '1') res *= -1;
+    return res;
 }

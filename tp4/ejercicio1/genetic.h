@@ -15,13 +15,27 @@ using namespace std;
  * Las funciones están hechas asumiendo que los alelos disponibles son '0' y '1'
  * (es decir cadenas binarias).
  */
- 
+
 typedef char Gen;
 typedef string Cromosoma;
-typedef vector<Cromosoma> Poblacion;
+
+class Individuo {
+public:
+    Cromosoma cromosoma;
+    double fitness;
+    
+    Individuo() : fitness(0.0) {}
+    bool operator< (const Individuo &i) const { return fitness < i.fitness; }
+};
+
+typedef vector<Individuo> Poblacion;
 
 Poblacion crear(int n, int l);
 void cruzar(Cromosoma &a, Cromosoma &b);
 void mutar(Cromosoma &a);
+Poblacion seleccionar(Poblacion &vieja);
 
+int bin2int(Cromosoma &c);
+
+    
 #endif
