@@ -23,8 +23,10 @@ Particula::Particula(double ac1,double ac2,vector<pair<double,double> > rango,in
 	int dim=rango.size(); ///<dimension del problema a resolver
 	
 	//inicializo las posiciones en el rango correspondiente
+	
 	for(int i=0;i<dim;i++) { 
-		double p=rango[i].first+rand()%((int) rango[i].second);
+		int sep=abs(rango[i].second-rango[i].first);
+		double p=rango[i].first+rand()%(sep);
 		this->Pos.push_back(p);
 	}
 	
