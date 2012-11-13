@@ -7,7 +7,7 @@ using namespace std;
 
 int main (int argc, char *argv[]) {
 	RBFNetwork red;
-	red.setear_arquitectura(2, 1);
+	red.setear_arquitectura(10, 1);
 	red.entrenar("xorvar.csv");
 	red.probar("xorvar.csv");
 	cin.get();

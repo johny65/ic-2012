@@ -16,11 +16,11 @@ current_source=Perceptron.cpp
 path_char=/
 [source]
 path=main.cpp
-cursor=1017
+cursor=474
 open=true
 [source]
 path=Perceptron.cpp
-cursor=668
+cursor=3419
 open=true
 [source]
 path=func.cpp
@@ -53,9 +53,9 @@ path=bin/error.dat
 cursor=41076
 [config]
 name=Debug
-working_folder=
+working_folder=bin
 always_ask_args=0
-args=
+args=-e "tabla_OR.csv"
 wait_for_key=2
 temp_folder=Debug
 output_file=bin/ejercicio1

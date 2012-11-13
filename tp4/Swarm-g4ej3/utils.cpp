@@ -138,3 +138,27 @@ vector< vector<double> > pesos_desde_archivo(const char * archivo){
 	}
 	return pesos;
 }
+
+
+
+void crear_datos(vector<Particula> &S,vector<double> &fit, const char *name){
+	std::ostringstream ss;
+	ofstream out(name, ios::trunc);
+	for(int i=0;i<S.size();i++) { //Para cada vecindad genero un archivo con namei donde i=1,2,3... 
+		vector<double> P=S[i].get_Pos();
+		for(int k=0;k<P.size();k++) { 
+				ss<<P[k]<<" ";
+			}
+		ss<<fit[i]<<" \n";
+	}
+
+	
+	
+	out<<"# archivo temporal usado para graficar posicion de las particulas en gnuplot\n";
+	out<<ss.str();
+	out.close();
+	
+}
+
+
+

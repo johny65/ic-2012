@@ -2,8 +2,14 @@
 #include <cstdlib>
 #include "func.h"
 #include <vector>
+#include <iostream>
 using namespace std;
-
+void mostrar(vector<double> x){
+	for(size_t i=0;i<x.size();i++) { 
+		cout<<x[i]<<", ";
+	}
+	cout<<endl;
+}
 Particula::Particula(double ac1,double ac2,vector<pair<double,double> > rango,int v0){
 	/**
 	* @param ac1: aceleracion c1;
@@ -32,7 +38,9 @@ Particula::Particula(double ac1,double ac2,vector<pair<double,double> > rango,in
 	
 	//incializacion de la velocidad
 	if(v0==0){//inicializo la velocidad igual a la posicion inicial
-		this->Vel=this->Pos;
+		for(int i=0;i<dim;i++) { 
+			this->Vel.push_back(0);
+		}
 	}
 	else{//incializo la velocidad con un numero aletorio entre 0 y v0
 		for(int i=0;i<dim;i++) { 
@@ -52,16 +60,25 @@ Particula::~Particula() {
 
 
 void Particula::actualizar_vel(vector<double> best_local){
+//	this->r1=(rand()%100)/100.0;
+//	this->r2=(rand()%100)/100.0;
 	vector<double> dml=dif(this->best_pers,this->Pos);
 	vector<double> dmg=dif(best_local,this->Pos);
-	for(int i=0;i<this->Vel.size();i++) { 
-		Vel[i]+=c1*r1*dml[i]+c2*r2*dmg[i];
+	//double coef1=c1*r1, coef2=c2*r2;
+//	cout<<"muestro la componente individual "<<endl; mostrar(dml);
+//	cout<<"muestro la componente grupal "<<endl; mostrar(dmg);
+	
+	//this->Vel=sum(this->Vel,sum(prod_escalar(dml,coef1),prod_escalar(dmg,coef2)));
+	for(size_t i=0;i<Vel.size();i++) { 
+		Vel[i]=Vel[i]+c1*dml[i]+c2*dmg[i];
 	}
+//	cout<<"Muestro como se actualiza la velocidad "<<endl;
+//	mostrar(this->Vel);
 	
 } 
 
 void Particula::actualizar_pos(){
-	for(int i=0;i<this->Pos.size();i++) { 
+	for(size_t i=0;i<this->Pos.size();i++) { 
 		Pos[i]+=Vel[i];
 	}
 
@@ -78,3 +95,10 @@ vector<double>Particula::get_best_pers(){
 	return this->best_pers;
 }
 
+double Particula::get_fitness(){
+	return this->fitness;
+}
+
+void Particula::set_fitness(double f){
+	this->fitness=f;
+}

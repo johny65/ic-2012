@@ -3,15 +3,19 @@
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
+#include <sstream>
+#include "utils.h"
+#include <limits>
 using namespace std;
 
-void mostrar(vector<double> x){
+template <class T>
+void mostrar(vector<T> x){
 	for(size_t i=0;i<x.size();i++) { 
 		cout<<x[i]<<", ";
 	}
 }
 
-Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double> > rango, int v0) {
+Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double> > rango, int v0, int overlap) {
 	/**
 	@param cant_p: cantidad de particulas
 	@param cant_v: cantidad de vecindades
@@ -19,41 +23,62 @@ Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double
 	@param c2: aceleracion respecto a la mejor pos local (vencindad)
 	@param rango: rango de inicializacion x-min, xmax del problema extendible a n-dimensiones
 	@param v0: intero entre 0-100 para realizar una inicializacion aletoria de la velocidad ~U(0,v0)
+	@param overlap: numero de particulas solapadas
 	*/
 	srand(time(NULL));
 	int cantxv=cant_p/cant_v; //cantidad de particulas por vecindad
-	//cout<<"cant x vecindad "<<cantxv<<endl;
-	for(int i=0;i<cant_v;i++) { 
-			vector<Particula> A;
-			for(int j=0;j<cantxv;j++) { 
-				
-				//aca podria cambiar c1 y c2 para hacerlo diferente para cada particula o cambiarlo arriba para que varie por cada vecindad 
-				Particula P(c1,c2,rango,v0);
-				A.push_back(P);
-			}
-			this->Enjambre.push_back(A);
+	
+	for(int i=0;i<cant_v;i++) { //Inicializo las particulas 
+		set<int> temp; //guarda la vecindad
+		for(int j=0;j<cantxv;j++) { 
+			//aca podria cambiar c1 y c2 para hacerlo diferente para cada particula o cambiarlo arriba para que varie por cada vecindad 
+			Particula P(c1,c2,rango,v0);
+			this->Enjambre.push_back(P);
+			temp.insert(temp.end(),i*cantxv+j);
 		}
-//
-//		//agregar los restantes a la ultima vecindad si cantxv no da exacto.
-		int parada=cantxv*cant_v;
-		if(parada!=cant_p && this->Enjambre.at(0).size()!=cant_p){ 
-			parada=cant_p-parada;
-			for(int i=0; i<parada; i++){
-				Particula P(c1,c2,rango,v0);
-				this->Enjambre[i].push_back(P);
-			}
-		}
-
-		
-
-		
-		//inicializo las mejores posiciones en las vecindades igual a la posicion de la primera particula en cada vecindad
-		for(int i=0;i<cant_v;i++) { 
-			this->bestxvec.push_back(this->Enjambre[i][0].get_Pos());
-		}
-		cout<<"Posiciones iniciales "<<endl;
-		mostrar_posiciones();	
+		this->Vecindad.push_back(temp);
 	}
+	
+	//Para cada conjuntos C tomo un numero igual a overlap y se los agrego al conjunto siguiente
+	for(int i=(this->Vecindad.size()-1);i>0;i--) { 
+		set<int>::iterator q=this->Vecindad[i].begin();
+		for(int j=0;j<overlap;j++) { 
+			this->Vecindad.at(i-1).insert(*q);
+			q++;
+		}
+	}
+	
+	//falta solapar 0 con el final lo hago aqui
+	set<int>::iterator q=this->Vecindad[0].begin();
+	for(int j=0;j<overlap;j++) { 
+		this->Vecindad.at(cant_v-1).insert(*q);
+		q++;
+	}
+
+	//Inicializo el mejor por vecidad
+	for(int i=0;i<this->Vecindad.size();i++) { 
+		this->bestxvec.push_back(*(this->Vecindad[i].begin()));
+	}
+	//cout<<"Posiciones iniciales "<<endl;
+//	mostrar_posiciones();	
+}
+
+void Swarm::mejores_pos_vecindad(int id){
+	for(int i=0;i<this->Vecindad.size();i++) { 
+		set<int>::iterator q=Vecindad[i].begin();
+		int mejor=*q; 
+		double m_fitness=fitness(id,this->Enjambre.at(mejor).get_Pos());
+		q++;
+		while(q!=Vecindad[i].end()){
+			if(fitness(id,this->Enjambre.at(*q).get_Pos())<m_fitness){
+				m_fitness=fitness(id,this->Enjambre.at(*q).get_Pos());
+				mejor=*q;
+			}
+			q++;
+		}
+		this->bestxvec.push_back(mejor);
+	}
+}
 Swarm::~Swarm() {
 	
 }
@@ -70,9 +95,9 @@ double Swarm::fitness(int id, vector<double> P){
 	
 	
 	switch(id){
-	case 1: if(abs(x)>512) z=10000; else z=-x*sin(sqrt(abs(x)));
+	case 1: if(abs(x)>512) z=500; else z=-x*sin(sqrt(abs(x)));
 		break;
-	case 2: z=x + 5*sin(3*x) + 8*cos(5*x);
+	case 2: if(x<0 or x>20) z=10000; else z=x + 5*sin(3*x) + 8*cos(5*x);
 		break;
 	case 3: int y=P[1]; z= pow(pow(x,2)+pow(y,2),0.25)*(pow(sin(50*(pow(pow(x,2)+pow(y,2),0.1))),2)+1);
 		break;
@@ -80,64 +105,158 @@ double Swarm::fitness(int id, vector<double> P){
 	return z;
 }
 
-void Swarm::Volar(int max_it,int id){
+void Swarm::Volar(int max_it,int id, bool vis){
 	/**
 	@param max_it: maximo num de iteraciones
 	@param id: identificador de la funcion de fitness
 	*/
 	int i=0;
-	vector<double> pos_a, best_pp;
+	vector<double> pos_a, best_pp, best_vec; //pos_a: posicion actual; best_pp: mejor posicion personal lograda; best_vec: mejor de la vecindad
+	//Cargo todos los fitness de las posiciones iniciales
+	for(int i=0;i<this->Enjambre.size();i++) { 
+		this->func_obj.push_back(fitness(id, this->Enjambre[i].get_Pos()));
+		cout<<this->func_obj.at(i)<<endl;
+	}
+	
+	//mostrar_posiciones(id);
+	
+	double mejor_i_ant=500; //mejor de la iteracion anterior para calcular pendiente
+	double mejor_a; //mejor actual;
 	while (i<max_it){
-		cout<<"iteracion "<<i+1<<endl;
-		for(size_t j=0;j<this->Enjambre.size();j++) { 
-			for(size_t k=0;k<this->Enjambre[j].size();k++) { 
+		
+		for(size_t j=0;j<this->Vecindad.size();j++) {//Para cada vecindad 
+			set<int>::iterator q=this->Vecindad[j].begin();
+			while(q!=this->Vecindad[j].end()){
 				
-				pos_a=this->Enjambre.at(j).at(k).get_Pos(); //posicion actual de la particula
-				best_pp=this->Enjambre.at(j).at(k).get_best_pers(); //mejor posicion personal obtenida por la particula
+				int mejor_vecindad=this->bestxvec[j];
+				best_vec=this->Enjambre[mejor_vecindad].get_Pos();
+				
+				//pos_a=this->Enjambre.at(*q).get_Pos(); //posicion actual de la particula
+				best_pp=this->Enjambre.at(*q).get_best_pers(); //mejor posicion personal obtenida por la particula
 				
 				//Actualizo la mejor posicion personal de cada particula y calculo la mejor posicion en el vecindario
-				if(fitness(id,pos_a)<fitness(id,best_pp)){
+				if(func_obj.at(*q)<fitness(id,best_pp)){
 					
-					//actualizo la posicion pesonal
-					this->Enjambre[j][k].actualizar_best_pers(pos_a);
+					pos_a=this->Enjambre.at(*q).get_Pos(); //Posicion actual
+					this->Enjambre.at(*q).actualizar_best_pers(pos_a);//actualizo la posicion pesonal
 				}
-				if(fitness(id,pos_a)<fitness(id,this->bestxvec[j])){
+				
+				if(this->func_obj.at(*q)<fitness(id,best_vec)){
 					//actualizo la mejor posicion local (en el vecindario)
-					this->bestxvec[j]=pos_a;
+					this->bestxvec[j]=*q; //actualizo el indice del mejor de la vecindad
 				}
+				q++;
 			}
 		}
-	
-		for(size_t j=0;j<this->Enjambre.size();j++) { 
-			for(size_t k=0;k<this->Enjambre[j].size();k++) { 
+		mostrar_posiciones(id);
+		cout<<"mejor por vecindad "; mostrar(this->bestxvec); cout<<endl;
+		
+		for(size_t j=0;j<this->Vecindad.size();j++) { 
+			int ind_mejor_vecindad=this->bestxvec[j];
+			set<int>::iterator q=this->Vecindad[j].begin();
+			while(q!=this->Vecindad[j].end()) { 
 				//Actulizo la velocidad
-				this->Enjambre[j][k].actualizar_vel(this->bestxvec[j]);
+				this->Enjambre.at(*q).actualizar_vel(this->Enjambre.at(ind_mejor_vecindad).get_Pos());
 				//Actualizo la posicion
-				this->Enjambre[j][k].actualizar_pos();
+				this->Enjambre.at(*q).actualizar_pos();
+				this->Enjambre.at(*q).set_fitness(fitness(id,Enjambre.at(*q).get_Pos()));
+				q++;
 			}
 		}
 		
-			mostrar_posiciones();
-			i+=1;
+		//cout<<"Controlar contra este"<<endl;
+		
+		//recalculo todos los fitness
+		for(int i=0;i<this->Enjambre.size();i++) { 
+			this->func_obj.at(i)=fitness(id, this->Enjambre[i].get_Pos());
+			//cout<<this->func_obj.at(i)<<endl;
+		}
+		if(vis){
+			//mostrar_posiciones(id);	
+			graficar(id);
 		}
 		
-		cout<<"Posiciones finales "<<endl; mostrar_posiciones();
-		for(int i=0;i<this->bestxvec.size();i++) { 
-			mostrar(this->bestxvec.at(i));
-		}
-		///< to do: rutinas de graficacion
-		///< to do: otra condicion de corte
-		
+		mejor_a=*min_element(this->func_obj.begin(),this->func_obj.end());
+		if((mejor_a-mejor_i_ant)/mejor_a<0.1) {cout<<"corto en la iteracion"<<i<<endl; break;}
+			
+		i+=1; //Siguiente iteracion
+			
 	}
+		
+		//cout<<endl<<"Finaliza por cantidad de iteraciones "<<endl<<endl;
+		mostrar_posiciones(id);
+		cout<<"El mejor de todos es "<<*min_element(this->func_obj.begin(),this->func_obj.end());
+		
+		graficar(id);
+	
+		
+}
 
 
-void Swarm::mostrar_posiciones(){
-	for(size_t i=0;i<this->Enjambre.size();i++) { //recorro la vecindad
-		for(size_t j=0;j<this->Enjambre[i].size();j++) {  //recorro las particulas de la vecindad i
-			cout<<"Particula "<<j<<" ";
-			mostrar(this->Enjambre[i][j].get_Pos());
-			cout<<" fitness "<<fitness(1,this->Enjambre[i][j].get_Pos())<<endl;
+//void Swarm::mostrar_mejor_vecindad(int id){
+//	double mejor=10000; int mejor_i, v;
+//	for(size_t j=0;j<this->Vecindad.size();j++) {
+//		int mejor_v=this->bestxvec[j];
+//		if(fitness(id,this->Enjambre[mejor_v].get_Pos())<mejor){
+//			mejor=fitness(id,this->Enjambre[mejor_v].get_Pos());
+//			mejor_i=mejor_v;
+//			v=j;
+//		}
+//		mostrar(this->Enjambre[mejor_v].get_Pos());
+//	}
+//	cout<<endl<<"El mejor de todos es: "<<endl; mostrar(this->Enjambre[mejor_i].get_Pos());
+//}
+//
+//void Swarm::mejores_de_vecindad(int id){
+//	for(size_t j=0;j<this->Vecindad.size();j++) {
+//		int mejor_v=this->bestxvec[j];
+//		set<int>::iterator q=this->Vecindad[j].begin();
+//		while(q!=this->Vecindad[j].end()) { 
+//			if(fitness(id,this->Enjambre.at(*q).get_Pos())<fitness(id,this->Enjambre[mejor_v].get_Pos())){
+//				//actualizo la mejor posicion local (en el vecindario)
+//				this->bestxvec[j]=*q;
+//			}
+//			q++;
+//		}
+//	}
+//}
+void Swarm::mostrar_posiciones(int id){
+	for(size_t i=0;i<this->Vecindad.size();i++) { //recorro la vecindad
+		set<int>::iterator q=this->Vecindad[i].begin();
+		cout<<"Vecindad "<<i<<endl;
+		while(q!=this->Vecindad[i].end()) {  //recorro las particulas de la vecindad i
+			cout<<"Particula "<<*q<<" ";
+			mostrar(this->Enjambre[*q].get_Pos());
+			cout<<" fitness "<<this->func_obj.at(*q)<<endl;
 			//cout<<endl<<"------------------"<<endl;
+			q++;
 		}
 	}
+}
+void Swarm::graficar(int id){
+	stringstream ss;
+	if(id==1){
+//		z=-x*sin(sqrt(abs(x)));
+		ss<<"plot [-512:512]-x*sin(sqrt(abs(x))) \n";
+		crear_datos(this->Enjambre,this->func_obj, "datos");
+		ss<<"replot \"datos\" with points \n";
+
+		
+		}
+	if(id==2){
+//		z=x + 5*sin(3*x) + 8*cos(5*x);
+		ss<<"plot [0:20] x+5*sin(3*x)+8*cos(5*x) \n";
+		crear_datos(this->Enjambre,this->func_obj, "datos");
+		ss<<"replot \"datos\" with points \n";
+	}
+	if(id==3){
+		ss<<"set isosamples 50,50\n"; //números más grandes hacen mejor la gráfica, pero más lento
+		ss<<"set hidden3d\n";
+		ss<<"splot [-100:100][-100:100] (x**2 + y**2)**0.25 * ( sin(50 * (x**2+y**2)**0.1)**2 + 1)\n";
+		crear_datos(this->Enjambre,this->func_obj, "datos");
+		ss<<"replot \"datos\" with points \n";
+	}
+	plotter(ss.str());
+	cin.get();
+	
 }
