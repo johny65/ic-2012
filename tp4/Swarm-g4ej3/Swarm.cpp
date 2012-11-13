@@ -15,6 +15,13 @@ void mostrar(vector<T> x){
 	}
 }
 
+void generar(vector<double> &alet1, vector<double> &alet2){
+	for(size_t i=0;i<alet1.size();i++) { 
+		alet1[i]=rand()/(RAND_MAX+1.0);
+		alet2[i]=rand()/(RAND_MAX+1.0);
+	}
+}
+
 Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double> > rango, int v0, int overlap) {
 	/**
 	@param cant_p: cantidad de particulas
@@ -56,7 +63,7 @@ Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double
 	}
 
 	//Inicializo el mejor por vecidad
-	for(int i=0;i<this->Vecindad.size();i++) { 
+	for(size_t i=0;i<this->Vecindad.size();i++) { 
 		this->bestxvec.push_back(*(this->Vecindad[i].begin()));
 	}
 	//cout<<"Posiciones iniciales "<<endl;
@@ -64,7 +71,7 @@ Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double
 }
 
 void Swarm::mejores_pos_vecindad(int id){
-	for(int i=0;i<this->Vecindad.size();i++) { 
+	for(size_t i=0;i<this->Vecindad.size();i++) { 
 		set<int>::iterator q=Vecindad[i].begin();
 		int mejor=*q; 
 		double m_fitness=fitness(id,this->Enjambre.at(mejor).get_Pos());
@@ -95,9 +102,9 @@ double Swarm::fitness(int id, vector<double> P){
 	
 	
 	switch(id){
-	case 1: if(abs(x)>512) z=500; else z=-x*sin(sqrt(abs(x)));
+	case 1: /*if(abs(x)>512) z=500; else */z=-x*sin(sqrt(abs(x)));
 		break;
-	case 2: if(x<0 or x>20) z=10000; else z=x + 5*sin(3*x) + 8*cos(5*x);
+	case 2: /*if(x<0 or x>20) z=10000; else*/ z=x + 5*sin(3*x) + 8*cos(5*x);
 		break;
 	case 3: int y=P[1]; z= pow(pow(x,2)+pow(y,2),0.25)*(pow(sin(50*(pow(pow(x,2)+pow(y,2),0.1))),2)+1);
 		break;
@@ -113,15 +120,24 @@ void Swarm::Volar(int max_it,int id, bool vis){
 	int i=0;
 	vector<double> pos_a, best_pp, best_vec; //pos_a: posicion actual; best_pp: mejor posicion personal lograda; best_vec: mejor de la vecindad
 	//Cargo todos los fitness de las posiciones iniciales
-	for(int i=0;i<this->Enjambre.size();i++) { 
+	for(size_t i=0;i<this->Enjambre.size();i++) { 
 		this->func_obj.push_back(fitness(id, this->Enjambre[i].get_Pos()));
 		cout<<this->func_obj.at(i)<<endl;
 	}
 	
 	//mostrar_posiciones(id);
 	
-	double mejor_i_ant=500; //mejor de la iteracion anterior para calcular pendiente
+	double mejor_i_ant=500.0; //mejor de la iteracion anterior para calcular pendiente
 	double mejor_a; //mejor actual;
+	
+	vector<double> alet1;
+	vector<double> alet2;
+	//Inicializo con 0
+	for(size_t i=0;i<this->Enjambre[i].get_Pos().size();i++) { 
+		alet1.push_back(0);
+		alet2.push_back(0);
+	}
+	
 	while (i<max_it){
 		
 		for(size_t j=0;j<this->Vecindad.size();j++) {//Para cada vecindad 
@@ -151,15 +167,19 @@ void Swarm::Volar(int max_it,int id, bool vis){
 		mostrar_posiciones(id);
 		cout<<"mejor por vecindad "; mostrar(this->bestxvec); cout<<endl;
 		
+		generar(alet1, alet2);
+		
+		
 		for(size_t j=0;j<this->Vecindad.size();j++) { 
 			int ind_mejor_vecindad=this->bestxvec[j];
 			set<int>::iterator q=this->Vecindad[j].begin();
 			while(q!=this->Vecindad[j].end()) { 
 				//Actulizo la velocidad
+				this->Enjambre.at(*q).set_r(alet1,alet2);
 				this->Enjambre.at(*q).actualizar_vel(this->Enjambre.at(ind_mejor_vecindad).get_Pos());
 				//Actualizo la posicion
 				this->Enjambre.at(*q).actualizar_pos();
-				this->Enjambre.at(*q).set_fitness(fitness(id,Enjambre.at(*q).get_Pos()));
+				//this->Enjambre.at(*q).set_fitness(fitness(id,Enjambre.at(*q).get_Pos()));
 				q++;
 			}
 		}
@@ -167,8 +187,8 @@ void Swarm::Volar(int max_it,int id, bool vis){
 		//cout<<"Controlar contra este"<<endl;
 		
 		//recalculo todos los fitness
-		for(int i=0;i<this->Enjambre.size();i++) { 
-			this->func_obj.at(i)=fitness(id, this->Enjambre[i].get_Pos());
+		for(size_t k=0;k<this->Enjambre.size();k++) { 
+			this->func_obj.at(k)=fitness(id, this->Enjambre[k].get_Pos());
 			//cout<<this->func_obj.at(i)<<endl;
 		}
 		if(vis){
@@ -177,7 +197,7 @@ void Swarm::Volar(int max_it,int id, bool vis){
 		}
 		
 		mejor_a=*min_element(this->func_obj.begin(),this->func_obj.end());
-		if((mejor_a-mejor_i_ant)/mejor_a<0.1) {cout<<"corto en la iteracion"<<i<<endl; break;}
+		//if((mejor_a-mejor_i_ant)/mejor_a<0.1) {cout<<"corto en la iteracion"<<i<<endl; break;}
 			
 		i+=1; //Siguiente iteracion
 			
@@ -193,33 +213,7 @@ void Swarm::Volar(int max_it,int id, bool vis){
 }
 
 
-//void Swarm::mostrar_mejor_vecindad(int id){
-//	double mejor=10000; int mejor_i, v;
-//	for(size_t j=0;j<this->Vecindad.size();j++) {
-//		int mejor_v=this->bestxvec[j];
-//		if(fitness(id,this->Enjambre[mejor_v].get_Pos())<mejor){
-//			mejor=fitness(id,this->Enjambre[mejor_v].get_Pos());
-//			mejor_i=mejor_v;
-//			v=j;
-//		}
-//		mostrar(this->Enjambre[mejor_v].get_Pos());
-//	}
-//	cout<<endl<<"El mejor de todos es: "<<endl; mostrar(this->Enjambre[mejor_i].get_Pos());
-//}
-//
-//void Swarm::mejores_de_vecindad(int id){
-//	for(size_t j=0;j<this->Vecindad.size();j++) {
-//		int mejor_v=this->bestxvec[j];
-//		set<int>::iterator q=this->Vecindad[j].begin();
-//		while(q!=this->Vecindad[j].end()) { 
-//			if(fitness(id,this->Enjambre.at(*q).get_Pos())<fitness(id,this->Enjambre[mejor_v].get_Pos())){
-//				//actualizo la mejor posicion local (en el vecindario)
-//				this->bestxvec[j]=*q;
-//			}
-//			q++;
-//		}
-//	}
-//}
+
 void Swarm::mostrar_posiciones(int id){
 	for(size_t i=0;i<this->Vecindad.size();i++) { //recorro la vecindad
 		set<int>::iterator q=this->Vecindad[i].begin();

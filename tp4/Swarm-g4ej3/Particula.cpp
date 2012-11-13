@@ -10,7 +10,7 @@ void mostrar(vector<double> x){
 	}
 	cout<<endl;
 }
-Particula::Particula(double ac1,double ac2,vector<pair<double,double> > rango,int v0){
+Particula::Particula(double ac1,double ac2,vector<pair<double,double> > r,int v0){
 	/**
 	* @param ac1: aceleracion c1;
 	* @param ac2: aceleracion c2;
@@ -20,10 +20,11 @@ Particula::Particula(double ac1,double ac2,vector<pair<double,double> > rango,in
 	//incializo c1 y c2
 	this->c1=ac1;
 	this->c2=ac2;
+	this->rango=r;
 	
-	//inicializo r1 y r2
-	r1=(0+rand()%100)/100.0;
-	r2=(0+rand()%100)/100.0;
+//	//inicializo r1 y r2
+//	r1=(0+rand()%100)/100.0;
+//	r2=(0+rand()%100)/100.0;
 	
 	//Inicializo las posiciones aletoriamente
 	int dim=rango.size(); ///<dimension del problema a resolver
@@ -58,6 +59,11 @@ Particula::~Particula() {
 	
 }
 
+void Particula::set_r(vector<double> &a1, vector<double> &a2){
+	this->r1=a1;
+	this->r2=a2;
+}
+
 
 void Particula::actualizar_vel(vector<double> best_local){
 //	this->r1=(rand()%100)/100.0;
@@ -70,7 +76,7 @@ void Particula::actualizar_vel(vector<double> best_local){
 	
 	//this->Vel=sum(this->Vel,sum(prod_escalar(dml,coef1),prod_escalar(dmg,coef2)));
 	for(size_t i=0;i<Vel.size();i++) { 
-		Vel[i]=Vel[i]+c1*dml[i]+c2*dmg[i];
+		Vel[i]=Vel[i]+c1*this->r1[i]*(this->best_pers[i]-this->Pos[i])+c2*this->r2[i]*(best_local[i]-this->Pos[i]);
 	}
 //	cout<<"Muestro como se actualiza la velocidad "<<endl;
 //	mostrar(this->Vel);
@@ -78,10 +84,18 @@ void Particula::actualizar_vel(vector<double> best_local){
 } 
 
 void Particula::actualizar_pos(){
+	vector<double> P_viejo=this->Pos;
 	for(size_t i=0;i<this->Pos.size();i++) { 
 		Pos[i]+=Vel[i];
 	}
-
+	//Evaluo los rangos si se va de rango dejo el peso viejo
+	for(int i=0;i<this->rango.size();i++) { 
+		if(abs(Pos[i])>this->rango[i].second){
+			this->Pos=P_viejo;
+			break;
+		}
+	}
+	
 }
 void Particula::actualizar_best_pers(vector<double> &b){
 	this->best_pers=b;
