@@ -6,6 +6,7 @@
 #include <sstream>
 #include "utils.h"
 #include <limits>
+#include "func.h"
 using namespace std;
 
 template <class T>
@@ -17,12 +18,12 @@ void mostrar(vector<T> x){
 
 void generar(vector<double> &alet1, vector<double> &alet2){
 	for(size_t i=0;i<alet1.size();i++) { 
-		alet1[i]=rand()/(RAND_MAX+1.0);
-		alet2[i]=rand()/(RAND_MAX+1.0);
+		alet1[i]=(rand()%100)/100.0;
+		alet2[i]=(rand()%100)/100.0;
 	}
 }
 
-Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double> > rango, int v0, int overlap) {
+Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double> > r, int v0, int overlap) {
 	/**
 	@param cant_p: cantidad de particulas
 	@param cant_v: cantidad de vecindades
@@ -34,7 +35,7 @@ Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double
 	*/
 	srand(time(NULL));
 	int cantxv=cant_p/cant_v; //cantidad de particulas por vecindad
-	
+	this->rango=r;
 	for(int i=0;i<cant_v;i++) { //Inicializo las particulas 
 		set<int> temp; //guarda la vecindad
 		for(int j=0;j<cantxv;j++) { 
@@ -198,7 +199,11 @@ void Swarm::Volar(int max_it,int id, bool vis){
 		
 		mejor_a=*min_element(this->func_obj.begin(),this->func_obj.end());
 		//if((mejor_a-mejor_i_ant)/mejor_a<0.1) {cout<<"corto en la iteracion"<<i<<endl; break;}
-			
+		
+		if(evaluar_rad_norm()<0.0001) {mostrar_posiciones(id);cout<<"Corte en la iteracion "<<i<<endl; cout<<"El valor del radio es"<<evaluar_rad_norm()<<endl; break;}
+		
+		
+		
 		i+=1; //Siguiente iteracion
 			
 	}
@@ -252,5 +257,36 @@ void Swarm::graficar(int id){
 	}
 	plotter(ss.str());
 	cin.get();
+	
+}
+double Swarm::evaluar_rad_norm(){
+	double Rmax, DiameterS;
+	
+	int ind_p=0;
+	double fit_alto=this->func_obj.at(0);
+	for(int i=1;i<this->Enjambre.size();i++) { 
+/*		cout<<"fitness de la particula "<<i<<" "<<this->func_obj[i]<<endl;*/
+		if(this->func_obj[i]>fit_alto){
+			fit_alto=this->func_obj[i];
+			ind_p=i;
+		}
+	}
+	//Busco el mejor global
+	double mejor_f=this->func_obj.at(0); int ind_m=0;
+	for(int j=1;j<this->Enjambre.size();j++) { 
+		if(this->func_obj.at(j)<mejor_f){
+			mejor_f=this->func_obj.at(j);
+			ind_m=j;
+		}
+	}
+	
+	Rmax=norma(dif(this->Enjambre.at(ind_p).get_Pos(),this->Enjambre.at(ind_m).get_Pos()));
+	DiameterS=this->rango.at(0).second-this->rango.at(0).first;
+//	cout<<"DiameterS es "<<DiameterS<<endl;
+//	cout<<"La norma es "<<Rmax<<endl;
+//	cout<<"El peor es la particula "<<ind_p<<endl;
+//	cout<<"El mejor es la particula "<<ind_m<<endl;
+	
+	return Rmax/DiameterS;
 	
 }

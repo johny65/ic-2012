@@ -13,14 +13,16 @@ private:
 	vector<int> bestxvec; ///<vector que guarda el mejor por cada vecindario
 	vector<double> func_obj; ///<vector que guarda todos los fitness 
 	vector<set<int> > Vecindad;
+	vector<pair<double,double> > rango;
 	void mejores_de_vecindad(int id);
 	void graficar(int id);
 	GNUplot plotter;
 	void mejores_pos_vecindad(int);
+	double evaluar_rad_norm();
 public:
 	Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double> > rango, int v0, int overlap);
 	~Swarm();
-	double fitness(int id, vector<double> );
+	double fitness(int id, vector<double>);
 	void Volar(int,int,bool); ///<rutina principal del programa
 	void mostrar_posiciones(int);
 	void mostrar_mejor_vecindad(int id);

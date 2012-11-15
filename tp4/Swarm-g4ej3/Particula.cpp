@@ -34,7 +34,8 @@ Particula::Particula(double ac1,double ac2,vector<pair<double,double> > r,int v0
 	for(int i=0;i<dim;i++) { 
 		int sep=abs(rango[i].second-rango[i].first);
 		double p=rango[i].first+rand()%(sep);
-		this->Pos.push_back(p);
+		this->Pos.push_back(400+rand()%5);
+		//this->Pos.push_back(p);
 	}
 	
 	//incializacion de la velocidad

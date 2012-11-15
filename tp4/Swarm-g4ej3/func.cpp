@@ -185,3 +185,10 @@ double gaussiana(Punto &x, Punto &media, double sigma2)
 	double res = exp(-dist(x, media) / (2*sigma2));
 	return res;
 }
+double norma(vector<double> X){
+	double N=0;
+	for(int i=0;i<X.size();i++) { 
+		N+=pow(X[i],2);
+	}
+	return sqrt(N);
+}

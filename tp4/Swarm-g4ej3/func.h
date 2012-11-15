@@ -84,4 +84,6 @@ double signo(double valor);
  */
 double gaussiana(Punto &x, Punto &media, double sigma2);
 
+
+double norma(vector<double> X);
 #endif
