@@ -20,12 +20,12 @@ private:
 	void mejores_pos_vecindad(int);
 	double evaluar_rad_norm();
 public:
-	Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double> > rango, int v0, int overlap);
+	Swarm(int ,int ,double ,double ,vector<pair<double,double> > , int , int);
 	~Swarm();
-	double fitness(int id, vector<double>);
+	double fitness(int, vector<double>);
 	void Volar(int,int,bool); ///<rutina principal del programa
 	void mostrar_posiciones(int);
-	void mostrar_mejor_vecindad(int id);
+	void mostrar_mejor_vecindad(int );
 };
 
 #endif

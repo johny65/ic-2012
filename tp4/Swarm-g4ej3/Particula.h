@@ -15,16 +15,15 @@ private:
 	double fitness;
 	
 public:
-	Particula(double ac1,double ac2,vector<pair<double,double> > rango,int v0); ///< Aqui se incializa la velocidad,se fijan c1 y c2, rango guarda los rangos de busqueda para cada variable x,y,z...etc
+	Particula(double ,double ,vector<pair<double,double> > ,int ); ///< Aqui se incializa la velocidad,se fijan c1 y c2, rango guarda los rangos de busqueda para cada variable x,y,z...etc
 	~Particula();
-	void actualizar_vel(vector<double> best_local); ///<best_local es la mejor posicion en la vecindad(lbest) o global (gbest)
+	void actualizar_vel(vector<double> ); ///<best_local es la mejor posicion en la vecindad(lbest) o global (gbest)
 	void actualizar_pos();
-	void actualizar_best_pers(vector<double> &b);
+	void actualizar_best_pers();
 	void set_r(vector<double> &, vector<double> &);
 	vector<double> get_Pos();
 	vector<double> get_best_pers();
-	double get_fitness();
-	void set_fitness(double f);
+
 };
 
 #endif

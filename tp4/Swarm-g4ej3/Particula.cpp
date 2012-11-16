@@ -34,8 +34,8 @@ Particula::Particula(double ac1,double ac2,vector<pair<double,double> > r,int v0
 	for(int i=0;i<dim;i++) { 
 		int sep=abs(rango[i].second-rango[i].first);
 		double p=rango[i].first+rand()%(sep);
-		this->Pos.push_back(400+rand()%5);
-		//this->Pos.push_back(p);
+//		this->Pos.push_back(400+rand()%5);
+		this->Pos.push_back(p);
 	}
 	
 	//incializacion de la velocidad
@@ -77,7 +77,7 @@ void Particula::actualizar_vel(vector<double> best_local){
 	
 	//this->Vel=sum(this->Vel,sum(prod_escalar(dml,coef1),prod_escalar(dmg,coef2)));
 	for(size_t i=0;i<Vel.size();i++) { 
-		Vel[i]=Vel[i]+c1*this->r1[i]*(this->best_pers[i]-this->Pos[i])+c2*this->r2[i]*(best_local[i]-this->Pos[i]);
+		Vel[i]=0.9*Vel[i]+c1*this->r1[i]*(this->best_pers[i]-this->Pos[i])+c2*this->r2[i]*(best_local[i]-this->Pos[i]);
 	}
 //	cout<<"Muestro como se actualiza la velocidad "<<endl;
 //	mostrar(this->Vel);
@@ -91,15 +91,15 @@ void Particula::actualizar_pos(){
 	}
 	//Evaluo los rangos si se va de rango dejo el peso viejo
 	for(int i=0;i<this->rango.size();i++) { 
-		if(abs(Pos[i])>this->rango[i].second){
+		if((Pos[i]<this->rango[i].first)||(Pos[i]>this->rango[i].second)){
 			this->Pos=P_viejo;
 			break;
 		}
 	}
 	
 }
-void Particula::actualizar_best_pers(vector<double> &b){
-	this->best_pers=b;
+void Particula::actualizar_best_pers(){
+	this->best_pers=this->Pos;
 }
 
 vector<double> Particula::get_Pos(){
@@ -110,10 +110,5 @@ vector<double>Particula::get_best_pers(){
 	return this->best_pers;
 }
 
-double Particula::get_fitness(){
-	return this->fitness;
-}
 
-void Particula::set_fitness(double f){
-	this->fitness=f;
-}
+

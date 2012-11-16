@@ -26,7 +26,7 @@ void semilla(int cant_p, int cant_v, double c1, double c2, int solapa,int max_it
 
 int main (int argc, char *argv[]) {
 	
-	semilla(15,1,0.1,0.1,1,5000,1,1);
+	semilla(15,3,0.2,0.2,2,2000,1,0);
 	return 0;
 }
 
