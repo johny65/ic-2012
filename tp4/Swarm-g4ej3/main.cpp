@@ -9,11 +9,11 @@ void semilla(int cant_p, int cant_v, double c1, double c2, int solapa,int max_it
 	
 	switch(id){
 		case 1: a.first=-512; a.second=512;
-				 rango.push_back(a);
-				 break;
+			rango.push_back(a);
+			break;
 		case 2: a.first=0; a.second=20;
-				rango.push_back(a);
-				break;
+			rango.push_back(a);
+			break;
 		case 3:
 			a.first=-100; a.second=100;
 			rango.push_back(a); rango.push_back(a);

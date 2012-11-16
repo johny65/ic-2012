@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "GNUplot.h"
 
 using namespace std;
 
@@ -25,17 +26,38 @@ public:
     double fitness;
     
     Individuo() : fitness(0.0) {}
-    bool operator< (const Individuo &i) const { return fitness < i.fitness; }
+    bool operator< (const Individuo &i) const { return fitness > i.fitness; }
 };
 
 typedef vector<Individuo> Poblacion;
 
-Poblacion crear(int n, int l);
-void cruzar(Cromosoma &a, Cromosoma &b);
-void mutar(Cromosoma &a);
-Poblacion seleccionar(Poblacion &vieja);
 
-int bin2int(Cromosoma &c);
+class GA {
+private:
+    Poblacion poblacion; ///< Población de individuos
+    int N; ///< Cantidad de individuos en la población
+    int itmax; ///< Cantidad máxima de iteraciones
+    double pc, pm; ///< Probabilidad de cruza y mutación
+    int elite; ///< Cantidad de individuos que pasan directamente
+
+    void inicializar_poblacion(int n, int l);
+    void evaluar_fitness_poblacion();
+    void cruzar(Cromosoma &a, Cromosoma &b);
+    void mutar(Cromosoma &a);
+    Poblacion seleccionar(Poblacion &vieja);
+    double (*fitness_func)(Individuo&); ///< Función de fitness
+
+    //para gráficos:
+    GNUplot plotter;
+    vector<double> f_mejor, f_promedio, f_peor;
+    
+public:
+    GA(int n, int l);
+    void setFuncionFitness(double (*f)(Individuo&));
+    void setMaximasIteraciones(int it);
+    void Elitismo(int n);
+    Cromosoma Ejecutar();
+};
 
     
 #endif

@@ -3,49 +3,33 @@
 #include <string>
 #include <cstdlib>
 #include <cmath>
-#include "genetic.h"
+#include <limits>
 #include <algorithm>
-
-
+#include <sstream>
+#include "genetic.h"
+#include "func.h"
 
 using namespace std;
 
-double func(int x)
-{
-    return -x * sin(sqrt(fabs(x)));
-}
-
-double fitness_func(int x)
-{
-    return -func(x);
-}
-
-void evaluar_fitness(Poblacion &p)
-{
-    for (size_t i=0; i<p.size(); ++i){
-        p[i].fitness = fitness_func(bin2int(p[i].cromosoma));
-    }
-}
-
 int main(){
 
-    int maxiter = 100;
-    Poblacion v = crear(100, 10);
-    int it = 0;
-    while (it < maxiter){
-        evaluar_fitness(v);
-        Poblacion nueva = seleccionar(v);
-        for (int i=0; i<100; ++i){
-            cruzar(v[rand()%100].cromosoma, v[rand()%100].cromosoma);
-            mutar(v[rand()%100].cromosoma);
-        }
-        v = nueva;
-        it++;
-    }
-    
-    evaluar_fitness(v);
-    sort(v.begin(), v.end());
-    cout<<"Solución: "<<v[0].cromosoma<<endl<<bin2int(v[0].cromosoma)<<endl;
+    int maxiter = 1000;
 
+    //GA genetico(10, 13); //f1
+    GA genetico(10, 9); //f2
+    
+    cout<<"Inited\n";
+    genetico.setFuncionFitness(fitness2);
+    cout<<"Fitness listo\n";
+    genetico.setMaximasIteraciones(maxiter);
+    //genetico.Elitismo(1);
+    cout<<"Ejecutando...";cout.flush();
+    //double r = func2(decode(genetico.Ejecutar(), 6, false));
+
+    Individuo ii; ii.cromosoma = genetico.Ejecutar();
+    double r = -fitness2(ii);
+    //double r = -fitness2(genetico.Ejecutar());
+    cout<<"Solución: "<<r<<endl;
+    cin.get();
     return 0;
 }

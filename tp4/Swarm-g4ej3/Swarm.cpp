@@ -1,20 +1,21 @@
-#include "Swarm.h"
 #include <ctime>
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
 #include <sstream>
-#include "utils.h"
 #include <limits>
+#include "Swarm.h"
+#include "utils.h"
 #include "func.h"
+
 using namespace std;
 
 
 
 void generar(vector<double> &alet1, vector<double> &alet2){
 	for(size_t i=0;i<alet1.size();i++) { 
-		alet1[i]=(rand()%100)/100.0;
-		alet2[i]=(rand()%100)/100.0;
+		alet1[i]=rand()*1.0 / RAND_MAX;
+		alet2[i]=rand()*1.0 / RAND_MAX;
 	}
 }
 
@@ -194,7 +195,7 @@ void Swarm::Volar(int max_it,int id, bool vis){
 		if(evaluar_rad_norm()<0.001) {mostrar_posiciones(id);cout<<"Corte en la iteracion "<<i<<endl; cout<<"El valor del radio es"<<evaluar_rad_norm()<<endl; break;}
 		
 		i+=1; //Siguiente iteracion
-			
+		
 	}
 		
 		//cout<<endl<<"Finaliza por cantidad de iteraciones "<<endl<<endl;
