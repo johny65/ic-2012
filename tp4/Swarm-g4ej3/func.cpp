@@ -106,7 +106,7 @@ vector<Punto> k_means(vector<Punto> datos, int k)
 				plot(s2.str().c_str());
 			}
 		}
-		cin.get();
+		double();
 	
 
 	return centroides;

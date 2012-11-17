@@ -18,6 +18,18 @@ void semilla(int cant_p, int cant_v, double c1, double c2, int solapa,int max_it
 			a.first=-100; a.second=100;
 			rango.push_back(a); rango.push_back(a);
 			break;
+		case 4:
+			a.first=-5; a.second=5;
+			for (int i=0; i<4; i++){
+				rango.push_back(a);
+			}
+			break;
+		case 5:
+			a.first=-32; a.second=32;
+			for (int i=0; i<20; i++){
+				rango.push_back(a);
+			}
+			break;
 	}
 	
 	Swarm S(cant_p,cant_v,c1,c2,rango, 0, solapa);
@@ -26,7 +38,9 @@ void semilla(int cant_p, int cant_v, double c1, double c2, int solapa,int max_it
 
 int main (int argc, char *argv[]) {
 	
-	semilla(15,3,0.2,0.2,2,2000,1,0);
+	//semilla(15,3,0.2,0.2,2,2000,1,0);
+	semilla(150,1,2,2,0,1000,5,false);
+	
 	return 0;
 }
 

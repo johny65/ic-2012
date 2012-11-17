@@ -24,14 +24,7 @@ long_line_behaviour=1
 long_line_column=79
 
 [files]
-current_page=2
-FILE_NAME_0=491;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2FSwarm-g4ej3%2Fmain.cpp;0;4
-FILE_NAME_1=420;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2FSwarm-g4ej3%2FSwarm.h;0;4
-FILE_NAME_2=8377;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2FSwarm-g4ej3%2FSwarm.cpp;0;4
-FILE_NAME_3=2539;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2FSwarm-g4ej3%2FParticula.cpp;0;4
-FILE_NAME_4=168;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2FSwarm-g4ej3%2FParticula.h;0;4
-FILE_NAME_5=1926;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2FSwarm-g4ej3%2Ffunc.h;0;4
-FILE_NAME_6=3780;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2FSwarm-g4ej3%2Ffunc.cpp;0;4
+current_page=-1
 
 [VTE]
 last_dir=/home/johny/Documentos/ic/tp4/Swarm-g4ej3

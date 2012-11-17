@@ -3,6 +3,7 @@
 #include "func.h"
 #include <vector>
 #include <iostream>
+
 using namespace std;
 void mostrar(vector<double> x){
 	for(size_t i=0;i<x.size();i++) { 
@@ -60,9 +61,10 @@ Particula::~Particula() {
 	
 }
 
-void Particula::set_r(vector<double> &a1, vector<double> &a2){
+void Particula::set_r(vector<double> &a1, vector<double> &a2, double w){
 	this->r1=a1;
 	this->r2=a2;
+	this->w = w;
 }
 
 
@@ -77,7 +79,7 @@ void Particula::actualizar_vel(vector<double> best_local){
 	
 	//this->Vel=sum(this->Vel,sum(prod_escalar(dml,coef1),prod_escalar(dmg,coef2)));
 	for(size_t i=0;i<Vel.size();i++) { 
-		Vel[i]=0.9*Vel[i]+c1*this->r1[i]*(this->best_pers[i]-this->Pos[i])+c2*this->r2[i]*(best_local[i]-this->Pos[i]);
+		Vel[i]=this->w*Vel[i]+c1*this->r1[i]*(this->best_pers[i]-this->Pos[i])+c2*this->r2[i]*(best_local[i]-this->Pos[i]);
 	}
 //	cout<<"Muestro como se actualiza la velocidad "<<endl;
 //	mostrar(this->Vel);

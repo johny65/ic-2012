@@ -8,9 +8,46 @@
 #include "utils.h"
 #include "func.h"
 
+#include <iomanip>
 using namespace std;
 
 
+double ackley(vector<double> &val)
+{
+    int n = val.size();
+   double s1 = 0.0, s2 = 0.0;
+    for (int i=0; i<n; ++i){
+		s1 += val[i]*val[i];
+		s2 += cos(2*M_PI*val[i]);
+    }
+	double r= -20*exp(-0.2*sqrt(s1/n))-exp(s2/n)+20+exp(1);
+	//if (r != r){
+	/*	for (int i=0; i<n; i++){
+			cout<<val[i]<<endl;
+		}*/
+		//cout<<"r: "<<r<<endl;
+		//cin.get();
+
+	//}
+   //return -20*exp(-0.2*sqrt(s1/n))-exp(s2/n)+20+exp(1);
+	return r;
+
+}
+
+
+double kowalik(vector<double> &val)
+{
+	double r=0.0;
+	double a[]= {0.1957, 0.1947, 0.1735, 0.16, 0.0844, 0.0627, 0.0456, 0.0342, 0.0323, 0.0235, 0.0246};
+	double b[]= {0.25, 0.5, 1, 2, 4, 6, 8, 10, 12, 14, 16};
+	
+	for(int i=0; i<11; i++){
+		double aux= a[i]-(val[0]*(1+val[1]*b[i]))/(1+val[2]*b[i]+val[3]*b[i]);
+		r+= (aux*aux);
+	}
+	return r;
+	
+}
 
 void generar(vector<double> &alet1, vector<double> &alet2){
 	for(size_t i=0;i<alet1.size();i++) { 
@@ -22,7 +59,7 @@ void generar(vector<double> &alet1, vector<double> &alet2){
 template <class T>
 void mostrar(vector<T> x){
 	for(size_t i=0;i<x.size();i++) { 
-		cout<<x[i]<<", ";
+		cout<<setw(6)<<fixed<<x[i]<<", ";
 	}
 }
 
@@ -105,12 +142,16 @@ double Swarm::fitness(int id, vector<double> P){
 	
 	
 	switch(id){
-	case 1: z=-x*sin(sqrt(abs(x)));
-		break;
-	case 2: z=x + 5*sin(3*x) + 8*cos(5*x);
-		break;
-	case 3: int y=P[1]; z= pow(pow(x,2)+pow(y,2),0.25)*(pow(sin(50*(pow(pow(x,2)+pow(y,2),0.1))),2)+1);
-		break;
+	case 1: {z=-x*sin(sqrt(abs(x)));
+		break;}
+	case 2: {z=x + 5*sin(3*x) + 8*cos(5*x);
+		break;}
+	case 3: {int y=P[1]; z= pow(pow(x,2)+pow(y,2),0.25)*(pow(sin(50*(pow(pow(x,2)+pow(y,2),0.1))),2)+1);
+		break;}
+	case 4: {z=kowalik(P);	
+		break;}
+	case 5: {z=ackley(P);
+		break;}
 	}
 	return z;
 }
@@ -140,7 +181,7 @@ void Swarm::Volar(int max_it,int id, bool vis){
 	}
 	
 	while (i<max_it){
-		
+		cout <<"Iteración: "<<i<<endl;
 		for(size_t j=0;j<this->Vecindad.size();j++) {//Para cada vecindad 
 			set<int>::iterator q=this->Vecindad[j].begin();
 			while(q!=this->Vecindad[j].end()){
@@ -162,25 +203,43 @@ void Swarm::Volar(int max_it,int id, bool vis){
 				}
 				q++;
 			}
-		}
-		mostrar_posiciones(id);
-		cout<<"mejor por vecindad "; mostrar(this->bestxvec); cout<<endl;
-		
-		generar(alet1, alet2);
-		
-		 
-		for(size_t j=0;j<this->Vecindad.size();j++) { 
+
+			for(size_t k=0;k<this->Enjambre.size();k++) { 
+				this->func_obj.at(k)=fitness(id, this->Enjambre[k].get_Pos());
+			}
+
 			int ind_mejor_vecindad=this->bestxvec[j];
-			set<int>::iterator q=this->Vecindad[j].begin();
+			q=this->Vecindad[j].begin();
+			generar(alet1, alet2);
+			double w = 0.8 * (max_it - i)/max_it + 0.1;
 			while(q!=this->Vecindad[j].end()) { 
 				//Actulizo la velocidad
-				this->Enjambre.at(*q).set_r(alet1,alet2);
+				this->Enjambre.at(*q).set_r(alet1, alet2, w);
 				this->Enjambre.at(*q).actualizar_vel(this->Enjambre.at(ind_mejor_vecindad).get_Pos());
 				//Actualizo la posicion
 				this->Enjambre.at(*q).actualizar_pos();
 				q++;
 			}
 		}
+		//mostrar_posiciones(id);
+		//cout<<"mejor por vecindad "; mostrar(this->bestxvec); cout<<endl;
+		
+		//generar(alet1, alet2);
+		//double w = 0.8 * (max_it - i)/max_it + 0.1;
+
+	
+		//for(size_t j=0;j<this->Vecindad.size();j++) { 
+			//int ind_mejor_vecindad=this->bestxvec[j];
+			//set<int>::iterator q=this->Vecindad[j].begin();
+			//while(q!=this->Vecindad[j].end()) { 
+				//Actulizo la velocidad
+				//this->Enjambre.at(*q).set_r(alet1, alet2, w);
+				//this->Enjambre.at(*q).actualizar_vel(this->Enjambre.at(ind_mejor_vecindad).get_Pos());
+				//Actualizo la posicion
+				//this->Enjambre.at(*q).actualizar_pos();
+				//q++;
+			//}
+		//}
 		
 		//recalculo todos los fitness
 		for(size_t k=0;k<this->Enjambre.size();k++) { 
@@ -192,7 +251,7 @@ void Swarm::Volar(int max_it,int id, bool vis){
 		
 		mejor_a=*min_element(this->func_obj.begin(),this->func_obj.end());
 		
-		if(evaluar_rad_norm()<0.001) {mostrar_posiciones(id);cout<<"Corte en la iteracion "<<i<<endl; cout<<"El valor del radio es"<<evaluar_rad_norm()<<endl; break;}
+		//if(evaluar_rad_norm()<0.0001) {mostrar_posiciones(id);cout<<"Corte en la iteracion "<<i<<endl; cout<<"El valor del radio es"<<evaluar_rad_norm()<<endl; break;}
 		
 		i+=1; //Siguiente iteracion
 		
@@ -246,6 +305,8 @@ void Swarm::graficar(int id){
 		crear_datos(this->Enjambre,this->func_obj, "datos");
 		ss<<"replot \"datos\" with points \n";
 	}
+	if (id==4)
+		printf("\n");
 	plotter(ss.str());
 	cin.get();
 	
@@ -274,7 +335,7 @@ double Swarm::evaluar_rad_norm(){
 	Rmax=norma(dif(this->Enjambre.at(ind_p).get_Pos(),this->Enjambre.at(ind_m).get_Pos()));
 	DiameterS=this->rango.at(0).second-this->rango.at(0).first;
 //	cout<<"DiameterS es "<<DiameterS<<endl;
-	cout<<"La norma es "<<Rmax<<endl;
+	//cout<<"La norma es "<<Rmax<<endl;
 //	cout<<"El peor es la particula "<<ind_p<<endl;
 //	cout<<"El mejor es la particula "<<ind_m<<endl;
 	

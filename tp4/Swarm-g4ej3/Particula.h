@@ -12,6 +12,7 @@ private:
 	vector<pair<double,double> > rango;
 	double c1,c2; ///<aceleraciones para las dos componentes de velocidad
 	vector<double> r1,r2;///<numeros aletorios para la act de la velocidad
+	double w;
 	double fitness;
 	
 public:
@@ -20,7 +21,7 @@ public:
 	void actualizar_vel(vector<double> ); ///<best_local es la mejor posicion en la vecindad(lbest) o global (gbest)
 	void actualizar_pos();
 	void actualizar_best_pers();
-	void set_r(vector<double> &, vector<double> &);
+	void set_r(vector<double> &, vector<double> &, double w);
 	vector<double> get_Pos();
 	vector<double> get_best_pers();
 
