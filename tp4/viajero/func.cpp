@@ -76,32 +76,17 @@ double func1(double x)
 
 
 /**
- * @brief Decodificación para Función 1.
- *
- * 10 bits parte entera.
- */
-double var1(Cromosoma &c)
-{
-	return decode(c, 10, true);
-}
-
-
-/**
  * @brief Función de fitness para la Función 1.
- *
- * Valores de x en el rango [-512,512].
  */
 double fitness1(Individuo &i)
 {
-    double x = var1(i.cromosoma);
+    double x = decode(i.cromosoma, 10, true);
     return -func1(x);
 }
 
 
 /**
  * @brief Función 2. Mínimo: -9.4338 en x = 1.8270
- *
- * Valores de x en el rango [0,20].
  */
 double func2(double x)
 {
@@ -110,30 +95,17 @@ double func2(double x)
 
 
 /**
- * @brief Decodificación para Función 2.
- *
- * 5 bits parte entera, limitando hasta 20.
- */
-double var2(Cromosoma &c)
-{
-	return fmod(decode(c, 5, false), 21.0);
-}
-
-
-/**
  * @brief Función de fitness para la Función 2.
  */
 double fitness2(Individuo &i)
 {
-    double x = var2(i.cromosoma);
+    double x = decode(i.cromosoma, 6, false);
     return -func2(x);
 }
 
 
 /**
- * @brief Función 3. Mínimo: 0.0 en (x,y) = 0.
- *
- * Valores de x,y en el rango [-100,100].
+ * @brief Función 3. Mínimo: 
  */
 double func3(double x, double y)
 {
@@ -144,27 +116,19 @@ double func3(double x, double y)
 
 
 /**
- * @brief Decodificación para Función 3.
- */
-pair<double, double> var3(Cromosoma &c)
-{
-	//8 bits parte entera (7 -> 128, 8 para -128,128)
-    //3 bits decimal
-    //total l = 8+3+8+3 = 11+11 = 22
-
-    double x = decode(c.begin(), c.begin()+8, 8, true);
-    double y = decode(c.begin()+11, c.end(), 8, true);
-    return make_pair<double, double>(x, y);
-}
-
-
-/**
  * @brief Función de fitness para la Función 3.
  */
 double fitness3(Individuo &i)
 {
-    pair<double, double> val = var3(i.cromosoma);
-    double x = val.first;
-    double y = val.second;
-    return -func3(x, y);
+    //8 bits parte entera (7 -> 128, 8 para -128,128)
+    //3 bits decimal
+    //total l = 8+3+8+3 = 11+11 = 22
+    Cromosoma &c = i.cromosoma;
+    double x = decode(c.begin(), c.begin()+2, 3, true);
+    double y = decode(c.begin()+2, c.end(), 3, true);
+    //cout<<x<<" "<<y<<endl;
+    //if (x < -100 || x > 100 || y < -100 || y > 100)
+		//return -numeric_limits<double>::min();
+    //else
+		return -func3(x, y);
 }

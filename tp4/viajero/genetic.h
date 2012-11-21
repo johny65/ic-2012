@@ -11,14 +11,10 @@ using namespace std;
  * @file genetic.h
  * @brief Funciones para algoritmos genéticos.
  *
- * Cada cromosoma es un string (cadena de caracteres, donde cada caracter sería
- * un gen). La población es un vector de strings.
- * Las funciones están hechas asumiendo que los alelos disponibles son '0' y '1'
- * (es decir cadenas binarias).
+ * Cada cromosoma es un vector de valores enteros.
  */
 
-typedef char Gen;
-typedef string Cromosoma;
+typedef vector<int> Cromosoma;
 
 
 /**
@@ -40,6 +36,12 @@ public:
 typedef vector<Individuo> Poblacion;
 
 
+enum TipoCruza {
+	PartialMatchingCrossover,
+	OrderCrossover,
+	CycleCrossover
+};
+
 /**
  * @class GA
  * Clase principal para ejecutar el algoritmo genético.
@@ -51,6 +53,7 @@ private:
     int itmax; ///< Cantidad máxima de iteraciones
     double pc, pm; ///< Probabilidad de cruza y mutación
     int elite; ///< Cantidad de individuos que pasan directamente
+    TipoCruza tipo_cruza; ///< Operador de cruza
 
     void inicializar_poblacion(int n, int l);
     void evaluar_fitness_poblacion();
@@ -69,8 +72,6 @@ public:
     void setFuncionFitness(double (*f)(Individuo&));
     void setMaximasIteraciones(int it);
     void Elitismo(int n);
-    void setProbabilidadCruza(double pc);
-    void setProbabilidadMutacion(double pm);
     Cromosoma Ejecutar();
 };
 

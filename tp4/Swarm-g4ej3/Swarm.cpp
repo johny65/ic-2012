@@ -107,7 +107,7 @@ Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double
 	for(size_t i=0;i<this->Vecindad.size();i++) { 
 		this->bestxvec.push_back(*(this->Vecindad[i].begin()));
 	}
-
+	
 }
 
 void Swarm::mejores_pos_vecindad(int id){

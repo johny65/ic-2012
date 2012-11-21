@@ -1,5 +1,9 @@
 #include <iostream>
+#include <iterator>
 #include <cmath>
+#include <set>
+#include <map>
+#include <utility>
 #include <cstdio>
 #include <ctime>
 #include <cstdlib>
@@ -10,6 +14,8 @@
 #include "genetic.h"
 #include "utils.h"
 
+#define print(v) copy(v.begin(), v.end(), ostream_iterator<int>(cout, " "));\
+    cout<<endl
 
 using namespace std;
 
@@ -19,7 +25,8 @@ using namespace std;
  * @param n Cantidad de individuos que va a tener la población.
  * @param l Longitud de cada cromosoma.
  */
-GA::GA(int n, int l) : itmax(100), pc(0.9), pm(0.1), elite(0)
+GA::GA(int n, int l) : itmax(100), pc(0.9), pm(0.1), elite(0),
+	tipo_cruza(PartialMatchingCrossover)//PartialMatchingCrossover)
 {
     srand(time(NULL) + getpid());
     inicializar_poblacion(n, l);
@@ -44,6 +51,7 @@ Cromosoma GA::Ejecutar()
     int r1, r2;
     while (it < this->itmax){
         
+        //Poblacion nueva = seleccionar(this->poblacion);
         Poblacion nueva = seleccionar(this->poblacion);
 
         for (int i=0; i<this->N; ++i){
@@ -69,6 +77,10 @@ Cromosoma GA::Ejecutar()
         
         this->poblacion = nueva;
         it++;
+
+        if (!(it%1000)){
+			cout<<"Fitness promedio: "<<this->f_promedio.back()<<endl;
+		}
     }
     
     evaluar_fitness_poblacion();
@@ -87,19 +99,21 @@ Cromosoma GA::Ejecutar()
 void GA::inicializar_poblacion(int n, int l)
 {
     this->N = n;
-    int r, i, j;
-    this->poblacion = Poblacion(n);
-    Gen *s;
-    for (i=0; i<n; ++i){
-        s = new Gen[l+1];
-        for (j=0; j<l; ++j){
-            r = rand();
-            s[j] = (r%2 ? '0' : '1');
-        }
-        s[l] = '\0';
-        this->poblacion[i].cromosoma = s;
-        delete[] s;
-    }
+
+    //recorrido inicial trivial: 0, 1, 2, ...
+    Cromosoma c(l);
+    for (int i=0; i<l; ++i)
+		c[i] = i;
+	Individuo canon; canon.cromosoma = c;
+
+	//recorridos aleatorios:
+	
+    this->poblacion = Poblacion(n, canon);
+	for (int i=0; i<this->N; ++i){
+		Cromosoma &c = this->poblacion[i].cromosoma;
+		random_shuffle(c.begin(), c.end());
+	}
+	
 }
 
 
@@ -108,10 +122,122 @@ void GA::inicializar_poblacion(int n, int l)
  */
 void GA::cruzar(Cromosoma &a, Cromosoma &b)
 {
-    assert(a.size() == b.size());
+	assert(a.size() == b.size());
     int l = a.size();
-    int r = rand()%l; //locus aleatorio
-    swap_ranges(a.begin()+r, a.end(), b.begin()+r);
+	
+	switch (this->tipo_cruza){
+		
+		case PartialMatchingCrossover: {
+
+			int r1 = rand()%l, r2 = r1;
+			while (r2 == r1)
+				r2 = rand()%l;
+			if (r2 < r1) swap(r1, r2);
+
+			map<int, int> posa, posb;
+			for (int i=0; i<l; ++i){
+				posa.insert(make_pair(a[i], i));
+				posb.insert(make_pair(b[i], i));
+			}
+
+			Cromosoma anuevo(a), bnuevo(b);
+
+			int aux;
+			for (int i=r1; i<=r2; ++i){
+				aux = b[i];
+				swap(anuevo[i], anuevo[posa[aux]]);
+				aux = a[i];
+				swap(bnuevo[i], bnuevo[posb[aux]]);
+			}
+
+			a = anuevo;
+			b = bnuevo;
+
+			break;
+			
+		}
+
+		case CycleCrossover: {
+			
+			int r1 = rand()%(l+1), r2 = r1;
+			while (r2 == r1)
+				r2 = rand()%(l+1);
+			if (r2 < r1) swap(r1, r2);
+			
+			Cromosoma aux(b.begin()+r1, b.begin()+r2);
+			copy(a.begin()+r1, a.begin()+r2, b.begin()+r1);
+
+			//eliminar repetidos y llenar con aux:
+			set<int> s; unsigned int c = 0, iaux = 0;
+			for (int i=0; i<l; ++i){
+				s.insert(b[i]);
+				if (s.size() == c){ //repetido
+					while (s.size() == c){
+						b[i] = aux.at(iaux);
+						s.insert(b[i]);
+						iaux++;
+					}
+				}
+				c = s.size();
+			}
+
+			break;
+		}
+		case OrderCrossover: {
+
+			int r1 = rand()%(l+1), r2 = r1;
+			while (r2 == r1)
+				r2 = rand()%(l+1);
+			if (r2 < r1) swap(r1, r2);
+
+			//cout<<"A: "; print(a);
+			//cout<<"B: "; print(b);
+			//cout<<"r1: "<<r1<<" r2: "<<r2<<endl;
+			
+			int ib = r1+1, ia = r1+1;
+			set<int> sa, sb;
+			sa.insert(a.begin()+r1, a.begin()+r2);
+			sb.insert(b.begin()+r1, b.begin()+r2);
+			unsigned int ca = sa.size(), cb = sb.size();
+
+			//Cromosoma temp(a.begin()+r1, a.begin()+r2);
+			//cout<<"subcadena: "; print(temp);
+
+			Cromosoma anuevo(l, -1), bnuevo(l, -1);
+			copy(a.begin()+r1, a.begin()+r2, anuevo.begin()+r1);
+			copy(b.begin()+r1, b.begin()+r2, bnuevo.begin()+r1);
+			//cout<<"A nuevo: "; print(anuevo);
+			
+			for (int i=0; i<l; ++i){
+				if (anuevo[i] < 0){
+					while (sa.size() == ca){
+						sa.insert(b.at(ib%l));
+						ib++;
+					}
+					anuevo.at(i) = b.at((ib-1)%l);
+					ca = sa.size();
+				}
+				if (bnuevo[i] < 0){
+					while (sb.size() == cb){
+						sb.insert(a.at(ia%l));
+						ia++;
+					}
+					bnuevo.at(i) = a.at((ia-1)%l);
+					cb = sb.size();
+				}
+				
+			}
+
+			a = anuevo;
+			b = bnuevo;
+			//cout<<"Nuevo A: "; print(anuevo);
+			//cout<<"Nuevo B: "; print(b);
+			//cin.get();
+
+		}
+	}
+    
+    //cin.get();
 }
 
 
@@ -120,8 +246,12 @@ void GA::cruzar(Cromosoma &a, Cromosoma &b)
  */
 void GA::mutar(Cromosoma &a)
 {
-    int r = rand()%a.size();
-    a[r] = (a[r] == '0' ? '1' : '0');
+    int r1 = rand()%a.size();
+    int r2 = rand()%a.size();
+    Cromosoma::iterator it = a.begin()+r1;
+    int aux = *it;
+    a.erase(it);
+    a.insert(a.begin()+r2, aux);
 }
 
 
@@ -214,22 +344,4 @@ void GA::graficar()
     plotter("plot \"fmejor.dat\" with lines");
     plotter("replot \"fpeor.dat\" with lines");
     plotter("replot \"fprom.dat\" with lines");
-}
-
-
-/**
- * @brief Establece la probabilidad de cruza.
- */
-void GA::setProbabilidadCruza(double pc)
-{
-    this->pc = pc;
-}
-
-
-/**
- * @brief Establece la probabilidad de mutación.
- */
-void GA::setProbabilidadMutacion(double pm)
-{
-    this->pm = pm;
 }

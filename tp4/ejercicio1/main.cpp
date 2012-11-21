@@ -8,28 +8,111 @@
 #include <sstream>
 #include "genetic.h"
 #include "func.h"
+#include "argparser.h"
 
 using namespace std;
 
-int main(){
+int main(int argc, char **argv){
 
-    int maxiter = 1000;
-
-    //GA genetico(10, 13); //f1
-    GA genetico(10, 9); //f2
+	ArgParserNew(parser);
+	parser.opcion("maxiter", 'i', "Cantidad máxima de iteraciones", "100");
+	parser.opcion("ind", 'n', "Cantidad de individuos", "10");
+	parser.opcion("elite", 'e', "Elitismo", "1");
+	parser.opcion("func", 'f', "Función a probar", "1");
+    parser.opcion("pc", 'c', "Probabilidad de cruza", "0.9");
+    parser.opcion("pm", 'm', "Probabilidad de mutación", "0.1");
+    parser.opcion_bool("graf", 'g', "Graficar función");
+	parser.parsear(true);
     
-    cout<<"Inited\n";
-    genetico.setFuncionFitness(fitness2);
-    cout<<"Fitness listo\n";
-    genetico.setMaximasIteraciones(maxiter);
-    //genetico.Elitismo(1);
-    cout<<"Ejecutando...";cout.flush();
-    //double r = func2(decode(genetico.Ejecutar(), 6, false));
+    int maxiter = parser.get("maxiter");
+    int N = parser.get("ind");
+    int elite = parser.get("elite");
+    int funcnum = parser.get("func");
+    double pc = parser.get("pc");
+    double pm = parser.get("pm");
 
+    GNUplot p;
+    bool graf = parser.is("graf");
+
+    int L; //longitud del cromosoma
+    double (*f)(Individuo&); //puntero a función de fitness
+    
+    switch (funcnum) {
+        case 1: {
+            /*
+             * Función 1. Codificación:
+             * 
+             * Longitud total del cromosoma: 13 bits.
+             * 10 bits para la parte entera (de -512 a 512) y 3 bits para parte
+             * decimal.
+             */
+            L = 13;
+            f = fitness1;
+            if (graf)
+                p("plot [-512:512] -x * sin(sqrt(abs(x)))");
+            break;
+        }
+        case 2: {
+            /*
+             * Función 2. Codificación:
+             *
+             * Longitud total del cromosoma: 10 bits.
+             * 5 bits para la parte entera (de 0 a 31) y 5 bits parte decimal.
+             */
+            L = 10;
+            f = fitness2;
+            if (graf)
+                p("plot [0:20] x + 5*sin(3*x) + 8*cos(5*x)");
+            break;
+        }
+        case 3: {
+            /*
+             * Función 3. Codificación:
+             *
+             * 2 valores reales pegados.
+             * 8 bits parte entera (7 -> 128, 8 para -128,128)
+             * 3 bits decimal
+             * total l = 8+3+8+3 = 11+11 = 22
+             */
+            L = 22;
+            f = fitness3;
+            break;
+        }
+    }
+
+    GA genetico(N, L);
+    genetico.setProbabilidadCruza(pc);
+    genetico.setProbabilidadMutacion(pm);
+    genetico.setFuncionFitness(f);
+    genetico.setMaximasIteraciones(maxiter);
+    genetico.Elitismo(elite);
+    
+    cout<<"Ejecutando...";
+    cout<<"Función: "<<funcnum<<endl;
+	cout<<"Cantidad máxima de iteraciones: "<<maxiter<<endl;
+	cout<<"Cantidad de individuos: "<<N<<endl;
+	
+    
     Individuo ii; ii.cromosoma = genetico.Ejecutar();
-    double r = -fitness2(ii);
-    //double r = -fitness2(genetico.Ejecutar());
+    double r = -f(ii);
     cout<<"Solución: "<<r<<endl;
+
+    switch (funcnum) {
+        case 1: {
+            cout<<"Valor de x: "<<var1(ii.cromosoma)<<endl;
+            break;
+        }
+        case 2: {
+            cout<<"Valor de x: "<<var2(ii.cromosoma)<<endl;
+            break;
+        }
+        case 3: {
+            pair<double, double> val = var3(ii.cromosoma);
+            cout<<"En el punto ("<<val.first<<", "<<val.second<<")"<<endl;
+            break;
+        }
+    }
+    
     cin.get();
     return 0;
 }

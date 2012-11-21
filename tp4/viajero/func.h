@@ -22,13 +22,10 @@ int bin2dec(iterador inicio, iterador fin, bool neg);
 double decode(iterador inicio, iterador fin, int A, bool neg);
 double decode(const Cromosoma &c, int A, bool neg);
 double func1(double x);
-double var1(Cromosoma &c);
 double fitness1(Individuo &i);
 double func2(double x);
-double var2(Cromosoma &c);
 double fitness2(Individuo &i);
 double func3(double x);
-pair<double, double> var3(Cromosoma &c);
 double fitness3(Individuo &i);
 
 #endif
