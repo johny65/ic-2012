@@ -21,6 +21,7 @@ int main(int argc, char **argv){
 	parser.opcion("func", 'f', "Función a probar", "1");
     parser.opcion("pc", 'c', "Probabilidad de cruza", "0.9");
     parser.opcion("pm", 'm', "Probabilidad de mutación", "0.1");
+    parser.opcion("eta", 'd', "Constante para el gradiente descendiente", "0.2");
     parser.opcion_bool("graf", 'g', "Graficar función");
 	parser.parsear(true);
     
@@ -28,8 +29,8 @@ int main(int argc, char **argv){
     int N = parser.get("ind");
     int elite = parser.get("elite");
     int funcnum = parser.get("func");
-    double pc = parser.get("pc");
-    double pm = parser.get("pm");
+    double pc = parser.get_double("pc");
+    double pm = parser.get_double("pm");
 
     GNUplot p;
     bool graf = parser.is("graf");
@@ -76,6 +77,12 @@ int main(int argc, char **argv){
              */
             L = 22;
             f = fitness3;
+            if (graf){
+                string s = "set isosamples 100,100\n";
+                s += "set hidden3d\n";
+                s += "splot [-100:100][-100:100] (x**2 + y**2)**0.25 * ( sin(50 * (x**2+y**2)**0.1)**2 + 1)\n";
+                p(s);
+            }
             break;
         }
     }

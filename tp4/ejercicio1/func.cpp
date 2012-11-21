@@ -168,3 +168,58 @@ double fitness3(Individuo &i)
     double y = val.second;
     return -func3(x, y);
 }
+
+
+
+//para gradiente descendiente: -------------------------------------------
+
+
+X descent(X &inicio, double (*der)(X&), int maxiter, double eta)
+{
+	X x(inicio);
+	int it = 0;
+	while (it < maxiter){
+		double g = eta*der(x);
+		for (size_t i=0; i<x.size(); ++i){
+			x[i] -= g;
+		}
+		it++;
+	}
+	return x;
+}
+
+
+/**
+ * @brief Derivada de la Función 1.
+ */
+double derivada1(X &val)
+{
+	double &x = val[0];
+	double xx = pow(x*x, 1.0/4.0);
+	return (-1.0/2.0) * xx * cos(xx) - sin(xx);
+}
+
+
+/**
+ * @brief Derivada de la Función 2.
+ */
+double derivada2(X &val)
+{
+	double &x = val[0];
+	return 1 + 15 * cos(3*x)- 40*sin(5*x);
+}
+
+
+/**
+ * @brief Derivada de la Función 3.
+ */
+double derivada3(X &val)
+{
+	double &x = val[0];
+	double &y = val[1];
+
+	double xy = x*x + y*y;
+
+	return (0.5 * x * (1+pow(sin(50*pow(xy, 0.1)), 2))) / pow(xy, 0.75)
+		+ (10.0 * x * sin(100 * pow(xy, 0.1))) / pow(xy, 0.65);
+}
