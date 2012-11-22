@@ -132,7 +132,7 @@ int main(int argc, char **argv){
 	Individuo ii;
 	ii.cromosoma = genetico.Ejecutar();
 		
-	cout<<"Solución: "; print(ii.cromosoma);
+	//cout<<"Solución: "; print(ii.cromosoma);
 	cout<<"Costo total: "<<-fitness(ii)<<endl;
 	
 	while (true){}

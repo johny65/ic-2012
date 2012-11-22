@@ -26,7 +26,7 @@ using namespace std;
  * @param l Longitud de cada cromosoma.
  */
 GA::GA(int n, int l) : itmax(100), pc(0.9), pm(0.1), elite(0),
-	tipo_cruza(PartialMatchingCrossover)//PartialMatchingCrossover)
+	tipo_cruza(PartialMatchingCrossover)
 {
     srand(time(NULL) + getpid());
     inicializar_poblacion(n, l);
@@ -51,7 +51,6 @@ Cromosoma GA::Ejecutar()
     int r1, r2;
     while (it < this->itmax){
         
-        //Poblacion nueva = seleccionar(this->poblacion);
         Poblacion nueva = seleccionar(this->poblacion);
 
         for (int i=0; i<this->N; ++i){
@@ -156,33 +155,6 @@ void GA::cruzar(Cromosoma &a, Cromosoma &b)
 			break;
 			
 		}
-
-		case CycleCrossover: {
-			
-			int r1 = rand()%(l+1), r2 = r1;
-			while (r2 == r1)
-				r2 = rand()%(l+1);
-			if (r2 < r1) swap(r1, r2);
-			
-			Cromosoma aux(b.begin()+r1, b.begin()+r2);
-			copy(a.begin()+r1, a.begin()+r2, b.begin()+r1);
-
-			//eliminar repetidos y llenar con aux:
-			set<int> s; unsigned int c = 0, iaux = 0;
-			for (int i=0; i<l; ++i){
-				s.insert(b[i]);
-				if (s.size() == c){ //repetido
-					while (s.size() == c){
-						b[i] = aux.at(iaux);
-						s.insert(b[i]);
-						iaux++;
-					}
-				}
-				c = s.size();
-			}
-
-			break;
-		}
 		case OrderCrossover: {
 
 			int r1 = rand()%(l+1), r2 = r1;
@@ -233,7 +205,6 @@ void GA::cruzar(Cromosoma &a, Cromosoma &b)
 			//cout<<"Nuevo A: "; print(anuevo);
 			//cout<<"Nuevo B: "; print(b);
 			//cin.get();
-
 		}
 	}
     

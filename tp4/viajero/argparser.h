@@ -33,6 +33,7 @@ public:
     void opcion(const char *nombre, char opcion, const char *descripcion, const char *defecto);
     void parsear(bool mostrar_uso = true);
     int get(const char *nombre);
+    double get_double(const char *nombre);
     bool is(const char *nombre);
     void mostrar_ayuda();
     vector<const char*> get_sueltos();

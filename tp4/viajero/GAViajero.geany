@@ -14,7 +14,7 @@ indent_mode=2
 
 [project]
 name=GA Viajero
-base_path=/home/johny/Documentos/viajero/
+base_path=/home/johny/Documentos/ic/tp4/viajero/
 description=
 file_patterns=*.cpp;*.h;
 
@@ -23,15 +23,14 @@ long_line_behaviour=1
 long_line_column=79
 
 [files]
-current_page=4
-FILE_NAME_0=7898;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fviajero%2Fgenetic.cpp;0;4
-FILE_NAME_1=2425;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fviajero%2Fmain.cpp;0;4
-FILE_NAME_2=958;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fviajero%2Fgenetic.h;0;4
-FILE_NAME_3=82;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fviajero%2Fargparser.cpp;0;4
-FILE_NAME_4=1000;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fviajero%2Fargparser.h;0;4
+current_page=0
+FILE_NAME_0=0;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fviajero%2Fmain.cpp;0;4
+FILE_NAME_1=212;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Fmain.cpp;0;4
+FILE_NAME_2=3130;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fviajero%2Fgenetic.cpp;0;4
+FILE_NAME_3=816;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fviajero%2Fgenetic.h;0;4
 
 [VTE]
-last_dir=/home/johny/Documentos/viajero/bin
+last_dir=/home/johny/Documentos/ic/tp4/viajero/bin
 
 [gproject]
 source_patterns=*.c;*.C;*.cpp;*.cxx;*.c++;*.cc;

@@ -38,8 +38,7 @@ typedef vector<Individuo> Poblacion;
 
 enum TipoCruza {
 	PartialMatchingCrossover,
-	OrderCrossover,
-	CycleCrossover
+	OrderCrossover
 };
 
 /**

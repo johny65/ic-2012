@@ -75,6 +75,24 @@ int ArgParser::get(const char *nombre)
 	}
 }
 
+double ArgParser::get_double(const char *nombre)
+{
+	verificar_parseado();
+	string snombre(nombre);
+	map<string, string>::iterator it = this->data.find(snombre);
+	if (it == this->data.end()){
+		cerr<<"Error: No fue agregada una opción con el nombre \""<<snombre<<"\".\n";
+		abort();
+	}
+	else {
+		stringstream ss;
+		ss<<it->second;
+		double res;
+		ss>>res;
+		return res;
+	}
+}
+
 bool ArgParser::is(const char *nombre)
 {
 	verificar_parseado();
