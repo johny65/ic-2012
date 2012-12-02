@@ -1,32 +1,15 @@
 #ifndef FUNC_H
 #define FUNC_H
 
-/**
-	@file func.h Maneja todas las funciones matemáticas.
-*/
-
 #include <vector>
 #include <cmath>
 #include <ctime>
 
 using namespace std;
-typedef vector<double> Punto;
-
 
 /**
- * @brief Calcula la distancia euclídea entre 2 puntos de cualquier dimensión
- * (sin calcular la raíz cuadrada).
- */
-double dist(Punto a, Punto b);
-
-
-/**
- * @brief Algoritmo de k-means.
- * @param datos Vector con los puntos de datos de entrada.
- * @param k Cantidad de clústers.
- * @return Un vector con los k centroides (medias) calculados.
- */ 
-vector<Punto> k_means(vector<Punto> datos, int k);
+	@file func.h Maneja todas las funciones matemáticas utilizadas por la clase Perceptron.
+*/
 
 
 /**
@@ -64,26 +47,25 @@ double dot(const vector<double> &x, const vector<double> &y);
 
 
 /**
+ * @brief Función para recalcular los pesos del perceptrón.
+ * @param pv Pesos anteriores (viejos).
+ * @param tasa
+ * @param s Salida generada.
+ * @param se Salida esperada.
+ * @param datos Entradas.
+ */
+vector<double> recalcular_pesos(const vector<double>&, double, double, double, const vector<double>&);
+
+
+/**
  * @brief Calcula la energía de un vector (suma de los cuadrados).
  * @param s Vector.
  */
 double energia(const vector<double> &s);
 
 
-/**
- * @brief Función signo.
- */
-double signo(double valor);
+double signo(double valor, double a = 1.0);
+double sigmoide(double valor, double a = 1.0);
+double derivada_sigmoide(double valor, double a = 1.0);
 
-
-/**
- * @brief Función de base radial gaussiana.
- * @param x Punto a evaluar.
- * @param media Media para la gaussiana (mu).
- * @param sigma2 Varianza para la gaussiana (sigma cuadrado).
- */
-double gaussiana(Punto &x, Punto &media, double sigma2);
-
-
-double norma(vector<double> X);
 #endif

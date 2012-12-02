@@ -149,11 +149,10 @@ double func3(double x, double y)
 pair<double, double> var3(Cromosoma &c)
 {
 	//8 bits parte entera (7 -> 128, 8 para -128,128)
-    //3 bits decimal
-    //total l = 8+3+8+3 = 11+11 = 22
+    //10 bits decimal
 
     double x = decode(c.begin(), c.begin()+8, 8, true);
-    double y = decode(c.begin()+11, c.end(), 8, true);
+    double y = decode(c.begin()+16, c.end(), 8, true);
     return make_pair<double, double>(x, y);
 }
 

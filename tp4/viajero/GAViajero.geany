@@ -24,10 +24,9 @@ long_line_column=79
 
 [files]
 current_page=0
-FILE_NAME_0=0;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fviajero%2Fmain.cpp;0;4
-FILE_NAME_1=212;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Fmain.cpp;0;4
-FILE_NAME_2=3130;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fviajero%2Fgenetic.cpp;0;4
-FILE_NAME_3=816;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fviajero%2Fgenetic.h;0;4
+FILE_NAME_0=2550;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fviajero%2Fgenetic.cpp;0;4
+FILE_NAME_1=858;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fviajero%2Fgenetic.h;0;4
+FILE_NAME_2=2430;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fviajero%2Fmain.cpp;0;4
 
 [VTE]
 last_dir=/home/johny/Documentos/ic/tp4/viajero/bin

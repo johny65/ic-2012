@@ -9,7 +9,9 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
-#include "Particula.h"
+#include "GNUplot.h"
+
+
 using namespace std;
 
 /**
@@ -20,8 +22,8 @@ using namespace std;
 /**
  * @brief Rutina para leer un archivo csv.
  *
- * Lee todas las entradas más la salida deseada. No agrega la entrada del sesgo.
- * Las salidas deseadas las mete en un vector aparte.
+ * Lee todas las entradas más la salida deseada. La entrada del sesgo la agrega
+ * al principio. Las salidas deseadas las mete en un vector aparte.
  *
  * @param archivo Nombre del archivo que se va a leer.
  * @param sd Vector donde se guardarán las salidas deseadas.
@@ -29,10 +31,7 @@ using namespace std;
 */
 vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd);
 
-
-/**
- * @brief Lee un archivo csv pero no separa las salidas deseadas.
- */
+//no separa salidas deseada
 vector< vector<double> > leer_csv(const char *archivo);
 
 
@@ -69,6 +68,7 @@ void guardar_csv(const char *file, vector< vector<double> > &datos);
 */
 void pesos_a_archivo(vector< vector<double> > pesos); 
 
+void mostrar_sdcapa(vector<vector<double> > x);
 
 /**
 * @brief Recibe el nombre de un archivo y crea un vector con los pesos de una red.
@@ -76,7 +76,5 @@ void pesos_a_archivo(vector< vector<double> > pesos);
 * @param archivo Es el nombre del archivo del que se van a extraer los datos.
 */
 vector< vector<double> > pesos_desde_archivo(const char * archivo);
-
-void crear_datos(vector<Particula> &S,vector<double> &, const char *name);
 
 #endif

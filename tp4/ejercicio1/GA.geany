@@ -24,14 +24,12 @@ long_line_column=79
 
 [files]
 current_page=0
-FILE_NAME_0=2305;C++;0;16;0;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Fmain.cpp;0;4
-FILE_NAME_1=3377;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Ffunc.cpp;0;4
+FILE_NAME_0=1537;C++;0;16;0;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Fmain.cpp;0;4
+FILE_NAME_1=2002;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Ffunc.cpp;0;4
 FILE_NAME_2=775;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Ffunc.h;0;4
 FILE_NAME_3=1975;C++;0;16;0;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Fgenetic.h;0;4
-FILE_NAME_4=167;C++;0;16;0;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Fgenetic.cpp;0;4
+FILE_NAME_4=1818;C++;0;16;0;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Fgenetic.cpp;0;4
 FILE_NAME_5=2188;C++;0;16;0;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2Fgrad.cpp;0;4
-FILE_NAME_6=368;Make;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Fic%2Ftp4%2Fejercicio1%2FMakefile;0;4
-FILE_NAME_7=14065;C++;0;16;1;1;0;%2Fhome%2Fjohny%2FDocumentos%2Ftpf-ic%2FKH-Algorithm%2Fherd.cpp;0;4
 
 [VTE]
 last_dir=/home/johny/Documentos/ic/tp4/ejercicio1/bin

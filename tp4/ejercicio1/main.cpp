@@ -43,11 +43,11 @@ int main(int argc, char **argv){
             /*
              * Función 1. Codificación:
              * 
-             * Longitud total del cromosoma: 13 bits.
-             * 10 bits para la parte entera (de -512 a 512) y 3 bits para parte
+             * Longitud total del cromosoma: 20 bits.
+             * 10 bits para la parte entera (de -512 a 512) y 10 bits para parte
              * decimal.
              */
-            L = 13;
+            L = 20;
             f = fitness1;
             if (graf)
                 p("plot [-512:512] -x * sin(sqrt(abs(x)))");
@@ -57,10 +57,10 @@ int main(int argc, char **argv){
             /*
              * Función 2. Codificación:
              *
-             * Longitud total del cromosoma: 10 bits.
-             * 5 bits para la parte entera (de 0 a 31) y 5 bits parte decimal.
+             * Longitud total del cromosoma: 15 bits.
+             * 5 bits para la parte entera (de 0 a 31) y 10 bits parte decimal.
              */
-            L = 10;
+            L = 15;
             f = fitness2;
             if (graf)
                 p("plot [0:20] x + 5*sin(3*x) + 8*cos(5*x)");
@@ -72,10 +72,10 @@ int main(int argc, char **argv){
              *
              * 2 valores reales pegados.
              * 8 bits parte entera (7 -> 128, 8 para -128,128)
-             * 3 bits decimal
-             * total l = 8+3+8+3 = 11+11 = 22
+             * 10 bits decimal
+             * total l = 8+10+8+10 = 18+18 = 36
              */
-            L = 22;
+            L = 36;
             f = fitness3;
             if (graf){
                 string s = "set isosamples 100,100\n";

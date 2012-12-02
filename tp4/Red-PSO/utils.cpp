@@ -6,7 +6,7 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
-#include "utils.h"
+#include "GNUplot.h"
 
 using namespace std;
 
@@ -20,7 +20,7 @@ vector< vector<double> > leer_csv(const char *archivo, vector<double> &sd)
 	string linea, temp;
 	double val;
 	while (getline(in, linea)){
-		//aux.push_back(-1); //para las redes RBF no hay que poner el -1 en la entrada
+		aux.push_back(-1);
 		stringstream ss(linea);
 		while(getline(ss, temp, ',')){
 			stringstream ss2(temp);
@@ -46,7 +46,7 @@ vector< vector<double> > leer_csv(const char *archivo)
 	string linea, temp;
 	double val;
 	while (getline(in, linea)){
-		//aux.push_back(-1);
+		aux.push_back(-1);
 		stringstream ss(linea);
 		while(getline(ss, temp, ',')){
 			stringstream ss2(temp);
@@ -66,7 +66,7 @@ void crear_dat(vector<vector<double> > &v, const char *name)
 	vector<vector<double> >::iterator q=v.begin();
 	while(q!=v.end()){
 		int n=(*q).size();
-		for(int i=0;i<n;++i){
+		for(int i=1;i<n;++i){
 			if(i!=n-1) ss << ((*q)[i]) << " ";
 			else ss << ((*q)[i]) << endl;
 		}
@@ -75,6 +75,7 @@ void crear_dat(vector<vector<double> > &v, const char *name)
 	out<<"# archivo temporal usado para graficar los puntos de entrada en gnuplot\n";
 	out<<ss.str();
 	out.close();
+	
 }
 
 void crear_dat_vector(vector<double> &v, const char *name)
@@ -96,7 +97,7 @@ void guardar_csv(const char *file, vector< vector<double> > &datos)
 {
 	ofstream out(file, ios::trunc);
 	for (size_t i=0; i<datos.size(); ++i){
-		for (size_t j=0; j<datos[i].size()-1; ++j){
+		for (size_t j=1; j<datos[i].size()-1; ++j){
 			out<<datos[i][j]<<", ";
 		}
 		out<<datos[i].back()<<endl;
@@ -104,11 +105,23 @@ void guardar_csv(const char *file, vector< vector<double> > &datos)
 	out.close();
 }
 
+void mostrar_sdcapa(vector<vector<double> > x){
+	vector<vector<double> >::iterator q=x.begin();
+	
+	while(q!=x.end()){
+		for(size_t i=0;i<(*q).size();i++) { 
+			cout<<(*q)[i]<<" ";
+		}
+		cout<<endl;
+		q++;
+	}
+}
+
 void pesos_a_archivo(vector< vector<double> > pesos){
 	ofstream out("pesos.txt", ios::app);
 	std::ostringstream aux;
-	for (size_t i=0; i<pesos.size(); i++){
-		for (size_t j=0; j< pesos[i].size(); j++){
+	for (int i=0; i<pesos.size(); i++){
+		for (int j=0; j< pesos[i].size(); j++){
 				aux<<pesos[i][j]<<" ";
 		}
 		aux<<endl;
@@ -138,27 +151,3 @@ vector< vector<double> > pesos_desde_archivo(const char * archivo){
 	}
 	return pesos;
 }
-
-
-
-void crear_datos(vector<Particula> &S,vector<double> &fit, const char *name){
-	std::ostringstream ss;
-	ofstream out(name, ios::trunc);
-	for(int i=0;i<S.size();i++) { //Para cada vecindad genero un archivo con namei donde i=1,2,3... 
-		vector<double> P=S[i].get_Pos();
-		for(int k=0;k<P.size();k++) { 
-				ss<<P[k]<<" ";
-			}
-		ss<<fit[i]<<" \n";
-	}
-
-	
-	
-	out<<"# archivo temporal usado para graficar posicion de las particulas en gnuplot\n";
-	out<<ss.str();
-	out.close();
-	
-}
-
-
-

@@ -100,7 +100,7 @@ int main(int argc, char **argv){
 	vector< pair<int, int> > coord(N);
 	for (int i=0; i<N; ++i){
 		cin>>c>>x1>>x2;
-		coord[c] = make_pair(x1, x2);
+		coord.at(c-1) = make_pair(x1, x2);
 	}
 	for (int i=0; i<N; ++i){
 		for (int j=0; j<N; ++j){
@@ -132,7 +132,7 @@ int main(int argc, char **argv){
 	Individuo ii;
 	ii.cromosoma = genetico.Ejecutar();
 		
-	//cout<<"Solución: "; print(ii.cromosoma);
+	cout<<"Solución: "; print(ii.cromosoma);
 	cout<<"Costo total: "<<-fitness(ii)<<endl;
 	
 	while (true){}

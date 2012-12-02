@@ -38,9 +38,13 @@ void semilla(int cant_p, int cant_v, double c1, double c2, int solapa,int max_it
 
 int main (int argc, char *argv[]) {
 	
+
 	//semilla(15,3,0.2,0.2,2,2000,1,0);
-	semilla(150,1,2,2,0,1000,5,false);
+	//semilla(int cant_p, int cant_v, double c1, double c2, int solapa,int max_it, int id, bool vis){
+	semilla(10,3,2,2,
+		2, 100,3,0);
 	
+
 	return 0;
 }
 

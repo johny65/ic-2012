@@ -12,43 +12,6 @@
 using namespace std;
 
 
-double ackley(vector<double> &val)
-{
-    int n = val.size();
-   double s1 = 0.0, s2 = 0.0;
-    for (int i=0; i<n; ++i){
-		s1 += val[i]*val[i];
-		s2 += cos(2*M_PI*val[i]);
-    }
-	double r= -20*exp(-0.2*sqrt(s1/n))-exp(s2/n)+20+exp(1);
-	//if (r != r){
-	/*	for (int i=0; i<n; i++){
-			cout<<val[i]<<endl;
-		}*/
-		//cout<<"r: "<<r<<endl;
-		//cin.get();
-
-	//}
-   //return -20*exp(-0.2*sqrt(s1/n))-exp(s2/n)+20+exp(1);
-	return r;
-
-}
-
-
-double kowalik(vector<double> &val)
-{
-	double r=0.0;
-	double a[]= {0.1957, 0.1947, 0.1735, 0.16, 0.0844, 0.0627, 0.0456, 0.0342, 0.0323, 0.0235, 0.0246};
-	double b[]= {0.25, 0.5, 1, 2, 4, 6, 8, 10, 12, 14, 16};
-	
-	for(int i=0; i<11; i++){
-		double aux= a[i]-(val[0]*(1+val[1]*b[i]))/(1+val[2]*b[i]+val[3]*b[i]);
-		r+= (aux*aux);
-	}
-	return r;
-	
-}
-
 void generar(vector<double> &alet1, vector<double> &alet2){
 	for(size_t i=0;i<alet1.size();i++) { 
 		alet1[i]=rand()*1.0 / RAND_MAX;
@@ -107,7 +70,7 @@ Swarm::Swarm(int cant_p,int cant_v,double c1,double c2,vector<pair<double,double
 	for(size_t i=0;i<this->Vecindad.size();i++) { 
 		this->bestxvec.push_back(*(this->Vecindad[i].begin()));
 	}
-	
+
 }
 
 void Swarm::mejores_pos_vecindad(int id){
@@ -148,10 +111,10 @@ double Swarm::fitness(int id, vector<double> P){
 		break;}
 	case 3: {int y=P[1]; z= pow(pow(x,2)+pow(y,2),0.25)*(pow(sin(50*(pow(pow(x,2)+pow(y,2),0.1))),2)+1);
 		break;}
-	case 4: {z=kowalik(P);	
-		break;}
-	case 5: {z=ackley(P);
-		break;}
+	//case 4: {z=kowalik(P);	
+		//break;}
+	//case 5: {z=ackley(P);
+		//break;}
 	}
 	return z;
 }
